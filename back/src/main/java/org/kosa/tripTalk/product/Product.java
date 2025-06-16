@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.product;
 
+import java.time.LocalDateTime;
 import java.util.Locale.Category;
 
 import org.kosa.tripTalk.seller.Seller;
@@ -49,5 +50,11 @@ public class Product {
 
 	@Column(nullable = false)
 	private String address;
+	
+	@Column(nullable = false)
+    private LocalDateTime startDate;
+	
+	@Column(nullable = false)
+    private LocalDateTime endDate;
 
 }

@@ -1,10 +1,10 @@
-import jakarta.persistence.*;
-
-package com.example.triptalk.entity;
+package org.kosa.tripTalk.review;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.*;
+import org.kosa.tripTalk.product.Product;
+import org.kosa.tripTalk.user.User;
 
 @Entity
 @Table(name = "review")

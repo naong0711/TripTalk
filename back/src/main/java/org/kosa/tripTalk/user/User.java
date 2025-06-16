@@ -8,33 +8,48 @@ import java.time.*;
 
 @Entity
 @Table(name = "user")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class User {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(unique = true, nullable = false)
     private String userId;
 
-    @Column
+    @Column(nullable = false)
+    private String name;
+
+    @Column(unique = true, nullable = false)
     private String email;
 
-    @Column
+    @Column(nullable = false)
     private String password;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String nickname;
 
     @Enumerated(EnumType.STRING)
-    private String role;
+    private Role role;
 
-    @Column
+    @Column(nullable = false)
     private String phone;
 
     @Column
     private String loginType;
 
-    @Column
+    @Column(unique = true)
     private String socialId;
+    
+    
+    
+    public enum Role {
+      USER, SELLER, ADMIN
+  }
 
 }
+

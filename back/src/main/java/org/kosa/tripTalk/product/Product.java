@@ -1,10 +1,9 @@
-import jakarta.persistence.*;
-
-package com.example.triptalk.entity;
+package org.kosa.tripTalk.product;
 
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.*;
+import org.kosa.tripTalk.seller.Seller;
 
 @Entity
 @Table(name = "product")
@@ -14,10 +13,10 @@ public class Product {
     private Long id;
 
     @ManyToOne @JoinColumn(name = "seller_id")
-    private SellerProfile seller;
+    private Seller seller;
 
-    @ManyToOne @JoinColumn(name = "category_id")
-    private Category category;
+//    @ManyToOne @JoinColumn(name = "category_id")
+//    private Category category;
 
     @Column
     private String title;

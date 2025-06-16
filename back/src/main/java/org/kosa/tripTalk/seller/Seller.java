@@ -1,5 +1,6 @@
-import org.kosa.tripTalk.user.User;
+package org.kosa.tripTalk.seller;
 
+import org.kosa.tripTalk.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

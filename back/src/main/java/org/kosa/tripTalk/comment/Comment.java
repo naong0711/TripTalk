@@ -21,21 +21,28 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "comment")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class Comment {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.SEQUENCE)
+	private Long id;
 
-    @ManyToOne @JoinColumn(name = "tlog_id")
-    private TravelLog tlog;
+	@ManyToOne
+	@JoinColumn(name = "tlog_id")
+	private TravelLog tlog;
 
-    @ManyToOne @JoinColumn(name = "user_id")
-    private User user;
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 
-    @Column
-    private String content;
+	@Column(unique = true, nullable = false)
+	private String content;
 
-    @Column
-    private LocalDateTime createdAt;
+	@Column(unique = true, nullable = false)
+	private LocalDateTime createdAt;
 
 }

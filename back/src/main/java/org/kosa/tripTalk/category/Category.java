@@ -8,16 +8,17 @@ import java.time.*;
 @Table(name = "category")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Category {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id 
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @Column(unique = true)
-    private String name;
+    @Column(unique = true, nullable = false)
+    private String kind;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String description;
 
-    @Column
+    @Column(unique = true, nullable = false)
     private String iconUrl;
 
 }

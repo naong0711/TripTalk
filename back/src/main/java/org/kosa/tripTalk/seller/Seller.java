@@ -1,3 +1,4 @@
+package org.kosa.tripTalk.seller;
 import org.kosa.tripTalk.user.User;
 
 import jakarta.persistence.Column;
@@ -22,7 +23,7 @@ import lombok.Setter;
 public class Seller {
 
 	@OneToOne
-	@JoinColumn(name = "user_id", unique = true)
+	@JoinColumn(name = "user_id")
 	@Id
 	private User id;
 

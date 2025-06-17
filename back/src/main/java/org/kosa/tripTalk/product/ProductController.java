@@ -24,10 +24,10 @@ public class ProductController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-//	@GetMapping("/{id}")
-//	public ResponseEntity<?> getProduct(@PathVariable("id") Long id) {
-//		productService.getProduct();
-//		return ResponseEntity.ok();
-//		
-//	}
+	@GetMapping("/{id}")
+	public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long id) {
+		ProductResponseDTO response = productService.getProductById(id);
+		return ResponseEntity.ok(response);
+		
+	}
 }

@@ -21,11 +21,14 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Seller {
-
+	@Id
+    private Long id;
+	
 	@OneToOne
 	@JoinColumn(name = "user_id")
-	@Id
-	private User id;
+	//@Id
+	//private User id;
+	private User user;
 
 	@Column(unique = true)
 	private String businessNumber;

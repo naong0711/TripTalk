@@ -39,7 +39,6 @@ public class TravelLog {
     @JoinColumn(name = "category_id")
     private Category category;
 
-
     @Column
     private LocalDateTime createdAt;
 

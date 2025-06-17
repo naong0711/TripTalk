@@ -2,12 +2,11 @@ package org.kosa.tripTalk.travellog;
 
 import java.time.LocalDateTime;
 
+import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -36,8 +35,10 @@ public class TravelLog {
     @Column
     private String content;
 
-    @Enumerated(EnumType.STRING)
-    private String category;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
 
     @Column
     private LocalDateTime createdAt;

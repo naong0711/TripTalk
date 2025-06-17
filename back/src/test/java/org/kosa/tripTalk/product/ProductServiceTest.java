@@ -70,7 +70,7 @@ class ProductServiceTest {
     @DisplayName("정상적인 상품 등록이 성공해야 한다")
     void createProduct_success() {
         // given
-        ProductRequest request = ProductRequest.builder()
+        ProductRequestDTO request = ProductRequestDTO.builder()
                 .title("제주도 여행")
                 .description("힐링 3박 4일")
                 .address("제주특별자치도 제주시")

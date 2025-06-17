@@ -21,7 +21,7 @@ public class ProductService {
 	private final CategoryRepository categoryRepository;
 
 	@Transactional
-	public void create(ProductRequest request) {
+	public void create(ProductRequestDTO request) {
 		 // 1. 판매자 유저 조회
 		User sellerUser = userRepository.findById(request.getSellerId())
                 .orElseThrow(() -> new IllegalArgumentException("판매자 유저가 존재하지 않습니다."));

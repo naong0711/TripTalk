@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ProductRequest {
+public class ProductRequestDTO {
 	private String title;
     private String description;
     private String address;

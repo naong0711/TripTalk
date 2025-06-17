@@ -3,6 +3,8 @@ import org.kosa.tripTalk.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -22,10 +24,12 @@ import lombok.Setter;
 @Builder
 public class Seller {
 
+	@Id
+	private Long id;
+	
 	@OneToOne
 	@JoinColumn(name = "user_id")
-	@Id
-	private User id;
+	private User userId;
 
 	@Column(unique = true)
 	private String businessNumber;

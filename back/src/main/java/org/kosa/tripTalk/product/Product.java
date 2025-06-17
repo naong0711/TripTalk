@@ -1,8 +1,8 @@
 package org.kosa.tripTalk.product;
 
 import java.time.LocalDateTime;
-import java.util.Locale.Category;
 
+import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.seller.Seller;
 
 import jakarta.persistence.Column;
@@ -56,5 +56,6 @@ public class Product {
 	
 	@Column(nullable = false)
     private LocalDateTime endDate;
-
+	
+	
 }

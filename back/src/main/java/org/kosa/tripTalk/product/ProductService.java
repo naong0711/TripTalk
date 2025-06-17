@@ -27,7 +27,7 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("판매자 유저가 존재하지 않습니다."));
 		
 		// 2. 판매자 프로필 조회
-        Seller seller = sellerRepository.findById(sellerUser)
+        Seller seller = sellerRepository.findById(request.getSellerId())
                 .orElseThrow(() -> new IllegalArgumentException("판매자 프로필이 존재하지 않습니다."));
         
      // 3. 카테고리 조회

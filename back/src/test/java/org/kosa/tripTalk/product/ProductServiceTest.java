@@ -10,12 +10,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
+import org.kosa.tripTalk.common.dto.PageRequestDTO;
 import org.kosa.tripTalk.seller.Seller;
 import org.kosa.tripTalk.seller.SellerRepository;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -160,5 +165,35 @@ class ProductServiceTest {
 	        .containsExactlyInAnyOrder("제주도 여행", "부산 투어");
 	}
 	
-	
+	@Test
+	@DisplayName("상품 목록 페이징 조회 성공")
+	void getAllProducts_withPaging_success() {
+	    // given: 15개의 상품 등록
+	    for (int i = 1; i <= 15; i++) {
+	        productRepository.save(Product.builder()
+	                .title("상품" + i)
+	                .description("설명" + i)
+	                .address("주소" + i)
+	                .price(10000 * i)
+	                .startDate(LocalDateTime.now().plusDays(i))
+	                .endDate(LocalDateTime.now().plusDays(i + 2))
+	                .category(savedCategory)
+	                .seller(savedSeller)
+	                .build());
+	    }
+
+	    PageRequestDTO pageRequestDTO = new PageRequestDTO(1, 10, "");
+	    Pageable pageable = pageRequestDTO.toPageable();
+
+	    // when
+	    Page<ProductResponseDTO> result = productService.getAllProducts(pageable);
+
+	    // then
+	    assertThat(result.getContent()).hasSize(10);                 // 페이지 크기만큼 반환
+	    assertThat(result.getTotalElements()).isEqualTo(15);         // 전체 상품 수
+	    assertThat(result.getTotalPages()).isEqualTo(2);             // 총 2페이지
+	    assertThat(result.isFirst()).isTrue();                       // 첫 페이지
+	    assertThat(result.isLast()).isFalse();                       // 아직 마지막 아님
+	    assertThat(result.getContent().get(0).getPrice()).isEqualTo(10000); // 정렬 확인
+	}
 }

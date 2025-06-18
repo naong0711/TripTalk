@@ -56,5 +56,12 @@ public class Product {
 	@Column(nullable = false)
     private LocalDateTime endDate;
 	
-	
+	public void updateFromDTO(ProductRequestDTO dto) {
+	    this.title = dto.getTitle();
+	    this.description = dto.getDescription();
+	    this.address = dto.getAddress();
+	    this.price = dto.getPrice();
+	    this.startDate = dto.getStartDate();
+	    this.endDate = dto.getEndDate();
+	}
 }

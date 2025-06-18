@@ -106,7 +106,7 @@ class ProductServiceTest {
 	            .seller(savedSeller)
 	            .build());
 
-	    ProductUpdateRequestDTO updateDto = ProductUpdateRequestDTO.builder()
+	    ProductRequestDTO updateDto = ProductRequestDTO.builder()
 	            .title("수정된 제목")
 	            .description("수정된 설명")
 	            .address("부산 해운대")

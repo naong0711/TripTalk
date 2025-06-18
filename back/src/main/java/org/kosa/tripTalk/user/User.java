@@ -45,6 +45,9 @@ public class User {
     @Column(unique = true)
     private String socialId;
     
+    @Column(name = "email_verified")
+    private boolean emailVerified;
+    
     
     
     public enum Role {

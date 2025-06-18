@@ -28,7 +28,12 @@ public class SecurityConfig {
               .httpBasic(AbstractHttpConfigurer::disable) //httpBasic 인증 비활성화
               .formLogin(AbstractHttpConfigurer::disable) //스프링 시큐리티 기본 로그인 폼 비활성화
               .authorizeHttpRequests((authorize) -> authorize //요청경로 접근제어
-                      .requestMatchers("/api/user/register", "/", "/api/user/login").permitAll()
+                      .requestMatchers(
+                          "/api/user/register",
+                          "/",
+                          "/api/user/login",
+                          "/email/verify"
+                      ).permitAll()
                       .anyRequest().authenticated())
               .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
               // 폼 로그인은 현재 사용하지 않음         

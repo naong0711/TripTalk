@@ -10,21 +10,24 @@ import org.springframework.web.bind.annotation.*;
 public class PaymentController {
 
     private final PaymentService paymentService;
+    private final KakaoPayService kakaoPayService;
 
     @PostMapping("/create")
-    public ResponseEntity<PaymentResponse> create(@RequestBody PaymentRequest request) {
-        Payment payment = paymentService.createPayment(request);
+    public ResponseEntity<KakaoPayReadyResponse> create(@RequestBody PaymentRequest request) {
+        // DB에 결제 준비 상태로 저장
+        paymentService.createPayment(request);
 
-        PaymentResponse response = PaymentResponse.builder()
-                .id(payment.getId())
-                .transactionId(payment.getTransactionId())
-                .paymentMethod(payment.getPaymentMethod())
-                .amount(payment.getAmount())
-                .status(payment.getStatus())
-                .paymentDate(payment.getPaymentDate())
-                .refundDate(payment.getRefundDate())
-                .build();
+        // 카카오페이 결제 요청
+        KakaoPayReadyResponse response = kakaoPayService.kakaoPayReady(request);
 
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/approve")
+    public ResponseEntity<KakaoPayApproveResponse> approve(@RequestParam("pg_token") String pgToken) {
+        KakaoPayApproveResponse response = kakaoPayService.kakaoPayApprove(pgToken);
+
+        // 결제 승인 이후 상태 업데이트 등은 필요시 여기에 추가
         return ResponseEntity.ok(response);
     }
 

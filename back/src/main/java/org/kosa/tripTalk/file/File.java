@@ -34,7 +34,7 @@ public class File {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
-    @Column(nullable = false)
+    @Column(name = "is_thumbnail", nullable = false)
     private boolean isThumbnail; // 썸네일 여부 (nullable 허용)
 }
 

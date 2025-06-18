@@ -38,16 +38,7 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
         
      // 4. 상품 생성 및 저장
-        Product product = Product.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .address(request.getAddress())
-                .price(request.getPrice())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .seller(seller)
-                .category(category)
-                .build();
+        Product product = request.toEntity(seller, category);
         
         productRepository.save(product);
 	}

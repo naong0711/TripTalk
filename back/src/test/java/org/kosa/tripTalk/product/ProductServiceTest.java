@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @DisplayName("상품 테스트")
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 class ProductServiceTest {
 
 	@Autowired
@@ -67,7 +68,7 @@ class ProductServiceTest {
     }
 	
 	@Test
-    @DisplayName("정상적인 상품 등록이 성공해야 한다")
+    @DisplayName("정상 상품 등록")
     void createProduct_success() {
         // given
         ProductRequestDTO request = ProductRequestDTO.builder()
@@ -90,4 +91,37 @@ class ProductServiceTest {
         assertThat(result.get(0).getTitle()).isEqualTo("제주도 여행");
     }
 
+	@Test
+	@DisplayName("상품 정상 수정")
+	void updateProduct_success() {
+	    // given
+	    Product savedProduct = productRepository.save(Product.builder()
+	            .title("기존 제목")
+	            .description("기존 설명")
+	            .address("서울시 강남구")
+	            .price(100000)
+	            .startDate(LocalDateTime.now().plusDays(5))
+	            .endDate(LocalDateTime.now().plusDays(7))
+	            .category(savedCategory)
+	            .seller(savedSeller)
+	            .build());
+
+	    ProductUpdateRequestDTO updateDto = ProductUpdateRequestDTO.builder()
+	            .title("수정된 제목")
+	            .description("수정된 설명")
+	            .address("부산 해운대")
+	            .price(200000)
+	            .startDate(LocalDateTime.now().plusDays(10))
+	            .endDate(LocalDateTime.now().plusDays(13))
+	            .build();
+
+	    // when
+	    productService.update(savedProduct.getId(), updateDto);
+
+	    // then
+	    Product updatedProduct = productRepository.findById(savedProduct.getId()).orElseThrow();
+	    assertThat(updatedProduct.getTitle()).isEqualTo("수정된 제목");
+	    assertThat(updatedProduct.getAddress()).isEqualTo("부산 해운대");
+	    assertThat(updatedProduct.getPrice()).isEqualTo(200000);
+	}
 }

@@ -131,43 +131,8 @@ class ProductServiceTest {
 	}
 	
 	@Test
-	@DisplayName("상품 목록 조회")
-	void getAllProducts_success() {
-	    // given
-	    productRepository.save(Product.builder()
-	            .title("제주도 여행")
-	            .description("3박 4일 힐링")
-	            .address("제주")
-	            .price(300000)
-	            .startDate(LocalDateTime.now().plusDays(3))
-	            .endDate(LocalDateTime.now().plusDays(6))
-	            .category(savedCategory)
-	            .seller(savedSeller)
-	            .build());
-
-	    productRepository.save(Product.builder()
-	            .title("부산 투어")
-	            .description("2박 3일 먹방")
-	            .address("부산")
-	            .price(250000)
-	            .startDate(LocalDateTime.now().plusDays(2))
-	            .endDate(LocalDateTime.now().plusDays(4))
-	            .category(savedCategory)
-	            .seller(savedSeller)
-	            .build());
-
-	    // when
-	    List<ProductResponseDTO> result = productService.getAllProducts();
-
-	    // then
-	    assertThat(result).hasSize(2);
-	    assertThat(result).extracting("title")
-	        .containsExactlyInAnyOrder("제주도 여행", "부산 투어");
-	}
-	
-	@Test
-	@DisplayName("상품 목록 페이징 조회 성공")
-	void getAllProducts_withPaging_success() {
+	@DisplayName("상품 목록 페이징 + 정렬 조회 성공")
+	void getAllProducts_withPagingAndSorting_success() {
 	    // given: 15개의 상품 등록
 	    for (int i = 1; i <= 15; i++) {
 	        productRepository.save(Product.builder()
@@ -182,7 +147,7 @@ class ProductServiceTest {
 	                .build());
 	    }
 
-	    PageRequestDTO pageRequestDTO = new PageRequestDTO(1, 10, "");
+	    PageRequestDTO pageRequestDTO = new PageRequestDTO(1, 10, "price,asc");
 	    Pageable pageable = pageRequestDTO.toPageable();
 
 	    // when

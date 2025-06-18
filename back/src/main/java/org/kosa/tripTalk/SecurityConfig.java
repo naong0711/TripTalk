@@ -19,18 +19,18 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final UserService userService;
   private final JwtUtil jwtUtil;
   
   //스프링 시큐리티 설정
   @Bean
-  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+  public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
       http    .csrf(csrf -> csrf.disable()) //csrt 보호 비활성화
               .httpBasic(AbstractHttpConfigurer::disable) //httpBasic 인증 비활성화
               .formLogin(AbstractHttpConfigurer::disable) //스프링 시큐리티 기본 로그인 폼 비활성화
               .authorizeHttpRequests((authorize) -> authorize //요청경로 접근제어
-                      .requestMatchers("/api/user/signup", "/", "/api/user/login").permitAll()
+                      .requestMatchers("/api/user/register", "/", "/api/user/login").permitAll()
                       .anyRequest().authenticated())
+              .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
               // 폼 로그인은 현재 사용하지 않음         
 //            .formLogin(formLogin -> formLogin
 //                    .loginPage("/login")
@@ -40,11 +40,7 @@ public class SecurityConfig {
                       .invalidateHttpSession(true))
               .sessionManagement(session -> session //세션 삭제
                   .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-      
-      //jwt 토큰 설정
-      http    .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),
-                   UsernamePasswordAuthenticationFilter.class);
-      
+
       return http.build();
   }
   
@@ -54,7 +50,10 @@ public class SecurityConfig {
       return new BCryptPasswordEncoder();
   }
   
-  
-  
+//jwt 토큰 설정
+  @Bean
+  public JwtAuthenticationFilter jwtAuthenticationFilter(UserService userService) {
+      return new JwtAuthenticationFilter(jwtUtil, userService);
+  }
   
 }

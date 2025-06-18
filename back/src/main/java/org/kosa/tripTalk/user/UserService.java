@@ -19,14 +19,11 @@ public class UserService {
   private final RefreshTokenRepository tokenRepository;
   private final JwtUtil jwtUtil;
   //회원가입 시 패스워드 암호화 - 미구현
-  private PasswordEncoder passwordEncoder;
+  private final PasswordEncoder passwordEncoder;
 
+  //로그인 요청
   public LoginResponse login(@Valid LoginRequest request) {
-    
-    //인증 시도
-    System.out.println(request.getUserId());
-    System.out.println(request.getPassword());
-    
+  
     //유저 정보 가져오기
     User user =  repository.findByUserId(request.getUserId())
         .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
@@ -50,7 +47,7 @@ public class UserService {
     return new LoginResponse(accessToken, user.getName(), user.getRole());
   }
 
-  //유저 아이디로 유저 정보 가져오기
+  //유저 아이디로 유저 정보 가져오기(jwt 요청용)
   public User loadUserByUserId(String userId) {
     
     User user =  repository.findByUserId(userId)
@@ -58,5 +55,25 @@ public class UserService {
     
     return user;
   }
+  
+  //회원가입
+  public UserResponse register(UserRequest request) {
+    
+    String encodedPassword = passwordEncoder.encode(request.getPassword());
+    
+    User user = User.builder()
+        .userId(request.getUserId())
+        .name(request.getName())
+        .email(request.getEmail())
+        .nickname(request.getNickname())
+        .phone(request.getPhone())
+        .password(encodedPassword) 
+        .role(User.Role.USER)
+        .build();
+
+    User savedUser = repository.save(user);
+
+    return UserResponse.fromEntity(savedUser);
+}
 
 }

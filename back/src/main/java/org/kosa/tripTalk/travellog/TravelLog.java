@@ -2,6 +2,7 @@ package org.kosa.tripTalk.travellog;
 
 import java.time.LocalDateTime;
 
+import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.user.User;
 
 import jakarta.persistence.Column;
@@ -35,9 +36,9 @@ public class TravelLog {
 
     @Column
     private String content;
-
-    @Enumerated(EnumType.STRING)
-    private String category;
+    
+    @ManyToOne @JoinColumn(name = "category_id")
+    private Category category;
 
     @Column
     private LocalDateTime createdAt;

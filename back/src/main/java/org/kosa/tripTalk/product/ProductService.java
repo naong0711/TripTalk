@@ -9,6 +9,8 @@ import org.kosa.tripTalk.seller.Seller;
 import org.kosa.tripTalk.seller.SellerRepository;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,10 +60,9 @@ public class ProductService {
 		return product;
 	}
 
-	public List<ProductResponseDTO> getAllProducts() {
-		return productRepository.findAll().stream()
-						.map(ProductResponseDTO::from)
-						.collect(Collectors.toList());
+	public Page<ProductResponseDTO> getAllProducts(Pageable pageable) {
+		return productRepository.findAll(pageable)
+						.map(ProductResponseDTO::from);
 	}
 	
 }

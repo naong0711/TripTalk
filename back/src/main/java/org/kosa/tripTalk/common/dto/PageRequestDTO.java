@@ -18,6 +18,9 @@ public class PageRequestDTO {
 	private String sort = "id,desc";
 	
 	public Pageable toPageable() {
+		if(sort == null || sort.isBlank())
+			return PageRequest.of(page -1, size);
+		
 		String [] sortParams = sort.split(",");
 		String sortFiled = sortParams[0];
 		

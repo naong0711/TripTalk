@@ -1,0 +1,60 @@
+package org.kosa.tripTalk;
+
+import org.kosa.tripTalk.jwt.JwtAuthenticationFilter;
+import org.kosa.tripTalk.jwt.JwtUtil;
+import org.kosa.tripTalk.user.UserService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+  private final UserService userService;
+  private final JwtUtil jwtUtil;
+  
+  //스프링 시큐리티 설정
+  @Bean
+  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+      http    .csrf(csrf -> csrf.disable()) //csrt 보호 비활성화
+              .httpBasic(AbstractHttpConfigurer::disable) //httpBasic 인증 비활성화
+              .formLogin(AbstractHttpConfigurer::disable) //스프링 시큐리티 기본 로그인 폼 비활성화
+              .authorizeHttpRequests((authorize) -> authorize //요청경로 접근제어
+                      .requestMatchers("/api/user/signup", "/", "/api/user/login").permitAll()
+                      .anyRequest().authenticated())
+              // 폼 로그인은 현재 사용하지 않음         
+//            .formLogin(formLogin -> formLogin
+//                    .loginPage("/login")
+//                    .defaultSuccessUrl("/home"))
+              .logout((logout) -> logout //로그아웃 요청시
+                      .logoutSuccessUrl("/")
+                      .invalidateHttpSession(true))
+              .sessionManagement(session -> session //세션 삭제
+                  .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+      
+      //jwt 토큰 설정
+      http    .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userService),
+                   UsernamePasswordAuthenticationFilter.class);
+      
+      return http.build();
+  }
+  
+  //비밀번호암호화
+  @Bean
+  public BCryptPasswordEncoder bCryptPasswordEncoder() {
+      return new BCryptPasswordEncoder();
+  }
+  
+  
+  
+  
+}

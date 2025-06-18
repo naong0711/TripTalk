@@ -1,7 +1,6 @@
 package org.kosa.tripTalk.travellog;
 
 import java.time.LocalDateTime;
-
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.user.User;
 

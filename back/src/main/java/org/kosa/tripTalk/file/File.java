@@ -6,7 +6,7 @@ import lombok.*;
 import java.time.*;
 
 @Entity
-@Table(name = "file")
+@Table(name = "files")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class File {
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
@@ -21,8 +21,8 @@ public class File {
     @Column(name = "file_type", nullable = false, length = 100)
     private String fileType;
 
-    @Column(name = "size", nullable = false)
-    private Long size;
+    @Column(name = "file_size", nullable = false)
+    private Long fileSize;
 
     @Column(name = "uploaded_at", nullable = false)
     private LocalDateTime uploadedAt;
@@ -34,7 +34,7 @@ public class File {
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
-    @Column(name = "is_thumbnail")
-    private Boolean isThumbnail; // 썸네일 여부 (nullable 허용)
+    @Column(name = "is_thumbnail", nullable = false)
+    private boolean isThumbnail; // 썸네일 여부 (nullable 허용)
 }
 

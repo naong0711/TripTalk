@@ -56,5 +56,6 @@ public class Product {
 	
 	@Column(nullable = false)
     private LocalDateTime endDate;
-
+	
+	
 }

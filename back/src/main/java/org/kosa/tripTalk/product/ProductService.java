@@ -1,5 +1,8 @@
 package org.kosa.tripTalk.product;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
 import org.kosa.tripTalk.seller.Seller;
@@ -63,4 +66,30 @@ public class ProductService {
 	    
 		return product;
 	}
+
+	public List<ProductResponseDTO> getAllProducts() {
+		return productRepository.findAll().stream()
+						.map(ProductResponseDTO::from)
+						.collect(Collectors.toList());
+	}
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

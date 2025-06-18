@@ -1,5 +1,7 @@
 package org.kosa.tripTalk.product;
 
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -40,4 +42,10 @@ public class ProductController {
 		
 		return ResponseEntity.ok(ProductResponseDTO.from(updateProduct));
 	}
+	
+	@GetMapping
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+        List<ProductResponseDTO> result = productService.getAllProducts();
+        return ResponseEntity.ok(result);
+    }
 }

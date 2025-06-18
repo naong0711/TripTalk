@@ -29,10 +29,9 @@ public class UserService {
         .orElseThrow(() -> new UsernameNotFoundException("사용자 없음"));
     
     //입력된 비밀번호와 유저 비밀번호 비교 (암호화x)
-    if (!user.getPassword().equals(request.getPassword())) {
+    if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
       throw new BadCredentialsException("비밀번호 틀림");
-    }
-    
+  }
     //토큰 생성
     String accessToken  = jwtUtil.generateAccessToken(user.getUserId(), user.getRole());
     String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());

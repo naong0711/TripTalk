@@ -35,5 +35,14 @@ public class Reservation {
 
     @Column(name = "total_price", nullable = false)
     private Integer totalPrice;  // 총 가격
+    
+    @Column(name = "payment_method", length = 30)
+    private String paymentMethod;
+
+    @Column(name = "transaction_id", length = 100)
+    private String transactionId;
+
+    @Column(name = "payment_approved_at")
+    private LocalDateTime paymentApprovedAt;
 
 }

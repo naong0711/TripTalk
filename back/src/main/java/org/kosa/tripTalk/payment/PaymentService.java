@@ -3,6 +3,8 @@ package org.kosa.tripTalk.payment;
 import lombok.RequiredArgsConstructor;
 import org.kosa.tripTalk.product.Product;
 import org.kosa.tripTalk.product.ProductRepository;
+import org.kosa.tripTalk.reservation.ReservationRequest;
+import org.kosa.tripTalk.reservation.ReservationService;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ReservationService reservationService;
 
     public Payment createPayment(PaymentRequest request) {
         User user = userRepository.findByUserId(request.getUserId())
@@ -42,4 +45,25 @@ public class PaymentService {
     public Optional<Payment> getPayment(Long id) {
         return paymentRepository.findById(id);
     }
+    public void approvePaymentAndCreateReservation(Long id, LocalDateTime approvedAt) {
+        Payment payment = paymentRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("결제 없음"));
+        System.out.println(id);
+
+        payment.setStatus("SUCCESS");
+        payment.setPaymentDate(approvedAt);
+        paymentRepository.save(payment);
+
+        ReservationRequest reservationRequest = new ReservationRequest();
+        reservationRequest.setUserId(payment.getUser().getId());
+        reservationRequest.setProductId(payment.getProduct().getId());
+        reservationRequest.setReservationDate(System.currentTimeMillis());
+        reservationRequest.setTotalPrice(payment.getAmount());
+        reservationRequest.setPaymentMethod(payment.getPaymentMethod());
+        reservationRequest.setTransactionId(payment.getTransactionId());
+        reservationRequest.setPaymentApprovedAt(approvedAt);
+
+        reservationService.createReservation(reservationRequest);
+    }
+
 }

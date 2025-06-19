@@ -23,12 +23,15 @@ public class ReservationService {
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
         Reservation reservation = Reservation.builder()
-                .user(user)
-                .product(product)
-                .reservationDate(request.getReservationDate())
-                .totalPrice(request.getTotalPrice())
-                .status("예약완료")
-                .build();
+        	    .user(user)
+        	    .product(product)
+        	    .reservationDate(request.getReservationDate())
+        	    .totalPrice(request.getTotalPrice())
+        	    .status("예약완료")
+        	    .paymentMethod(request.getPaymentMethod())
+        	    .transactionId(request.getTransactionId())
+        	    .paymentApprovedAt(request.getPaymentApprovedAt())
+        	    .build();
 
         return reservationRepository.save(reservation);
     }

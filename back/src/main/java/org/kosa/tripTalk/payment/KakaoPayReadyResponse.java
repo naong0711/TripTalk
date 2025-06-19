@@ -1,8 +1,10 @@
 package org.kosa.tripTalk.payment;
 
 import lombok.Getter;
-import java.time.LocalDateTime;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+@Setter
 @Getter
 public class KakaoPayReadyResponse {
     private String tid;
@@ -12,4 +14,6 @@ public class KakaoPayReadyResponse {
     private String android_app_scheme;
     private String ios_app_scheme;
     private LocalDateTime created_at;
+    private String status;
+
 }

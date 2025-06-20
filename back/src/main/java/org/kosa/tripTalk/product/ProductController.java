@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -24,7 +25,7 @@ public class ProductController {
 	private final ProductService productService;
 	
 	@PostMapping
-    public ResponseEntity<Void> createProduct(@RequestBody ProductRequestDTO request) {
+    public ResponseEntity<Void> createProduct(@RequestBody @Valid ProductRequestDTO request) {
         productService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }

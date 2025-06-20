@@ -20,12 +20,12 @@ public class Payment {
 
     // 🔗 FK: 상품 ID
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "PRODUCT_ID", nullable = false)
     private Product product;
 
     // 🔗 FK: 회원 ID
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "USER_ID", nullable = false)
     private User user;
 
     @Column(name = "transaction_id", nullable = false, length = 100, unique = true)

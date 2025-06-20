@@ -27,7 +27,7 @@ public class Seller {
 	
 	@Id
 	private Long id;
-	
+
 	@OneToOne
 	@JoinColumn(name = "id")
 	@MapsId
@@ -36,13 +36,17 @@ public class Seller {
 	@Column(nullable = false)
 	private String userid;
 
-	@Column(unique = true)
-	private String businessNumber;
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User userId;
 
-	@Column(nullable = false)
-	private String businessName;
+    @Column(unique = true)
+    private String businessNumber;
 
-	@Column(nullable = false)
-	private String contact;
+    @Column(nullable = false)
+    private String businessName;
+
+    @Column(nullable = false)
+    private String contact;
 
 }

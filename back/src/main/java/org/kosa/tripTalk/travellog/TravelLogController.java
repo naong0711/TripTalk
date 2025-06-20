@@ -1,49 +1,43 @@
 package org.kosa.tripTalk.travellog;
 
-import java.time.LocalDateTime;
+import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-@Slf4j
-@Controller
-@RequestMapping("/log")
+@RestController
+@RequestMapping("/api/log")
 @RequiredArgsConstructor
 public class TravelLogController {
-	@Autowired
-	TravelLogService travelLogService;
+	private final TravelLogService travelLogService;
 	
-	@GetMapping("/write")
-	public String writeLog() {
-		return "travellog";
+	//log 쓰기
+	@PostMapping("/write")
+	public ResponseEntity<?> write(@RequestBody TravelLogDTO article){
+		travelLogService.write(article);
+		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
 	
-	@PostMapping("/write")
-	@Builder
-	public String writeLog(TravelLog travelLog) {
-	
-		TravelLog article = TravelLog.builder()
-									 .title(travelLog.getTitle())
-									 //user는 가져와야 함
-									 .user(travelLog.getUser())
-									 .content(travelLog.getContent())
-									 //카테고리 값 수정 필요
-									 .category(travelLog.getCategory())
-									 .createdAt(LocalDateTime.now())
-									 .build();
-		
-		travelLogService.write(article);
-		
-		log.info(String.valueOf(article));
-		
-		return "redirect:/";
+	// 목록 중 하나 조회 (id로)
+	@GetMapping("/list/{id}")
+	public ResponseEntity<TravelLogListDTO> getLog(@PathVariable("id") Long id) {
+	    TravelLogListDTO log = travelLogService.findById(id);
+	    return ResponseEntity.ok(log);
+	}
+
+	// 전체 목록 조회
+	@GetMapping("/list")
+	public ResponseEntity<List<TravelLogListDTO>> getAllLogs() {
+	    List<TravelLogListDTO> logs = travelLogService.findAll();
+	    return ResponseEntity.ok(logs);
 	}
 
 	

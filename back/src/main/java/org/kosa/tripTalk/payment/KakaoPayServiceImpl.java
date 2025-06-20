@@ -86,8 +86,8 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         Map<String, Object> payload = new HashMap<>();
         payload.put("cid", "TC0ONETIME");
         payload.put("tid", kakaoPayReadyResponse.getTid());
-        payload.put("partner_order_id", Payment.getProduct().getId());
-        payload.put("partner_user_id", Payment.getUser().getUserId());
+        payload.put("partner_order_id", payment.getProduct().getId());
+        payload.put("partner_user_id", payment.getUser().getUserId());
         payload.put("pg_token", pgToken);
 
         HttpEntity<Map<String,Object>> body = new HttpEntity<>(payload, headers);

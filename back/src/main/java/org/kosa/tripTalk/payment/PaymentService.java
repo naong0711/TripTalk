@@ -34,7 +34,7 @@ public class PaymentService {
                 .product(product)
                 .amount(request.getAmount())
                 .paymentMethod(request.getPaymentMethod())
-                .status("READY")
+                .status("APPROVED")
                 .transactionId(UUID.randomUUID().toString())
                 .paymentDate(LocalDateTime.now())
                 .build();
@@ -45,12 +45,13 @@ public class PaymentService {
     public Optional<Payment> getPayment(Long id) {
         return paymentRepository.findById(id);
     }
+    
     public void approvePaymentAndCreateReservation(Long id, LocalDateTime approvedAt) {
         Payment payment = paymentRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("결제 없음"));
         System.out.println(id);
 
-        payment.setStatus("SUCCESS");
+        payment.setStatus("APPROVED");
         payment.setPaymentDate(approvedAt);
         paymentRepository.save(payment);
 

@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequiredArgsConstructor
+@RequiredArgsConstructor                                                                                                                    
 @RequestMapping("/api/files")
 public class FileController {
 

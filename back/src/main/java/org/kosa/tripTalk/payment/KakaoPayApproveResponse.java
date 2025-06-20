@@ -8,7 +8,6 @@ public class KakaoPayApproveResponse {
     private String tid;
     private String cid;
     private String partner_order_id;
-    private String status;
     private String partner_user_id;
     private String payment_method_type;
     private Amount amount;

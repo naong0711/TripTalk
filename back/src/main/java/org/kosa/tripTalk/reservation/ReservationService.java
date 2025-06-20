@@ -6,9 +6,11 @@ import org.kosa.tripTalk.product.ProductRepository;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ReservationService {
 
     private final ReservationRepository reservationRepository;

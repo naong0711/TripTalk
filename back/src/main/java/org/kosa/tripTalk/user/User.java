@@ -45,8 +45,8 @@ public class User {
     @Column(unique = true)
     private String socialId;
     
-    @Column(name = "email_verified")
-    private boolean emailVerified;
+    @Column(name = "email_verified", nullable = true)
+    private Boolean  emailVerified;
     
     
     

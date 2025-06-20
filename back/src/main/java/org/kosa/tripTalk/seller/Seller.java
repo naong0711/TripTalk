@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -23,10 +24,17 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Seller {
-
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    @Id
-    private Long id;
+	
+	@Id
+	private Long id;
+  
+	@OneToOne
+	@JoinColumn(name = "id")
+	@MapsId
+	private User user;
+	
+	@Column(nullable = false)
+	private String userid;
 
     @OneToOne
     @JoinColumn(name = "user_id")

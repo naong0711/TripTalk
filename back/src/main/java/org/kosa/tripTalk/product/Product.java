@@ -1,7 +1,6 @@
 package org.kosa.tripTalk.product;
 
 import java.time.LocalDateTime;
-
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.seller.Seller;
 
@@ -56,5 +55,6 @@ public class Product {
 	
 	@Column(nullable = false)
     private LocalDateTime endDate;
-
+	
+	
 }

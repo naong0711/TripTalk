@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class TravelLogDTO {
-	//입력받은 값 저장하기 위함 
+	//입력받은 값에 대한 DTO
 	private Long id;
 	private Long userId;
 	private String title;

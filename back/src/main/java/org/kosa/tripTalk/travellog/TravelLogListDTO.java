@@ -14,8 +14,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 public class TravelLogListDTO {
+	//log 목록을 보기 위한 DTO
 	private Long id;
-	private User user;
+	private Long userId;
 	private String title;
 	private String content;
 	private LocalDateTime createdAt;

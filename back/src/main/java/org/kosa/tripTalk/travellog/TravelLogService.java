@@ -1,12 +1,12 @@
 package org.kosa.tripTalk.travellog;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,21 +18,11 @@ public class TravelLogService {
 		private final TravelLogRepository travelLogRepository;
 		private final UserRepository userRepository;
 		private final CategoryRepository categoryRepository;
-		
-		/*
-		public TravelLog write(TravelLog travelLog) {
-			return travelLogRepository.save(travelLog);
-			 
-		}
-		 */
 
 		@Transactional
 		public TravelLog write(TravelLogDTO article) {
-			System.out.println("userId = " + article.getUserId());
-
-			
 			User users = userRepository.findById(article.getUserId())
-	                .orElseThrow(() -> new IllegalArgumentException("판매자 유저가 존재하지 않습니다."));
+	                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 			
 			Category category = categoryRepository.findById(article.getCategoryId())
 	                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
@@ -49,14 +39,54 @@ public class TravelLogService {
 			return travelLogRepository.save(tlEntity);
 			
 		}
-		
+
 		/*
-		public Optional logList(TravelLogListDTO list) {
+		public TravelLogListDTO findById(Long id) {
+			User users = userRepository.findById(article.getUserId())
+	                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 			
 			
+			
+			
+			TravelLog tlEntity = travelLogListDTO.builder()
+												 .id();
+			
+			return null;
 		}
+		
 		*/
 		
+		@Transactional
+		// 단일 조회
+		public TravelLogListDTO findById(Long id) {
+		    TravelLog log = travelLogRepository.findById(id)
+		        .orElseThrow(() -> new IllegalArgumentException("해당 로그가 없습니다. id=" + id));
+
+		    return TravelLogListDTO.builder()
+		            .id(log.getId())
+		            .userId((log.getUser()).getId())
+		            //.userId(log.getUser().getId())
+		            .title(log.getTitle())
+		            .content(log.getContent())
+		            .createdAt(log.getCreatedAt()) 
+		            .build();
+		}
+
+		// 전체 목록 조회
+		public List<TravelLogListDTO> findAll() {
+		    List<TravelLog> logs = travelLogRepository.findAll();
+
+		    return logs.stream()
+		            .map(log -> TravelLogListDTO.builder()
+		                    .id(log.getId())
+		                    .userId((log.getUser()).getId())
+		                    .title(log.getTitle())
+		                    .content(log.getContent())
+		                    .createdAt(log.getCreatedAt())
+		                    .build())
+		            .toList();
+		}
+
 
 }
 

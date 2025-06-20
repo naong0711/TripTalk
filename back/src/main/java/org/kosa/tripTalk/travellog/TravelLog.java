@@ -22,7 +22,6 @@ import lombok.Setter;
 @Table(name = "travellog")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class TravelLog {
-	//글 번호이니까 수정 필요!
     @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 

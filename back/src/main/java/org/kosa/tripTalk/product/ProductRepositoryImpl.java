@@ -23,27 +23,36 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 	@Override
 	public Page<ProductResponseDTO> searchAll(Pageable pageable, Search search) {
 		QProduct product = QProduct.product;
-		
 		BooleanExpression condition = ProductPredicateBuilder.build(product, search);
 		
-		List<Product> contents = queryFactory
-							.selectFrom(product)
-							.where(condition)
-							.offset(pageable.getOffset())
-							.limit(pageable.getPageSize())
-							.orderBy(QuerydslUtils.toOrders(pageable.getSort(), product))
-							.fetch();
-		
-		Long total = queryFactory
-							.select(product.count())
-							.from(product)
-							.where(condition)
-							.fetchOne();
-		
-		List<ProductResponseDTO> dtoList = contents.stream()
-						.map(ProductResponseDTO::from)
-						.toList();
+		List<Product> contents = fetchContent(pageable, product, condition);
+		Long total = fetchCount(product, condition);
+		List<ProductResponseDTO> dtoList = toDtoList(contents);
 		
 		return new PageImpl<>(dtoList, pageable, total);
+	}
+
+	private List<ProductResponseDTO> toDtoList(List<Product> contents) {
+		return contents.stream()
+						.map(ProductResponseDTO::from)
+						.toList();
+	}
+
+	private Long fetchCount(QProduct product, BooleanExpression condition) {
+		return queryFactory
+						.select(product.count())
+						.from(product)
+						.where(condition)
+						.fetchOne();
+	}
+
+	private List<Product> fetchContent(Pageable pageable, QProduct product, BooleanExpression condition) {
+		return queryFactory
+						.selectFrom(product)
+						.where(condition)
+						.offset(pageable.getOffset())
+						.limit(pageable.getPageSize())
+						.orderBy(QuerydslUtils.toOrders(pageable.getSort(), product))
+						.fetch();
 	}
 }

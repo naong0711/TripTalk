@@ -27,7 +27,7 @@ public class Seller {
 	
 	@Id
 	private Long id;
-  
+
 	@OneToOne
 	@JoinColumn(name = "id")
 	@MapsId

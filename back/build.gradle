@@ -32,6 +32,10 @@ dependencies {
 	implementation 'com.h2database:h2'
 	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'io.github.openfeign.querydsl:querydsl-jpa:6.10.1'
+	annotationProcessor 'io.github.openfeign.querydsl:querydsl-apt:6.10.1:jpa'
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'com.oracle.database.jdbc:ojdbc11'
@@ -55,6 +59,42 @@ dependencies {
 
     
 
+}
+
+// QueryDsl 디렉토리 경로
+def querydslSrcDir = 'src/main/generated/querydsl'
+
+// Q파일 생성 디렉토리 삭제 (clean 시)
+clean {
+    delete file(querydslSrcDir)
+}
+
+// Q파일 생성 디렉토리 지정
+tasks.withType(JavaCompile).configureEach {
+    options.generatedSourceOutputDirectory = file(querydslSrcDir)
+}
+
+// QueryDSL 전용 소스셋 등록
+sourceSets {
+    main {
+        java {
+            srcDirs += querydslSrcDir
+        }
+    }
+}
+
+// QueryDSL 전용 태스크 (Q타입만 생성용)
+tasks.register('generateQueryDSL', JavaCompile) {
+    group = 'build'
+    description = 'Generate Q classes using QueryDSL'
+
+    source = fileTree('src/main/java') {
+        include 'org/kosa/tripTalk/*/**/*.java'
+    }
+
+    classpath = sourceSets.main.compileClasspath
+    destinationDirectory = file(querydslSrcDir)
+    options.annotationProcessorPath = configurations.annotationProcessor
 }
 
 tasks.named('test') {

@@ -10,18 +10,23 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
+import org.kosa.tripTalk.common.dto.PageRequestDTO;
+import org.kosa.tripTalk.common.dto.Search;
 import org.kosa.tripTalk.seller.Seller;
 import org.kosa.tripTalk.seller.SellerRepository;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @DisplayName("상품 테스트")
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 class ProductServiceTest {
 
 	@Autowired
@@ -67,7 +72,7 @@ class ProductServiceTest {
     }
 	
 	@Test
-    @DisplayName("정상적인 상품 등록이 성공해야 한다")
+    @DisplayName("정상 상품 등록")
     void createProduct_success() {
         // given
         ProductRequestDTO request = ProductRequestDTO.builder()
@@ -90,4 +95,74 @@ class ProductServiceTest {
         assertThat(result.get(0).getTitle()).isEqualTo("제주도 여행");
     }
 
+	@Test
+	@DisplayName("상품 정상 수정")
+	void updateProduct_success() {
+	    // given
+	    Product savedProduct = productRepository.save(Product.builder()
+	            .title("기존 제목")
+	            .description("기존 설명")
+	            .address("서울시 강남구")
+	            .price(100000)
+	            .startDate(LocalDateTime.now().plusDays(5))
+	            .endDate(LocalDateTime.now().plusDays(7))
+	            .category(savedCategory)
+	            .seller(savedSeller)
+	            .build());
+
+	    ProductRequestDTO updateDto = ProductRequestDTO.builder()
+	            .title("수정된 제목")
+	            .description("수정된 설명")
+	            .address("부산 해운대")
+	            .price(200000)
+	            .startDate(LocalDateTime.now().plusDays(10))
+	            .endDate(LocalDateTime.now().plusDays(13))
+	            .build();
+
+	    // when
+	    productService.update(savedProduct.getId(), updateDto);
+
+	    // then
+	    Product updatedProduct = productRepository.findById(savedProduct.getId()).orElseThrow();
+	    assertThat(updatedProduct.getTitle()).isEqualTo("수정된 제목");
+	    assertThat(updatedProduct.getAddress()).isEqualTo("부산 해운대");
+	    assertThat(updatedProduct.getPrice()).isEqualTo(200000);
+	}
+	
+	@Test
+	@DisplayName("상품 목록 페이징 + 정렬 + 검색 조회 성공")
+	void getAllProducts_withPagingSortingAndSearch_success() {
+	    // given: 15개의 상품 등록
+	    for (int i = 1; i <= 15; i++) {
+	        productRepository.save(Product.builder()
+	                .title("제주 상품 " + i)
+	                .description("힐링 설명 " + i)
+	                .address("주소" + i)
+	                .price(10000 * i)
+	                .startDate(LocalDateTime.now().plusDays(i))
+	                .endDate(LocalDateTime.now().plusDays(i + 2))
+	                .category(savedCategory)
+	                .seller(savedSeller)
+	                .build());
+	    }
+
+	    PageRequestDTO pageRequestDTO = new PageRequestDTO(1, 10, "price,asc");
+	    Pageable pageable = pageRequestDTO.toPageable();
+
+	    // 검색 조건: title에 "제주" 포함
+		Search search = new Search();
+	    search.setSearchKey("title");
+	    search.setSearchValue("제주");
+
+	    // when
+	    Page<ProductResponseDTO> result = productService.getAllProducts(pageable, search);
+
+	    // then
+	    assertThat(result.getContent()).hasSize(10);                 // 1페이지에 10개
+	    assertThat(result.getTotalElements()).isEqualTo(15);         // 총 15개 중 모두 "제주" 포함
+	    assertThat(result.getTotalPages()).isEqualTo(2);             // 총 2페이지
+	    assertThat(result.isFirst()).isTrue();                       // 첫 페이지
+	    assertThat(result.isLast()).isFalse();                       // 아직 마지막 아님
+	    assertThat(result.getContent().get(0).getPrice()).isEqualTo(10000); // 정렬 확인 (오름차순)
+	}
 }

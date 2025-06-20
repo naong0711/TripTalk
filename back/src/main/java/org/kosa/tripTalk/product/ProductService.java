@@ -1,11 +1,17 @@
 package org.kosa.tripTalk.product;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
+import org.kosa.tripTalk.common.dto.Search;
 import org.kosa.tripTalk.seller.Seller;
 import org.kosa.tripTalk.seller.SellerRepository;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,16 +41,7 @@ public class ProductService {
                 .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
         
      // 4. 상품 생성 및 저장
-        Product product = Product.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .address(request.getAddress())
-                .price(request.getPrice())
-                .startDate(request.getStartDate())
-                .endDate(request.getEndDate())
-                .seller(seller)
-                .category(category)
-                .build();
+        Product product = request.toEntity(seller, category);
         
         productRepository.save(product);
 	}
@@ -54,4 +51,37 @@ public class ProductService {
 			.orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다."));
 		return ProductResponseDTO.from(product);
 	}
+
+	public Product update(Long id, ProductRequestDTO dto) {
+		Product product = productRepository.findById(id)
+		        .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다."));
+		
+		product.updateFromDTO(dto);
+	    
+		return product;
+	}
+
+	public Page<ProductResponseDTO> getAllProducts(Pageable pageable, Search search) {
+		return productRepository.searchAll(pageable, search);
+	}
+	
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

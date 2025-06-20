@@ -49,19 +49,19 @@ public class Product {
 
 	@Column(nullable = false)
 	private String address;
-	
+
 	@Column(nullable = false)
-    private LocalDateTime startDate;
-	
+	private LocalDateTime startDate;
+
 	@Column(nullable = false)
-    private LocalDateTime endDate;
-	
+	private LocalDateTime endDate;
+
 	public void updateFromDTO(ProductRequestDTO dto) {
-	    this.title = dto.getTitle();
-	    this.description = dto.getDescription();
-	    this.address = dto.getAddress();
-	    this.price = dto.getPrice();
-	    this.startDate = dto.getStartDate();
-	    this.endDate = dto.getEndDate();
+		this.title = dto.getTitle();
+		this.description = dto.getDescription();
+		this.address = dto.getAddress();
+		this.price = dto.getPrice();
+		this.startDate = dto.getStartDate();
+		this.endDate = dto.getEndDate();
 	}
 }

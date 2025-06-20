@@ -1,8 +1,7 @@
 package org.kosa.tripTalk.product;
 
-import java.util.List;
-
 import org.kosa.tripTalk.common.dto.PageRequestDTO;
+import org.kosa.tripTalk.common.dto.Search;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -47,9 +46,12 @@ public class ProductController {
 	}
 	
 	@GetMapping
-    public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(PageRequestDTO pageRequestDTO) {
+    public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
+    		PageRequestDTO pageRequestDTO,
+    		Search search
+    		) {
 		Pageable pageable = pageRequestDTO.toPageable();
-		Page<ProductResponseDTO> result = productService.getAllProducts(pageable);
+		Page<ProductResponseDTO> result = productService.getAllProducts(pageable, search);
 		
         return ResponseEntity.ok(result);
     }

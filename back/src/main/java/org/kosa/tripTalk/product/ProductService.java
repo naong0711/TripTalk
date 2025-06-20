@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
+import org.kosa.tripTalk.common.dto.Search;
 import org.kosa.tripTalk.seller.Seller;
 import org.kosa.tripTalk.seller.SellerRepository;
 import org.kosa.tripTalk.user.User;
@@ -60,9 +61,8 @@ public class ProductService {
 		return product;
 	}
 
-	public Page<ProductResponseDTO> getAllProducts(Pageable pageable) {
-		return productRepository.findAll(pageable)
-						.map(ProductResponseDTO::from);
+	public Page<ProductResponseDTO> getAllProducts(Pageable pageable, Search search) {
+		return productRepository.searchAll(pageable, search);
 	}
 	
 }

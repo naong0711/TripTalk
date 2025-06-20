@@ -1,11 +1,9 @@
 package org.kosa.tripTalk.product;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
 import org.kosa.tripTalk.common.dto.Search;
+import org.kosa.tripTalk.exception.NotFoundException;
 import org.kosa.tripTalk.seller.Seller;
 import org.kosa.tripTalk.seller.SellerRepository;
 import org.kosa.tripTalk.user.User;
@@ -30,15 +28,15 @@ public class ProductService {
 	public void create(ProductRequestDTO request) {
 		 // 1. 판매자 유저 조회
 		User sellerUser = userRepository.findById(request.getSellerId())
-                .orElseThrow(() -> new IllegalArgumentException("판매자 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("판매자 유저가 존재하지 않습니다."));
 		
 		// 2. 판매자 프로필 조회
         Seller seller = sellerRepository.findById(request.getSellerId())
-                .orElseThrow(() -> new IllegalArgumentException("판매자 프로필이 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("판매자 프로필이 존재하지 않습니다."));
         
      // 3. 카테고리 조회
         Category category = categoryRepository.findById(request.getCategoryId())
-                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
+                .orElseThrow(() -> new NotFoundException("카테고리가 존재하지 않습니다."));
         
      // 4. 상품 생성 및 저장
         Product product = request.toEntity(seller, category);
@@ -47,17 +45,15 @@ public class ProductService {
 	}
 
 	public ProductResponseDTO getProductById(Long id) {
-		Product product = productRepository.findById(id)
-			.orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다."));
+		Product product = notFoundProductId(id);
+		
 		return ProductResponseDTO.from(product);
 	}
 
 	public Product update(Long id, ProductRequestDTO dto) {
-		Product product = productRepository.findById(id)
-		        .orElseThrow(() -> new IllegalArgumentException("해당 상품이 존재하지 않습니다."));
-		
+		Product product = notFoundProductId(id);
 		product.updateFromDTO(dto);
-	    
+		
 		return product;
 	}
 
@@ -65,6 +61,10 @@ public class ProductService {
 		return productRepository.searchAll(pageable, search);
 	}
 	
+	private Product notFoundProductId(Long id) {
+		return productRepository.findById(id)
+		        .orElseThrow(() -> new NotFoundException("해당 상품을 찾을 수 없습니다"));
+	}
 }
 
 

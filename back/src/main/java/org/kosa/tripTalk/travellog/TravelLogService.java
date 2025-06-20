@@ -20,7 +20,7 @@ public class TravelLogService {
 		private final CategoryRepository categoryRepository;
 
 		@Transactional
-		public TravelLog write(TravelLogDTO article) {
+		public TravelLog write(TravelLogDTO article) {			
 			User users = userRepository.findById(article.getUserId())
 	                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 			
@@ -39,22 +39,6 @@ public class TravelLogService {
 			return travelLogRepository.save(tlEntity);
 			
 		}
-
-		/*
-		public TravelLogListDTO findById(Long id) {
-			User users = userRepository.findById(article.getUserId())
-	                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-			
-			
-			
-			
-			TravelLog tlEntity = travelLogListDTO.builder()
-												 .id();
-			
-			return null;
-		}
-		
-		*/
 		
 		@Transactional
 		// 단일 조회
@@ -65,7 +49,6 @@ public class TravelLogService {
 		    return TravelLogListDTO.builder()
 		            .id(log.getId())
 		            .userId((log.getUser()).getId())
-		            //.userId(log.getUser().getId())
 		            .title(log.getTitle())
 		            .content(log.getContent())
 		            .createdAt(log.getCreatedAt()) 
@@ -85,6 +68,14 @@ public class TravelLogService {
 		                    .createdAt(log.getCreatedAt())
 		                    .build())
 		            .toList();
+		}
+
+		//글 삭제 
+		public void deleteLog(Long id) {
+			TravelLog log = travelLogRepository.findById(id)
+				.orElseThrow(()-> new IllegalArgumentException("해당 로그가 없습니다. 글 번호 =" + id));
+			
+			travelLogRepository.delete(log);	
 		}
 
 

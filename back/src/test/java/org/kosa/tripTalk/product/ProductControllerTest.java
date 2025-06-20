@@ -8,14 +8,22 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.kosa.tripTalk.JwtTestConfig;
+import org.kosa.tripTalk.exception.GlobalExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest(ProductController.class)
+@ActiveProfiles("test")
+@Import({JwtTestConfig.class, GlobalExceptionHandler.class})
 class ProductControllerTest {
 	
 	@Autowired

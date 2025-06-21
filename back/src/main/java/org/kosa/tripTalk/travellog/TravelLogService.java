@@ -78,6 +78,21 @@ public class TravelLogService {
 			travelLogRepository.delete(log);	
 		}
 
+		@Transactional
+		public  void update(Long id, TravelLogDTO updateDTO) {
+			TravelLog existingLog = travelLogRepository.findById(id)
+					.orElseThrow(()-> new IllegalArgumentException("해당 로그가 없습니다."));
+			
+			if(updateDTO.getTitle() != null) {
+				existingLog.setTitle(updateDTO.getTitle());
+			}
+			
+			if(updateDTO.getContent() != null) {
+				existingLog.setContent(updateDTO.getContent());
+			}
+			
+		}
+
 
 }
 

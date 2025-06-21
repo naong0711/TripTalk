@@ -41,13 +41,20 @@ public class TravelLogController {
 	    return ResponseEntity.ok(logs);
 	}
 	
+	//글 수정
+	@GetMapping("/update/{id}")
+	public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody TravelLogDTO updateDTO){
+		travelLogService.update(id, updateDTO);
+		return ResponseEntity.ok().build();
+	}
+	
+	
 	//글 삭제
 	@DeleteMapping("/delete/{id}")
 	public ResponseEntity deleteLog(@PathVariable("id") Long id) {
 		travelLogService.deleteLog(id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
 	}
-
 	
 }
 

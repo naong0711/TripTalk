@@ -5,6 +5,7 @@ package org.kosa.tripTalk.user;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.*;
+import org.kosa.tripTalk.BooleanToYNConverter;
 
 @Entity
 @Table(name = "users")
@@ -46,7 +47,14 @@ public class User {
     private String socialId;
     
     @Column(name = "email_verified")
-    private boolean emailVerified;
+    private Boolean emailVerified;
+    
+    @Column(name = "IS_DEL", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'F'")
+    @Convert(converter = BooleanToYNConverter.class) //false -> 'F', true -> 'T' 자동 변환
+    private boolean isDel;
+    
+    @Column
+    private LocalDateTime delAt;
     
     
     

@@ -5,11 +5,15 @@ import org.kosa.tripTalk.cart.CartResponse;
 import org.kosa.tripTalk.favorite.FavoriteResponse;
 import org.kosa.tripTalk.reservation.ReservationResponse;
 import org.kosa.tripTalk.user.User;
+import org.kosa.tripTalk.user.UserRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -32,7 +36,32 @@ public class myPageController {
     return ResponseEntity.ok(response);
   }
   
-  //유저 crud
+  //마이페이지 정보수정
+  @PutMapping("profile/update")
+  public ResponseEntity<?> profileUpdate(Authentication authentication, @RequestBody UserRequest request) {
+    
+    //헤더에서 userid 추출
+    User user = (User) authentication.getPrincipal();
+    String userId = user.getUserId();
+    
+    ProfileResponse response = myService.profileUpdate(userId, request);
+
+    return ResponseEntity.ok(response);
+  }
+  
+  //마이페이지 탈퇴
+  @PutMapping("profile/delete")
+  public ResponseEntity<?> profileDelete(Authentication authentication) {
+    
+    //헤더에서 userid 추출
+    User user = (User) authentication.getPrincipal();
+    String userId = user.getUserId();
+    
+    myService.profileDelete(userId);
+
+    return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+  }
+  
   
   //예약 목록 확인
   @GetMapping("reservationList")

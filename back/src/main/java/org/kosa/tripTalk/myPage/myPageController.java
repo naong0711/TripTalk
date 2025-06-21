@@ -1,5 +1,7 @@
 package org.kosa.tripTalk.myPage;
 
+import java.util.List;
+import org.kosa.tripTalk.reservation.ReservationResponse;
 import org.kosa.tripTalk.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -19,6 +21,7 @@ public class myPageController {
   @GetMapping("profile")
   public ResponseEntity<?> profile(Authentication authentication) {
     
+    //헤더에서 userid 추출
     User user = (User) authentication.getPrincipal();
     String userId = user.getUserId();
     
@@ -27,13 +30,47 @@ public class myPageController {
     return ResponseEntity.ok(response);
   }
   
+  //유저 crud
+  
   //예약 목록 확인
+  @GetMapping("reservationList")
+  public ResponseEntity<?> reservationList(Authentication authentication) {
+    
+    //헤더에서 userid 추출
+    User user = (User) authentication.getPrincipal();
+    String userId = user.getUserId();
+    
+    List<ReservationResponse> responseList = myService.reservationList(userId);
+
+    return ResponseEntity.ok(responseList);
+  }
   
-  
-  
-  //찜 목록 확인
-  
-  //장바구니 확인
+//  //찜 목록 확인
+//  @GetMapping("favoriteList")
+//  public ResponseEntity<?> favoriteList(Authentication authentication) {
+//    
+//    //헤더에서 userid 추출
+//    User user = (User) authentication.getPrincipal();
+//    String userId = user.getUserId();
+//    
+//    ProfileResponse response = myService.favoriteList(userId);
+//
+//    return ResponseEntity.ok(response);
+//  }
+//  
+//  
+//  //장바구니 확인
+//  @GetMapping("cartList")
+//  public ResponseEntity<?> cartList(Authentication authentication) {
+//    
+//    //헤더에서 userid 추출
+//    User user = (User) authentication.getPrincipal();
+//    String userId = user.getUserId();
+//    
+//    ProfileResponse response = myService.cartList(userId);
+//
+//    return ResponseEntity.ok(response);
+//  }
   
   
 

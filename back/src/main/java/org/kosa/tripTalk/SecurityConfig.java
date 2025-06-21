@@ -38,6 +38,7 @@ public class SecurityConfig {
                           "/oauth2/**",
                           "/email/verify"
                       ).permitAll()
+                      .requestMatchers("/api/mypage/**").authenticated()  //로그인한 사용자만 접근 가능
                       .anyRequest().authenticated())
               .oauth2Login(oauth2 -> oauth2
                   .successHandler(oAuth2LoginSuccessHandler())

@@ -105,6 +105,7 @@ public class UserService {
         .email(request.getEmail())
         .nickname(request.getNickname())
         .phone(request.getPhone())
+        .loginType("LOCAL")
         .password(encodedPassword) 
         .role(User.Role.USER)
         .emailVerified(false)

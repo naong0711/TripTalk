@@ -2,6 +2,9 @@ package org.kosa.tripTalk.myPage;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.kosa.tripTalk.cart.Cart;
+import org.kosa.tripTalk.cart.CartRepository;
+import org.kosa.tripTalk.cart.CartResponse;
 import org.kosa.tripTalk.favorite.Favorite;
 import org.kosa.tripTalk.favorite.FavoriteRepository;
 import org.kosa.tripTalk.favorite.FavoriteResponse;
@@ -20,6 +23,7 @@ public class MyService {
   private final UserRepository userRepository;
   private final ReservationRepository reservationRepository;
   private final FavoriteRepository favoriteRepository;
+  private final CartRepository cartRepository;
   
   
   public ProfileResponse getProfile(String userId) {
@@ -62,6 +66,19 @@ public class MyService {
         .map(favorite -> FavoriteResponse.builder()
             .id(favorite.getId())
             .title(favorite.getProduct().getTitle())
+            .build())
+        .collect(Collectors.toList());
+  }
+
+
+  public List<CartResponse> cartList(String userId) {
+    List<Cart> carts = cartRepository.findByUserUserId(userId);
+    
+    return carts.stream()
+        .map(cart -> CartResponse.builder()
+            .id(cart.getId())
+            .title(cart.getProduct().getTitle())
+            .price(cart.getProduct().getPrice())
             .build())
         .collect(Collectors.toList());
   }

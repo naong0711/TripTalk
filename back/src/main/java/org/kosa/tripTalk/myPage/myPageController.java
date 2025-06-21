@@ -1,6 +1,7 @@
 package org.kosa.tripTalk.myPage;
 
 import java.util.List;
+import org.kosa.tripTalk.favorite.FavoriteResponse;
 import org.kosa.tripTalk.reservation.ReservationResponse;
 import org.kosa.tripTalk.user.User;
 import org.springframework.http.ResponseEntity;
@@ -45,20 +46,20 @@ public class myPageController {
     return ResponseEntity.ok(responseList);
   }
   
-//  //찜 목록 확인
-//  @GetMapping("favoriteList")
-//  public ResponseEntity<?> favoriteList(Authentication authentication) {
-//    
-//    //헤더에서 userid 추출
-//    User user = (User) authentication.getPrincipal();
-//    String userId = user.getUserId();
-//    
-//    ProfileResponse response = myService.favoriteList(userId);
-//
-//    return ResponseEntity.ok(response);
-//  }
-//  
-//  
+  //찜 목록 확인
+  @GetMapping("favoriteList")
+  public ResponseEntity<?> favoriteList(Authentication authentication) {
+    
+    //헤더에서 userid 추출
+    User user = (User) authentication.getPrincipal();
+    String userId = user.getUserId();
+    
+    List<FavoriteResponse> responseList = myService.favoriteList(userId);
+
+    return ResponseEntity.ok(responseList);
+  }
+  
+  
 //  //장바구니 확인
 //  @GetMapping("cartList")
 //  public ResponseEntity<?> cartList(Authentication authentication) {

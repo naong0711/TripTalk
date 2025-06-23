@@ -56,6 +56,24 @@ dependencies {
     
     //이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
+    
+    //WebSocket + Messaging 포함
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+    
+    //Security Messaging 설정
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+
+    //STOMP/SockJS 클라이언트
+    implementation 'org.webjars:sockjs-client:1.5.1'
+    implementation 'org.webjars:stomp-websocket:2.3.4'
+    
+	//테스트용 WebSocket/STOMP 지원
+    testImplementation 'org.springframework:spring-messaging'
+    testImplementation 'org.springframework:spring-websocket'
+    testImplementation 'org.springframework:spring-web'
+
+
+}
 
     
 

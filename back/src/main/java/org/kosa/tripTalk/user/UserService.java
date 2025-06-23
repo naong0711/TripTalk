@@ -40,7 +40,7 @@ public class UserService {
   }
     
     //이메일 미인증 시
-    if (!user.isEmailVerified()) {
+    if (user.getEmailVerified() == null || !user.getEmailVerified()) {
       throw new IllegalStateException("이메일 인증 후 로그인할 수 있습니다. 이메일을 확인해 주세요.");
   }
     //토큰 생성

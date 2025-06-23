@@ -18,6 +18,7 @@ public class ChatController {
 	
 	@PostMapping
 	public ChatRequest chat(@RequestBody ChatInput input) {
+		//대화가 ㅇ벗을 경우 요청 자체를 거부하는 예외로 둠 
 		if (input.getChatRequest() == null) {
 	        throw new IllegalArgumentException("chatRequest는 null일 수 없습니다.");
 	    }
@@ -27,38 +28,10 @@ public class ChatController {
 	
 	@Data
 	public static class ChatInput{
+		//대화 전체 히스토리
 		private ChatRequest chatRequest;
+		//사용자의 입력 
 		private String userInput;
 	}
-	
-	
-	/*
-	private final ChatService chatService;
-	
-	@PostMapping
-	public ResponseEntity<ChatResponse> chat(@RequestBody List<Message> history){
-		ChatResponse response = chatService.getChatResponse(history);
-		
-		return ResponseEntity.ok(response);
-	}
-	*/
-	
-	/*
-	 * 단일방향 대화
-	@PostMapping
-	public ResponseEntity<Map<String, Object>> chat(@RequestBody ChatRequest request){
-		if(Objects.isNull(request)) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-		}
-		
-		log.info("========chat zone========");
-		log.info("request ={}", request);
-		
-		ChatResponse response = chatService.getChatResponse(request);
-		
-		return ResponseEntity.ok(Map.of("status", "ok", "response", response));
-	}
-	
-	*/
 
 }

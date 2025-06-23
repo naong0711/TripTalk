@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatPayload {
 
-  private String roomId;
-  private String sender;
+  private Long receiverId;
   private String message;
   
   

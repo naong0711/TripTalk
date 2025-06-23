@@ -35,6 +35,7 @@ public class SecurityConfig {
                           "/api/user/register",
                           "/**",
                           "/api/user/login/**",
+                          "/ws/**",
                           "/oauth2/**",
                           "/email/verify"
                       ).permitAll()

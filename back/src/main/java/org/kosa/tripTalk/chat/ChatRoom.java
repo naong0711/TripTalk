@@ -48,15 +48,7 @@ public class ChatRoom {
         if (this.createdAt == null) {
             this.createdAt = LocalDateTime.now();
         }
-
-        if (this.id == null && user1 != null && user2 != null) {
-            Long userId1 = user1.getId();
-            Long userId2 = user2.getId();
-            if (userId1.compareTo(userId2) < 0) { //아이디값 비교하여 작은순정렬
-                this.id = userId1 + "_" + userId2;
-            } else {
-                this.id = userId2 + "_" + userId1;
-            }
-        }
     }
+    
+    
 }

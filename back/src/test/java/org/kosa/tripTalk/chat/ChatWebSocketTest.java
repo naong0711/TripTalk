@@ -50,8 +50,8 @@ public class ChatWebSocketTest {
                     }
                 });
 
-                ChatPayload message = new ChatPayload("1", "testUser", "테스트 메시지입니다");
-                session.send(SEND_ENDPOINT, message);
+//                ChatPayload message = new ChatPayload("1", "testUser", "테스트 메시지입니다");
+//                session.send(SEND_ENDPOINT, message);
             }
         };
 

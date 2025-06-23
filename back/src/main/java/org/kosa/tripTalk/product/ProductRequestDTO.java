@@ -3,6 +3,8 @@ package org.kosa.tripTalk.product;
 import java.time.LocalDateTime;
 
 import org.kosa.tripTalk.category.Category;
+import org.kosa.tripTalk.product.discount.Discount;
+import org.kosa.tripTalk.product.discount.DiscountDTO;
 import org.kosa.tripTalk.seller.Seller;
 
 import jakarta.validation.constraints.Min;
@@ -44,8 +46,10 @@ public class ProductRequestDTO {
     @NotNull(message = "카테고리 ID는 필수입니다.")
     private Long categoryId;
     
+    private DiscountDTO discount;
+    
     public Product toEntity(Seller seller, Category category) {
-        return Product.builder()
+        Product product = Product.builder()
                 .title(this.title)
                 .description(this.description)
                 .address(this.address)
@@ -55,5 +59,12 @@ public class ProductRequestDTO {
                 .seller(seller)
                 .category(category)
                 .build();
+        
+        Discount discount = DiscountDTO.toEntity(this.discount);
+        if(discount != null) {
+        	product.applyDiscount(discount);
+        }
+        
+        return product;
     }
 }

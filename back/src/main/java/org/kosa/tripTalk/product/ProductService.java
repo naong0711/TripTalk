@@ -53,7 +53,7 @@ public class ProductService {
 	public Product update(Long id, ProductRequestDTO dto) {
 		Product product = notFoundProductId(id);
 		product.updateFromDTO(dto);
-		
+
 		return product;
 	}
 

@@ -22,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BookMarkController {
 	private final BookMarkService bookMarkService;
 	
+	//검색어로 찾기위함
 	@GetMapping("/search")
 	public ResponseEntity<?> search(@RequestParam("keyword") String keyword){
 		String result = bookMarkService.searchPlaces(keyword);
@@ -29,14 +30,14 @@ public class BookMarkController {
 		return ResponseEntity.ok(result);
 	}
 	
-	
+	//위치 북마크하기 위한 메소드 
 	@PostMapping
 	public ResponseEntity<?> saveBookMark(@RequestBody BookMarkDTO bookMarkDTO){
 		bookMarkService.saveBookMark(bookMarkDTO);
 		return ResponseEntity.ok("북마크 성공");
 	}
 	
-	
+	//유저의 북마크한 곳 저장하기 위함 
 	@GetMapping("/{userid}")
 	public ResponseEntity<List<BookMark>> getUserBookMarks(@PathVariable Long userId){
 		return ResponseEntity.ok(bookMarkService.getBookMarks(userId));

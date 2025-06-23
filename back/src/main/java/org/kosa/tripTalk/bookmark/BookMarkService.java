@@ -60,7 +60,7 @@ public class BookMarkService {
 		bookMarkRepository.save(list);
 	}
 	
-	//북마크 목록 조회하기
+	//userid로 북마크 목록 조회하기
 	public List<BookMark> getBookMarks(Long userId){
 		return bookMarkRepository.findByUserId(userId);
 	}

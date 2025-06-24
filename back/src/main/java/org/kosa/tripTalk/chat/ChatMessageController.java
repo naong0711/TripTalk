@@ -24,31 +24,30 @@ public class ChatMessageController {
     public void sendMessage(@Payload ChatPayload payload,  Authentication authentication) {
       
       //헤더에서 user의 id 추출
-//      User sender  = (User) authentication.getPrincipal();
-//      Long senderId = sender.getId();
-//      
-//      // receiverId로 User 객체 조회
-      Long receiverId = payload.getReceiverId();
+//      User customer  = (User) authentication.getPrincipal();
+//      Long customerId = customer.getId();
       
       //테스트 상 인증불가로 하드코딩
-      Long senderId = (long) 1;
-      User sender = userRepository.findById(senderId) .orElseThrow(() -> new IllegalArgumentException("보낸 사람 없음"));
+      Long customerId = (long) 1;
+      User customer = userRepository.findById(customerId) .orElseThrow(() -> new IllegalArgumentException("보낸 사람 없음"));
+
+      //sellerId로 판매자 User 객체 조회
+      Long sellerId = payload.getReceiverId();
       
-      System.out.println("========="+sender);
-      System.out.println("========="+senderId);
-//      Long receiverId = (long) 1;
+      System.out.println("========="+customer);
+      System.out.println("========="+customerId);
 
       //채팅방 생성
-      ChatRoom room = chatMessageService.getOrCreateRoom(senderId, receiverId);
+      ChatRoom room = chatMessageService.getOrCreateRoom(customerId, sellerId);
       
       //메시지 저장이나 전송 처리 (필요 시)
-      chatMessageService.processMessage(room, sender, payload.getMessage());
+      chatMessageService.processMessage(room, customer, payload.getMessage());
      
     }
     
     @GetMapping("/chat/room/{roomId}")
-    public ResponseEntity<String> getRoomId(@RequestParam Long senderId, @RequestParam Long receiverId) {
-        String roomId = chatMessageService.generateRoomId(senderId, receiverId);
+    public ResponseEntity<String> getRoomId(@RequestParam Long customerId, @RequestParam Long sellerId) {
+        String roomId = chatMessageService.generateRoomId(customerId, sellerId);
         return ResponseEntity.ok(roomId);
     }
     

@@ -32,13 +32,13 @@ public class ChatRoom {
 
     //사용자 1 (구매자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user1_id")
-    private User user1;
+    @JoinColumn(name = "customer_id")
+    private User customer;
 
     //사용자 2 (판매자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user2_id")
-    private User user2;
+    @JoinColumn(name = "seller_id")
+    private User seller;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

@@ -1,8 +1,5 @@
 package org.kosa.tripTalk.product;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.category.CategoryRepository;
 import org.kosa.tripTalk.common.dto.Search;
@@ -14,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import lombok.RequiredArgsConstructor;
 
 @Service

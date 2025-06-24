@@ -18,4 +18,6 @@ public class BooleanToYNConverter implements AttributeConverter<Boolean, String>
     public Boolean convertToEntityAttribute(String dbData) {
         return "T".equalsIgnoreCase(dbData);
     }
+
 }
+

@@ -34,7 +34,7 @@ public class SecurityConfig {
               .authorizeHttpRequests((authorize) -> authorize //요청경로 접근제어
                       .requestMatchers(
                           "/api/user/register",
-                          "/",
+                          "/**",
                           "/api/user/login/**",
                           "/ws/**",
                           "/ws/**/**",

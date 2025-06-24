@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 
 public class ProductPredicateBuilder {
 	
+	// like 검색
 	public static BooleanExpression build(QProduct product, Search search) {
 		if (search == null || !search.isValid())
 			return null;

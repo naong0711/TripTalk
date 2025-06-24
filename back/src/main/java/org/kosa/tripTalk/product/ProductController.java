@@ -26,9 +26,9 @@ public class ProductController {
 	
 	// 등록
 	@PostMapping
-    public ResponseEntity<Void> createProduct(@RequestBody @Valid ProductRequestDTO request) {
-        productService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<Long> createProduct(@RequestBody @Valid ProductRequestDTO request) {
+        Long productId = productService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productId);
     }
 
 	// 상세

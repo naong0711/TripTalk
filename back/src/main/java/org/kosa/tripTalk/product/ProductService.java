@@ -26,7 +26,7 @@ public class ProductService {
 
 	// 생성
 	@Transactional
-	public void create(ProductRequestDTO request) {
+	public Long create(ProductRequestDTO request) {
 		 // 1. 판매자 유저 조회
 		User sellerUser = userRepository.findById(request.getSellerId())
                 .orElseThrow(() -> new NotFoundException("판매자 유저가 존재하지 않습니다."));
@@ -43,6 +43,8 @@ public class ProductService {
         Product product = request.toEntity(seller, category);
         
         productRepository.save(product);
+        
+        return product.getId();
 	}
 
 	// 상세

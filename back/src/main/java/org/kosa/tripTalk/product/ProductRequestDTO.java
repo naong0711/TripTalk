@@ -18,7 +18,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+// toBuilder = true, 생성된 객체를 바탕으로 수정한 새 객체 생성
+@Builder(toBuilder = true)
 public class ProductRequestDTO {
 	
 	@NotBlank(message = "제목은 필수입니다.")

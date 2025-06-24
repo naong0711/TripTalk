@@ -29,7 +29,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
     @Value("${kakao.secret-key}")
     private String secretKey;
 
-    private static final String HOST = "https://open-api.kakaopay.com"; // oh note
+    private static final String HOST = "https://open-api.kakaopay.com"; // 카카오페이 API 기본 URL
     private KakaoPayReadyResponse kakaoPayReadyResponse;
     private final PaymentService paymentService;
     private final ReservationService reservationService;
@@ -46,10 +46,12 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         // 2. approval_url에 paymentId 포함
         String approvalUrl = "http://localhost:8080/payments/approve?paymentId=" + paymentId;
 
+        // HTTP 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "SECRET_KEY " + secretKey);
-
+    
+        // 카카오페이 결제 승인 요청용 파라미터
         Map<String, Object> payload = new HashMap<>();
         payload.put("cid", "TC0ONETIME");
         payload.put("partner_order_id", request.getProductId().toString());
@@ -65,24 +67,29 @@ public class KakaoPayServiceImpl implements KakaoPayService {
 
         HttpEntity<Map<String,Object>> body = new HttpEntity<>(payload, headers);
 
+     // 카카오페이 결제 준비 API 호출 (POST)
         ResponseEntity<KakaoPayReadyResponse> res = rt.postForEntity(
             HOST + "/online/v1/payment/ready", body, KakaoPayReadyResponse.class
         );
 
+     // 응답에서 결제 준비 정보 저장 (tid 등)
         this.kakaoPayReadyResponse = res.getBody(); // tid 저장용
         return this.kakaoPayReadyResponse;
     }
 
     @Override
+    // DB에서 결제 정보 조회
     public KakaoPayApproveResponse kakaoPayApprove(String pgToken, Long paymentId) {
         RestTemplate rt = new RestTemplate();
         Payment payment = paymentService.getPayment(paymentId)
                 .orElseThrow(() -> new IllegalArgumentException("결제 정보가 없습니다."));
 
+     // HTTP 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "SECRET_KEY " + secretKey);
 
+     // 카카오페이 결제 승인 요청용 파라미터
         Map<String, Object> payload = new HashMap<>();
         payload.put("cid", "TC0ONETIME");
         payload.put("tid", kakaoPayReadyResponse.getTid());
@@ -91,7 +98,8 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         payload.put("pg_token", pgToken);
 
         HttpEntity<Map<String,Object>> body = new HttpEntity<>(payload, headers);
-
+    
+     // 카카오페이 결제 승인 API 호출 (POST)
         ResponseEntity<KakaoPayApproveResponse> res = rt.postForEntity(
             HOST + "/online/v1/payment/approve", body, KakaoPayApproveResponse.class);
 

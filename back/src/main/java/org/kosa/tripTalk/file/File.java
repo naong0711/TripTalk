@@ -35,6 +35,6 @@ public class File {
     private Long ownerId;
 
     @Column(name = "is_thumbnail", nullable = false)
-    private boolean isThumbnail; // 썸네일 여부 (nullable 허용)
+    private int isThumbnail; // 썸네일 여부 (nullable 허용)
 }
 

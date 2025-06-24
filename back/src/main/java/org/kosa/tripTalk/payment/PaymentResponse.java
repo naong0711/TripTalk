@@ -8,11 +8,11 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class PaymentResponse {
-    private Long id;
-    private String transactionId;
-    private String paymentMethod;
-    private int amount;
-    private String status;
-    private LocalDateTime paymentDate;
-    private LocalDateTime refundDate;
+    private Long id;					 // 결제 식별자 (Primary Key)
+    private String transactionId;		 // 거래 고유 식별자 (UUID 등으로 생성)
+    private String paymentMethod;		 // 결제 방식 (예: 카드, 카카오페이 등)
+    private int amount;					 // 결제 금액
+    private String status;				 // 결제 상태 (예: APPROVED, CANCELLED 등)
+    private LocalDateTime paymentDate;	 // 결제가 완료된 일시
+    private LocalDateTime refundDate;	 // 환불된 일시 (환불이 있을 경우만 값이 존재)
 }

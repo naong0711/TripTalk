@@ -43,6 +43,12 @@ public class UserService {
     if (user.getEmailVerified() == null || !user.getEmailVerified()) {
       throw new IllegalStateException("이메일 인증 후 로그인할 수 있습니다. 이메일을 확인해 주세요.");
   }
+   
+    //탈퇴 여부 확인(탈퇴 시 true)
+    if (user.isDel()) {
+      throw new IllegalStateException("탈퇴된 회원입니다.");
+  }
+    
     //토큰 생성
     String accessToken  = jwtUtil.generateAccessToken(user.getUserId(), user.getRole());
     String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
@@ -105,6 +111,7 @@ public class UserService {
         .email(request.getEmail())
         .nickname(request.getNickname())
         .phone(request.getPhone())
+        .loginType("LOCAL")
         .password(encodedPassword) 
         .role(User.Role.USER)
         .emailVerified(false)

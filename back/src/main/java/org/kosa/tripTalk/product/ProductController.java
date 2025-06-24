@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -23,12 +24,14 @@ public class ProductController {
 
 	private final ProductService productService;
 	
+	// 등록
 	@PostMapping
-    public ResponseEntity<Void> createProduct(@RequestBody ProductRequestDTO request) {
-        productService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    public ResponseEntity<Long> createProduct(@RequestBody @Valid ProductRequestDTO request) {
+        Long productId = productService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(productId);
     }
 
+	// 상세
 	@GetMapping("/{id}")
 	public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long id) {
 		ProductResponseDTO response = productService.getProductById(id);
@@ -36,6 +39,7 @@ public class ProductController {
 		
 	}
 	
+	// 수정
 	@PutMapping("/{id}")
 	public ResponseEntity<ProductResponseDTO> updateProduct(
 			@PathVariable Long id,
@@ -45,6 +49,7 @@ public class ProductController {
 		return ResponseEntity.ok(ProductResponseDTO.from(updateProduct));
 	}
 	
+	// 리스트
 	@GetMapping
     public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
     		PageRequestDTO pageRequestDTO,

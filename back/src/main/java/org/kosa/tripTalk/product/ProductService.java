@@ -24,6 +24,7 @@ public class ProductService {
 	private final UserRepository userRepository;
 	private final CategoryRepository categoryRepository;
 
+	// 생성
 	@Transactional
 	public void create(ProductRequestDTO request) {
 		 // 1. 판매자 유저 조회
@@ -44,12 +45,14 @@ public class ProductService {
         productRepository.save(product);
 	}
 
+	// 상세
 	public ProductResponseDTO getProductById(Long id) {
 		Product product = notFoundProductId(id);
 		
 		return ProductResponseDTO.from(product);
 	}
 
+	// 수정
 	public Product update(Long id, ProductRequestDTO dto) {
 		Product product = notFoundProductId(id);
 		product.updateFromDTO(dto);
@@ -57,10 +60,12 @@ public class ProductService {
 		return product;
 	}
 
+	// 리스트
 	public Page<ProductResponseDTO> getAllProducts(Pageable pageable, Search search) {
 		return productRepository.searchAll(pageable, search);
 	}
 	
+	// 없는 상품 예외
 	private Product notFoundProductId(Long id) {
 		return productRepository.findById(id)
 		        .orElseThrow(() -> new NotFoundException("해당 상품을 찾을 수 없습니다"));

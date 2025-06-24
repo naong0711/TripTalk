@@ -24,12 +24,14 @@ public class ProductController {
 
 	private final ProductService productService;
 	
+	// 등록
 	@PostMapping
     public ResponseEntity<Void> createProduct(@RequestBody @Valid ProductRequestDTO request) {
         productService.create(request);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+	// 상세
 	@GetMapping("/{id}")
 	public ResponseEntity<ProductResponseDTO> getProduct(@PathVariable Long id) {
 		ProductResponseDTO response = productService.getProductById(id);
@@ -37,6 +39,7 @@ public class ProductController {
 		
 	}
 	
+	// 수정
 	@PutMapping("/{id}")
 	public ResponseEntity<ProductResponseDTO> updateProduct(
 			@PathVariable Long id,
@@ -46,6 +49,7 @@ public class ProductController {
 		return ResponseEntity.ok(ProductResponseDTO.from(updateProduct));
 	}
 	
+	// 리스트
 	@GetMapping
     public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
     		PageRequestDTO pageRequestDTO,

@@ -3,6 +3,7 @@ package org.kosa.tripTalk.product.discount;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+// db 안쓰고 고정 값 할인 타입
 @RequiredArgsConstructor
 @Getter
 public enum DiscountType {

@@ -21,6 +21,7 @@ public class ProductResponseDTO {
     private String sellerName;
     private DiscountDTO discount;
     
+    // dto 폼
     public static ProductResponseDTO from(Product product) {
         return ProductResponseDTO.builder()
             .id(product.getId())

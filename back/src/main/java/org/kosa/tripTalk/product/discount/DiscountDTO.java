@@ -19,6 +19,7 @@ public class DiscountDTO {
     private LocalDateTime startAt;
     private LocalDateTime endAt;
     
+    // dto 변환
     public static DiscountDTO from(Discount discount) {
         if (discount == null) return null;
 
@@ -32,6 +33,7 @@ public class DiscountDTO {
                 .build();
     }
     
+    // 엔티티 변환
     public static Discount toEntity(DiscountDTO dto) {
         if (dto == null) return null;
 

@@ -48,6 +48,7 @@ public class ProductRequestDTO {
     
     private DiscountDTO discount;
     
+    // 엔티티 변환
     public Product toEntity(Seller seller, Category category) {
         Product product = Product.builder()
                 .title(this.title)
@@ -60,6 +61,7 @@ public class ProductRequestDTO {
                 .category(category)
                 .build();
         
+        // 할인 엔티티로 변환
         Discount discount = DiscountDTO.toEntity(this.discount);
         if(discount != null) {
         	product.applyDiscount(discount);

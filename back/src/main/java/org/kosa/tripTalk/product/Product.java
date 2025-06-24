@@ -63,6 +63,7 @@ public class Product {
 	@Column(nullable = false)
 	private LocalDateTime endDate;
 
+	// 수정DTO
 	public void updateFromDTO(ProductRequestDTO dto) {
 		this.title = dto.getTitle();
 		this.description = dto.getDescription();

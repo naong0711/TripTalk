@@ -20,6 +20,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 	
 	private final JPAQueryFactory queryFactory;
 
+	// 페이징, 검색, 정렬 리스트
 	@Override
 	public Page<ProductResponseDTO> searchAll(Pageable pageable, Search search) {
 		QProduct product = QProduct.product;
@@ -32,12 +33,14 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 		return new PageImpl<>(dtoList, pageable, total);
 	}
 
+	// dto변환
 	private List<ProductResponseDTO> toDtoList(List<Product> contents) {
 		return contents.stream()
 						.map(ProductResponseDTO::from)
 						.toList();
 	}
 
+	// 카운트
 	private Long fetchCount(QProduct product, BooleanExpression condition) {
 		return queryFactory
 						.select(product.count())
@@ -46,6 +49,7 @@ public class ProductRepositoryImpl implements ProductRepositoryCustom {
 						.fetchOne();
 	}
 
+	// 내용 가져오기
 	private List<Product> fetchContent(Pageable pageable, QProduct product, BooleanExpression condition) {
 		return queryFactory
 						.selectFrom(product)

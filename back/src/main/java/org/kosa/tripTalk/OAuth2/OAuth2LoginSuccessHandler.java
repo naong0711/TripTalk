@@ -3,6 +3,7 @@ package org.kosa.tripTalk.OAuth2;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.kosa.tripTalk.jwt.JwtUtil;
 
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.util.Map;
 
+@Transactional
 @Component
 @RequiredArgsConstructor
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
@@ -29,6 +31,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                                       HttpServletResponse response,
                                       Authentication authentication) throws IOException {
 
+      System.out.println("OAuth2LoginSuccessHandler 호출됨");
       OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
       
       // 1. 카카오 ID 추출

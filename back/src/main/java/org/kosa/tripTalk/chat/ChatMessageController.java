@@ -15,9 +15,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 @Controller
 @RequiredArgsConstructor
-public class ChatController {
+public class ChatMessageController {
 
-    private final ChatService chatService;
+    private final ChatMessageService chatMessageService;
     private final UserRepository userRepository;
 
     @MessageMapping("/chat/message")
@@ -31,7 +31,7 @@ public class ChatController {
       Long receiverId = payload.getReceiverId();
       
       //테스트 상 인증불가로 하드코딩
-      Long senderId = (long) 2202;
+      Long senderId = (long) 1;
       User sender = userRepository.findById(senderId) .orElseThrow(() -> new IllegalArgumentException("보낸 사람 없음"));
       
       System.out.println("========="+sender);
@@ -39,16 +39,16 @@ public class ChatController {
 //      Long receiverId = (long) 1;
 
       //채팅방 생성
-      ChatRoom room = chatService.getOrCreateRoom(senderId, receiverId);
+      ChatRoom room = chatMessageService.getOrCreateRoom(senderId, receiverId);
       
       //메시지 저장이나 전송 처리 (필요 시)
-      chatService.processMessage(room, sender, payload.getMessage());
+      chatMessageService.processMessage(room, sender, payload.getMessage());
      
     }
     
     @GetMapping("/chat/room/{roomId}")
     public ResponseEntity<String> getRoomId(@RequestParam Long senderId, @RequestParam Long receiverId) {
-        String roomId = chatService.generateRoomId(senderId, receiverId);
+        String roomId = chatMessageService.generateRoomId(senderId, receiverId);
         return ResponseEntity.ok(roomId);
     }
     

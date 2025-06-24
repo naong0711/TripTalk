@@ -9,7 +9,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class ChatService {
+public class ChatMessageService {
 
   private final ChatMessageRepository messageRepository;
   private final ChatRoomRepository roomRepository;

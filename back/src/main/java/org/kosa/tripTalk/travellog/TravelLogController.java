@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,7 +22,7 @@ public class TravelLogController {
 	
 	//log 쓰기
 	@PostMapping("/write")
-	public ResponseEntity<?> write(@RequestBody TravelLogDTO article){
+	public ResponseEntity write(@RequestBody TravelLogDTO article){
 		travelLogService.write(article);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 	}
@@ -39,7 +40,21 @@ public class TravelLogController {
 	    List<TravelLogListDTO> logs = travelLogService.findAll();
 	    return ResponseEntity.ok(logs);
 	}
-
+	
+	//글 수정
+	@GetMapping("/update/{id}")
+	public ResponseEntity<?> update(@PathVariable("id") Long id, @RequestBody TravelLogDTO updateDTO){
+		travelLogService.update(id, updateDTO);
+		return ResponseEntity.ok().build();
+	}
+	
+	
+	//글 삭제
+	@DeleteMapping("/delete/{id}")
+	public ResponseEntity deleteLog(@PathVariable("id") Long id) {
+		travelLogService.deleteLog(id);
+		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
 	
 }
 

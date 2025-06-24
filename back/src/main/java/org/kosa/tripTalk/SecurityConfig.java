@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -35,9 +36,12 @@ public class SecurityConfig {
                           "/api/user/register",
                           "/",
                           "/api/user/login/**",
+                          "/ws/**",
+                          "/ws/**/**",
                           "/oauth2/**",
                           "/email/verify"
                       ).permitAll()
+                      .requestMatchers("/api/mypage/**").authenticated()  //로그인한 사용자만 접근 가능
                       .anyRequest().authenticated())
               .oauth2Login(oauth2 -> oauth2
                   .successHandler(oAuth2LoginSuccessHandler())
@@ -56,7 +60,7 @@ public class SecurityConfig {
       return http.build();
   }
   
-  //비밀번호암호화
+  //비밀번호 암호화
   @Bean
   public BCryptPasswordEncoder bCryptPasswordEncoder() {
       return new BCryptPasswordEncoder();
@@ -68,7 +72,7 @@ public class SecurityConfig {
       return new JwtAuthenticationFilter(jwtUtil, userService);
   }
   
- //oAuth2 설정
+ //oAuth2 설정 -> 카카오 로그인
   @Bean
   public OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler() {
       return new OAuth2LoginSuccessHandler(jwtUtil, userRepository);

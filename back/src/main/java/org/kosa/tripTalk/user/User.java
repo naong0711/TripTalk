@@ -50,7 +50,6 @@ public class User {
     @Column(name = "IS_DEL", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'F'")
     @Convert(converter = BooleanToYNConverter.class) //false -> 'F', true -> 'T' 자동 변환
     private Boolean isDel;
-
     
     @Column
     private LocalDateTime delAt;

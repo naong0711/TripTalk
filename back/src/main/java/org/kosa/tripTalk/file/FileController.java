@@ -1,19 +1,14 @@
 package org.kosa.tripTalk.file;
 
-import java.util.List;
-import org.kosa.tripTalk.file.File;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import lombok.RequiredArgsConstructor;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,22 +18,44 @@ public class FileController {
     private final FileService fileService;
 
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadFile(@RequestPart MultipartFile file,
-                                        @RequestParam String ownerType,
-                                        @RequestParam Long ownerId,
-                                        @RequestParam(required = false) boolean isThumbnail) {
-        // 저장 및 DB 등록 로직
-        return ResponseEntity.ok("파일 업로드 완료");
+    public ResponseEntity<?> uploadFile(
+            @RequestPart("file") MultipartFile file,
+            @RequestParam("ownerType") String ownerType,
+            @RequestParam("ownerId") Long ownerId,
+            @RequestParam(name = "isThumbnail" ) int isThumbnail) {
+        try {
+        	// 파일 저장 처리 호출
+        	File savedFile = fileService.saveFile(file, ownerType, ownerId, isThumbnail);
+           
+        	// 성공 메시지와 저장된 파일 ID 반환을 위한 Map 생성
+        	Map<String, Object> response = new HashMap<>();
+            response.put("message", "파일 업로드 완료");
+            response.put("fileId", savedFile.getId());
+            
+            // HTTP 200 OK 응답과 함께 반환
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+        	// 예외 발생 시 HTTP 400 Bad Request와 에러 메시지 반환
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 
     @GetMapping
-    public List<File> getFiles(@RequestParam String ownerType, @RequestParam Long ownerId) {
-        return fileService.getFilesByOwner(ownerType, ownerId);
+    public ResponseEntity<List<File>> getFiles(@RequestParam String ownerType, @RequestParam Long ownerId) {
+    	// ownerType과 ownerId 기준으로 파일 목록 조회 후 반환
+    	return ResponseEntity.ok(fileService.getFilesByOwner(ownerType, ownerId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteFile(@PathVariable Long id) {
-        fileService.deleteFile(id);
-        return ResponseEntity.ok("삭제 완료");
+        try {
+        	// 파일 삭제 처리 호출
+            fileService.deleteFile(id);
+            // 삭제 성공 메시지 반환
+            return ResponseEntity.ok(Map.of("message", "삭제 완료"));
+        } catch (Exception e) {
+        	// 삭제 실패 시 에러 메시지와 함께 HTTP 400 반환
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
     }
 }

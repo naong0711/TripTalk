@@ -111,7 +111,7 @@ public class MyService {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
     
-    user.setDel(true);
+    user.setIsDel(true);
     user.setDelAt(LocalDateTime.now());
     
     userRepository.save(user);

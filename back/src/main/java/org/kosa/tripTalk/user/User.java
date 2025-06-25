@@ -59,5 +59,10 @@ public class User {
     public enum Role {
       USER, SELLER, ADMIN
   }
+    
+    public boolean isDel() {
+      return Boolean.TRUE.equals(this.isDel);
+  }
+
 
 }

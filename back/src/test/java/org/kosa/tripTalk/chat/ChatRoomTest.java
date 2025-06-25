@@ -18,8 +18,8 @@ public class ChatRoomTest {
         user2.setId(5L);
         user2.setUserId("user5");
 
-        room.setUser1(user1);
-        room.setUser2(user2);
+//        room.setUser1(user1);
+//        room.setUser2(user2);
 
         // @PrePersist 메서드 직접 호출 (실제 JPA 호출 전에 동작하는 메서드)
         room.prePersist();
@@ -39,8 +39,8 @@ public class ChatRoomTest {
         User user2 = new User();
         user2.setId(5L);
 
-        room.setUser1(user1);
-        room.setUser2(user2);
+//        room.setUser1(user1);
+//        room.setUser2(user2);
 
         room.prePersist();
 

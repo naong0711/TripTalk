@@ -1,14 +1,18 @@
-<<<<<<< HEAD
 <template>
   <div
     class="swiper-background"
-    :style="{ background: currentBackground, transition: 'background 0.5s ease' }"
+    :style="{ background: currentBackground, transition: 'background 0.8s ease' }"
   >
+    <div class="text-overlay">{{ currentText }}</div>
+
     <div class="swiper-inner">
       <Swiper
+        :modules="modules"
         :slides-per-view="1"
         :space-between="30"
         :loop="true"
+        :pagination="{ clickable: true }"
+        :autoplay="{ delay: 10000, disableOnInteraction: false }"
         class="mySwiper"
         @slideChange="onSlideChange"
       >
@@ -22,8 +26,14 @@
 
 <script setup>
 import 'swiper/css'
+import 'swiper/css/pagination'
+import 'swiper/css/autoplay'
+
 import { Swiper, SwiperSlide } from 'swiper/vue'
+import { Pagination, Autoplay } from 'swiper/modules'
 import { ref } from 'vue'
+
+const modules = [Pagination, Autoplay]
 
 const images = [
   new URL('@/assets/busan.jpg', import.meta.url).href,
@@ -32,100 +42,83 @@ const images = [
 ]
 
 const backgrounds = [
-  'linear-gradient(135deg, #d0e8ff, #a0c4ff)',
-  'linear-gradient(135deg, #ffe29a, #ff8a65)',
-  'linear-gradient(135deg, #d4fc79, #96e6a1)'
+  'linear-gradient(135deg, #d0e8ff, #a0c4ff)',  // Busan
+  'linear-gradient(135deg, #ffe29a, #ff8a65)',  // Daejeon
+  'linear-gradient(135deg, #d4fc79, #96e6a1)'   // Seoul
 ]
 
+const backgroundTexts = ['Busan', 'Daejeon', 'Seoul']
+
 const currentBackground = ref(backgrounds[0])
+const currentText = ref(backgroundTexts[0])
 
 function onSlideChange(swiper) {
   const realIndex = swiper.realIndex
   currentBackground.value = backgrounds[realIndex % backgrounds.length]
+  currentText.value = backgroundTexts[realIndex % backgroundTexts.length]
 }
 </script>
 
 <style scoped>
-/* 📌 배경 전체를 감싸는 div */
 .swiper-background {
   width: 100%;
   min-height: 60vh;
   padding: 50px 20px;
   box-sizing: border-box;
   display: flex;
-  justify-content: center;   /* ✅ 수평 중앙 정렬 */
-  align-items: center;       /* ✅ 수직 중앙 정렬 */
-  background: linear-gradient(135deg, #d0e8ff, #a0c4ff); /* 기본 배경 예시 */
+  justify-content: center;
+  align-items: center;
+  transition: background 0.8s ease;
+  position: relative;
+  overflow: hidden;
 }
 
-/* 📌 가운데 사진을 감싸는 영역 */
+/* 글자 크기 더 크게 (10rem) */
+.text-overlay {
+  position: absolute;
+  top: 40px;
+  left: 8%;
+  font-size: 10rem;
+  font-weight: 900;
+  color: rgba(0, 0, 0, 0.4); /* 진한 무채색 */
+  user-select: none;
+  pointer-events: none;
+  z-index: 0;
+}
+
 .swiper-inner {
-  width: 50%;
-  height: 50%;
+  width: 40%;
+  height: 40%;
   background-color: white;
   border-radius: 12px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  /* ✅ 위치 조정용 */
   position: relative;
-  margin-left: auto;    /* 오른쪽으로 붙임 */
-  margin-top: auto;     /* 아래쪽으로 붙임 */
+  margin-left: auto;
+  margin-top: auto;
   transform: translate(-15%, 20%);
+  z-index: 1;
 }
-/* 📌 이미지 크기 유지 */
+
 .slide-image {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
+  transition: opacity 0.8s ease;
+}
+
+/* pagination 스타일 오버라이드 */
+::v-deep(.swiper-pagination-bullets) {
+  bottom: 10px;
+}
+
+::v-deep(.swiper-pagination-bullet) {
+  background: #bbb;
+  opacity: 1;
+}
+
+::v-deep(.swiper-pagination-bullet-active) {
+  background: #2c3e50;
 }
 </style>
-=======
-<script setup>
-import { ref } from 'vue'
-
-defineProps({
-  msg: String,
-})
-
-const count = ref(0)
-</script>
-
-<template>
-  <h1>{{ msg }}</h1>
-
-  <div class="card">
-    <button type="button" @click="count++">count is {{ count }}</button>
-    <p>
-      Edit
-      <code>components/HelloWorld.vue</code> to test HMR
-    </p>
-  </div>
-
-  <p>
-    Check out
-    <a href="https://vuejs.org/guide/quick-start.html#local" target="_blank"
-      >create-vue</a
-    >, the official Vue + Vite starter
-  </p>
-  <p>
-    Learn more about IDE Support for Vue in the
-    <a
-      href="https://vuejs.org/guide/scaling-up/tooling.html#ide-support"
-      target="_blank"
-      >Vue Docs Scaling up Guide</a
-    >.
-  </p>
-  <p class="read-the-docs">Click on the Vite and Vue logos to learn more</p>
-</template>
-
-<style scoped>
-.read-the-docs {
-  color: #888;
-}
-</style>
->>>>>>> e73f2cb9dd558d49dceb3ba5cf48efb6c646d83f

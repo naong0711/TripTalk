@@ -1,6 +1,7 @@
 package org.kosa.tripTalk.user;
 
 import java.util.Optional;
+import org.kosa.tripTalk.email.Email;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -16,5 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long>{
   boolean existsByUserId(String userId);
   boolean existsByEmail(String email);
   boolean existsByNickname(String nickname);
+
+  //이메일
+  Optional<User> findByEmail(String email);
 
 }

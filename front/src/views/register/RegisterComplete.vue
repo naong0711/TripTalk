@@ -37,12 +37,14 @@ const route = useRoute()
 const currentStep = 3
 
 const userEmail = route.query.email || 'unknown@example.com';
+const userId = route.query.userId || null
 
 async function goReissue() {
   try {
     console.log(userEmail)
     console.log(route.query.email)
     await axios.post('/api/email/reissue', {
+      userId: userId,
       email: userEmail
     });
     alert('인증 메일이 재발송되었습니다.');

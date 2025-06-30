@@ -53,11 +53,18 @@
     </div>
 
     <div v-if="isEmailChanged" class="email-verify">
-        <span class="pw-msg">이메일 변경됨 — 인증 필요</span>
-        <button class="link-btn" @click="verifyEmail">인증 요청</button>
+        <template v-if="emailVerified">
+            <span style="color: green; font-weight: 600;">✔ 이메일 인증이 완료되었습니다.</span>
+        </template>
+        <template v-else>
+            <span class="pw-msg">이메일 변경됨 — 인증 필요</span>
+            <button class="link-btn" @click="verifyEmail">인증 요청</button>
+        </template>
     </div>
 
-    <div v-if="isEmailChanged && !emailVerified" class="pw-msg">⚠ 이메일 인증이 완료되지 않았습니다.</div>
+    <div v-if="isEmailChanged && !emailVerified" class="pw-msg">
+    ⚠ 이메일 인증이 완료되지 않았습니다.
+    </div>
     </div>
 
     <div class="form-group">
@@ -81,7 +88,7 @@
     </div>
 
     <div class="button-group">
-      <button class="save-btn" @click="submitUpdate" :disabled="isEmailChanged && !emailVerified">저장</button>
+      <button class="save-btn" @click="submitUpdate">저장</button>
       <button class="cancel-btn" @click="goBack">취소</button>
     </div>
   </div>
@@ -114,6 +121,7 @@ const isPasswordValid = computed(() => {
   const pw = form.password
   return pw.length >= 8 && /[A-Za-z]/.test(pw) && /\d/.test(pw) && /[^A-Za-z0-9]/.test(pw)
 })
+
 const originalEmail = ref('')
 const emailVerified = ref(true)
 
@@ -125,27 +133,59 @@ const currentEmail = computed(() => {
 
 const isEmailChanged = computed(() => currentEmail.value !== originalEmail.value)
 
-watch(currentEmail, (newVal) => {
-  if (newVal !== originalEmail.value) {
-    emailVerified.value = false
-  }
-})
 
-// 인증 이메일 재발송 API 호출 함수
-async function verifyEmail() {
-    try {
-    console.log(currentEmail.value);
-    await axios.post('/api/email/reissue', {
-      userId: form.userId,
-      email: currentEmail.value
-    });
-    alert('인증 메일이 재발송되었습니다.');
-  } catch (error) {
-    console.error(error);
-    alert('메일 재발급에 실패했습니다.');
+// ✅ 이메일 인증 상태 확인
+async function getEmailValid() {
+  try {
+    const res = await axios.get('/api/email/validate', {
+      params: { userId: form.userId }
+    })
+    emailVerified.value = res.data === 1
+  } catch (err) {
+    console.error('이메일 인증 상태 확인 실패:', err)
+    emailVerified.value = false
   }
 }
 
+// ✅ 이메일 변경 감지 → 인증 상태 초기화 또는 확인
+watch(currentEmail, async (newVal) => {
+  if (newVal !== originalEmail.value) {
+    emailVerified.value = false
+  } else {
+    await getEmailValid()
+  }
+})
+
+let intervalId = null
+
+// ✅ 인증 이메일 재발송
+async function verifyEmail() {
+  try {
+    await axios.post('/api/email/changeEmail', {
+      userId: form.userId,
+      email: currentEmail.value
+    })
+    alert('인증 메일이 재발송되었습니다.')
+
+    // 인증 상태 주기적 확인 (5초마다)
+    if (intervalId) clearInterval(intervalId) // 중복 방지
+
+    intervalId = setInterval(async () => {
+      await getEmailValid()
+
+      // 인증 완료되면 중단
+      if (emailVerified.value) {
+        clearInterval(intervalId)
+        intervalId = null
+      }
+    }, 5000)
+  } catch (error) {
+    console.error('이메일 인증 요청 실패:', error)
+    alert('메일 재발급에 실패했습니다.')
+  }
+}
+
+// ✅ 페이지 로드시 정보 불러오기 + 초기 인증 상태 확인
 onMounted(async () => {
   try {
     const res = await axios.get('/api/mypage/profile', {
@@ -168,12 +208,29 @@ onMounted(async () => {
       form.emailDomain = ['gmail.com', 'naver.com', 'daum.net', 'kakao.com'].includes(domain) ? domain : 'direct'
       form.customEmailDomain = form.emailDomain === 'direct' ? domain : ''
       originalEmail.value = data.email
+
+      // ✅ 이메일 인증 상태 초기 확인
+      await getEmailValid()
+    }
+    await getEmailValid()
+
+        if (!emailVerified.value) {
+        if (intervalId) clearInterval(intervalId)
+
+        intervalId = setInterval(async () => {
+            await getEmailValid()
+            if (emailVerified.value) {
+            clearInterval(intervalId)
+            intervalId = null
+            }
+        }, 5000)
     }
   } catch (error) {
     console.error('회원 정보 불러오기 실패:', error)
   }
 })
 
+// ✅ 주소 검색
 function searchAddress() {
   new window.daum.Postcode({
     oncomplete: function (data) {
@@ -183,6 +240,7 @@ function searchAddress() {
   }).open()
 }
 
+// ✅ 정보 저장
 async function submitUpdate() {
   if (form.password !== form.passwordConfirm) {
     alert('비밀번호가 일치하지 않습니다.')
@@ -205,26 +263,21 @@ async function submitUpdate() {
     userId: form.userId,
     name: form.name,
     nickname: form.nickname,
-    email,
+    email: currentEmail.value,
     phone: form.phone,
     birthDate: form.birthDate,
     zipcode: form.zipcode,
     address: form.address,
     addressDetail: form.addressDetail,
-    password: form.password || undefined,
+    ...(form.password ? { password: form.password } : {})
   }
 
   try {
     const res = await axios.put('/api/mypage/profile/update', updateData, {
       headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }
     })
-
-    if (email !== res.data.email) {
-      alert('이메일이 변경되어 인증이 필요합니다.')
-      router.push('/email-verification')
-    } else {
       alert('정보가 수정되었습니다.')
-    }
+      router.back()
   } catch (err) {
     console.error('업데이트 실패:', err)
     alert('정보 수정에 실패했습니다.')
@@ -235,6 +288,7 @@ function goBack() {
   router.back()
 }
 </script>
+
 
 
 <style scoped>

@@ -24,7 +24,7 @@ public class EmailService {
     private final EmailRepository emailRepository;
     private final UserRepository repository;
 
-    //이메일 요청 내용
+    // 이메일 요청 내용
     public void sendEmail(String to, String subject, String text) {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom("naong0711@gmail.com");
@@ -34,9 +34,8 @@ public class EmailService {
         mailSender.send(message);
     }
 
-
-    //이메일 인증 요청
-    public void sendVerificationEmail(User user, String token) {
+    // 인증 메일 발송
+    private void sendVerificationEmail(User user, String token) {
         String verificationUrl = verifyUrlBase + token;
         String subject = "이메일 인증을 완료해주세요.";
         String text = "아래 링크를 클릭하여 이메일 인증을 완료해주세요:\n" + verificationUrl;
@@ -44,24 +43,60 @@ public class EmailService {
         sendEmail(user.getEmail(), subject, text);
     }
 
-
-    //토큰 발급 요청
-    public void createVerificationToken(User user) {
-        String token = UUID.randomUUID().toString();
-
-        Email emailToken = Email.builder()
-            .token(token)
-            .user(user)
-            .expiryDate(LocalDateTime.now().plusHours(24))
-            .confirmed(false)
-            .build();
-
-        emailRepository.save(emailToken);
-        sendVerificationEmail(user, token);
+    // 토큰 생성 또는 업데이트 (재사용용)
+    private Email createOrUpdateEmailToken(User user) {
+        return emailRepository.findByUser(user)
+            .map(existing -> {
+                existing.setToken(UUID.randomUUID().toString());
+                existing.setExpiryDate(LocalDateTime.now().plusHours(24));
+                existing.setConfirmed(false);
+                return existing;
+            })
+            .orElseGet(() -> Email.builder()
+                .token(UUID.randomUUID().toString())
+                .user(user)
+                .expiryDate(LocalDateTime.now().plusHours(24))
+                .confirmed(false)
+                .build()
+            );
     }
 
+    // 토큰 생성, 저장, 이메일 발송 공통 처리 메서드
+    private void generateAndSendToken(User user) {
+        Email emailToken = createOrUpdateEmailToken(user);
+        emailRepository.save(emailToken);
+        sendVerificationEmail(user, emailToken.getToken());
+    }
 
-    //토큰 이메일 인증
+    // 회원가입 시 토큰 생성
+    public void createVerificationToken(User user) {
+        generateAndSendToken(user);
+    }
+
+    // 이메일 변경 및 인증 상태 초기화 + 인증 메일 재발급
+    public void updateEmailAndReissueVerification(String userId, String newEmail) {
+        User user = repository.findByUserId(userId)
+            .orElseThrow(() -> new UsernameNotFoundException("해당 유저가 없습니다."));
+
+        user.setEmail(newEmail);
+        user.setEmailVerified(false);
+
+        generateAndSendToken(user);
+    }
+
+    // 이메일 재발급만 (기존 이메일 유지, 인증 메일 재발송)
+    public void reissueVerificationEmail(String userId) {
+        User user = repository.findByUserId(userId)
+            .orElseThrow(() -> new UsernameNotFoundException("해당 유저가 없습니다."));
+
+        if (Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new IllegalStateException("이미 인증된 이메일입니다.");
+        }
+
+        generateAndSendToken(user);
+    }
+
+    // 토큰 이메일 인증 처리
     public String verifyToken(String token) {
         Email emailToken = emailRepository.findByToken(token)
             .orElseThrow(() -> new IllegalArgumentException("유효하지 않은 토큰입니다."));
@@ -83,39 +118,11 @@ public class EmailService {
 
         return "이메일 인증이 완료되었습니다.";
     }
-
-
-    //인증 이메일 재발급 요청
-    public void reissueVerificationEmailByUserId(String userId, String email) {
-      
-      User user = repository.findByUserId(userId)
-          .orElseThrow(() -> new UsernameNotFoundException("해당 유저가 없습니다."));
-
-      if (Boolean.TRUE.equals(user.getEmailVerified())) {
-          throw new IllegalStateException("이미 인증된 이메일입니다.");
-      }
-      
-      // 이메일 임시 변경 (아직 DB 저장 X)
-      user.setEmail(email);
-      user.setEmailVerified(false); // 인증 필요 상태로 설정
-
-      // 토큰 처리 및 발송
-      Email emailToken = emailRepository.findByUser(user)
-          .map(existing -> {
-              existing.setToken(UUID.randomUUID().toString());
-              existing.setExpiryDate(LocalDateTime.now().plusHours(24));
-              existing.setConfirmed(false);
-              return existing;
-          })
-          .orElseGet(() -> Email.builder()
-              .token(UUID.randomUUID().toString())
-              .user(user)
-              .expiryDate(LocalDateTime.now().plusHours(24))
-              .confirmed(false)
-              .build()
-          );
-
-      emailRepository.save(emailToken);
-      sendVerificationEmail(user, emailToken.getToken());
+    
+    //이메일 인증여부
+    public boolean isEmailVerified(String userId) {
+      return repository.findByUserId(userId)
+          .map(user -> user.getEmailVerified() != null && user.getEmailVerified())
+          .orElse(false);
   }
 }

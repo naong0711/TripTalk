@@ -45,8 +45,9 @@ public class MyService {
         .zipcode(user.getZipcode())
         .address(user.getAddress())
         .addressDetail(user.getAddressDetail())
+        .loginType(user.getLoginType())
         .build();
-  }
+}
 
 
   public List<ReservationResponse> reservationList(String userId) {
@@ -99,6 +100,11 @@ public class MyService {
     user.setNickname(request.getNickname());
     user.setPhone(request.getPhone());
     user.setEmail(request.getEmail());
+    user.setLoginType(request.getLoginType());
+    user.setBirthDate(request.getBirthDate());
+    user.setZipcode(request.getZipcode());
+    user.setAddress(request.getAddress());
+    user.setAddressDetail(request.getAddressDetail());
 
     userRepository.save(user);
 
@@ -108,9 +114,14 @@ public class MyService {
         .email(user.getEmail())
         .nickname(user.getNickname())
         .phone(user.getPhone())
+        .loginType(user.getLoginType())
+        .birthDate(user.getBirthDate() != null ? user.getBirthDate().toString() : null)
+        .zipcode(user.getZipcode())
+        .address(user.getAddress())
+        .addressDetail(user.getAddressDetail())
+        .reservations(null)  // 필요하면 예약 리스트 넣기
         .build();
-  }
-
+}
 
   public void profileDelete(String userId) {
     User user = userRepository.findByUserId(userId)

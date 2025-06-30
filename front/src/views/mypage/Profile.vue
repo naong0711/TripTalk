@@ -43,8 +43,6 @@ const labels = {
   address: '주소',
   addressDetail: '상세주소',
   loginType: '로그인 유형',
-  emailVerified: '이메일 인증 여부',
-  role: '권한'
 }
 
 onMounted(async () => {
@@ -55,6 +53,7 @@ onMounted(async () => {
       }
     })
     userInfo.value = res.data
+    console.log('profile data:', userInfo.value) 
   } catch (error) {
     console.error('회원 정보 조회 실패:', error)
   }

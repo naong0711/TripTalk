@@ -52,4 +52,7 @@ public class UserRequest {
 
     private String addressDetail;
 
+    @NotBlank
+    private String loginType;
+
 }

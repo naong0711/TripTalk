@@ -257,7 +257,7 @@ async function goNext() {
     alert('회원가입 성공! 이메일을 확인해 인증을 완료해주세요.')
     router.push({
       path: '/register/complete',
-      query: { email }  // 쿼리 파라미터로 email 전달
+      query: { email, userId }  // 쿼리 파라미터로 email 전달
     });
     
   } catch (error) {

@@ -25,7 +25,6 @@ public class UserService {
   private final JwtUtil jwtUtil;
   private final PasswordEncoder passwordEncoder;
   private final EmailService emailService;
-  private final EmailRepository emailRepository;
 
   //로그인 요청
   public LoginResponse login(@Valid LoginRequest request) {
@@ -170,6 +169,11 @@ public class UserService {
 
     return passwordEncoder.matches(inputPassword, user.getPassword());
 }
+
+  public boolean isEmailVerified(String userId) {
+    // TODO Auto-generated method stub
+    return false;
+  }
 
   
   

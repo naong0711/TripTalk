@@ -5,6 +5,8 @@ import RegisterAgree from '@/components/register/RegisterAgree.vue'
 import RegisterInfo from '@/components/register/RegisterInfo.vue'
 import RegisterComplete from '@/components/register/RegisterComplete.vue'
 import Mypage from '@/components/mypage/Mypage.vue'
+import Reservation from '@/components/Reservation.vue'
+
 
 const routes = [
   { path: '/', name: 'HelloWorld', component: HelloWorld } , //메인
@@ -13,6 +15,7 @@ const routes = [
   { path: '/register/info', name: 'RegisterInfo', component: RegisterInfo }, //회원가입폼(가입정보입력)
   { path: '/register/complete', name: 'RegisterComplete', component: RegisterComplete }, //회원가입폼(완료페이지)
   { path: '/mypage', name: 'Mypage', component: Mypage }, //마이페이지
+  { path: '/reservation', name: 'Reservation', component: Reservation }, // 예약페이지
 
 
 

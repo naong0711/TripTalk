@@ -5,16 +5,23 @@
       <img src="@/assets/logo.png" alt="TripTalk 로고" class="logo-img" />
     </div>
 
+
+
+    <!-- ✅ 검색창 추가 -->
+    <div class="search-box">
+      <input type="text" v-model="searchQuery" placeholder="여행지를 검색해보세요" class="search-input" />
+      <button class="search-button">검색</button>
+    </div>
+
+
     <!-- 햄버거 버튼 (마우스 호버용) -->
     <div class="burger-wrapper">
-      <button class="burger">
-        ☰
-      </button>
+      <button class="burger">☰</button>
 
       <!-- 버튼 / 네비게이션 영역 -->
-      <nav class="nav-buttons">
+    <nav class="nav-buttons">
         <router-link to="/boardList" class="nav-btn">여행 게시판</router-link>
-        <router-link to="/register/agree" class="nav-btn">회원가입</router-link>
+        <router-link to="/registerForm" class="nav-btn">회원가입</router-link>
         <router-link to="/loginForm" class="nav-btn">로그인</router-link>
         <router-link to="/MyPage" class="nav-btn">마이페이지</router-link>
       </nav>
@@ -23,21 +30,23 @@
 </template>
 
 <script setup>
-// ref, toggle 함수 삭제 (불필요해짐)
+import { ref } from 'vue'
+
+const searchQuery = ref('')
 </script>
 
 <style scoped>
 .header {
   width: 100%;
-
+  height: 100px;
   background-color: #f6f2ec;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  padding: 20px 5vw;
+  padding: 0 5vw;
   box-sizing: border-box;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border-bottom: 2px solid black; /* ✅ 검은 하단 선 추가 */
   position: relative;
 }
 
@@ -48,12 +57,51 @@
 }
 
 .logo-img {
-  width: 100%;
-  max-width: 250px;
+  height: 70px;
   object-fit: contain;
 }
 
-/* 햄버거와 메뉴 묶음 */
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  max-width: 600px;
+  margin-left: 10px;
+  margin-right: 250px; /* ✅ 오른쪽 마진 추가해서 왼쪽으로 이동 */
+}
+
+.search-input {
+  width: 400px;          /* 원하는 가로 크기 고정 */
+  height: 40px;          /* 원하는 높이 고정 */
+  padding: 12px 23px;    /* placeholder와 텍스트 좌우 패딩 조절 */
+  border: 2px solid #4a90e2;
+  border-radius: 8px;
+  outline: none;
+  font-size: 15px;
+  color: #333;
+  box-sizing: border-box; /* 패딩 포함해서 크기 계산 */
+}
+
+.search-input::placeholder {
+  color: #aaa;
+}
+
+.search-button {
+  padding: 10px 25px;
+  background-color: #4a90e2;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.search-button:hover {
+  background-color: #357abd;
+}
+
+
 .burger-wrapper {
   position: relative;
   display: flex;
@@ -61,7 +109,6 @@
   align-items: flex-end;
 }
 
-/* 햄버거 버튼 */
 .burger {
   font-size: 28px;
   background: none;
@@ -71,7 +118,6 @@
   display: none;
 }
 
-/* 버튼 영역 */
 .nav-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -98,7 +144,6 @@
   color: #ffffff;
 }
 
-/* 반응형 - 모바일 대응 */
 @media (max-width: 768px) {
   .burger {
     display: block;
@@ -112,7 +157,7 @@
     top: 50px;
     right: 0;
     width: 160px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     z-index: 10;
   }

@@ -4,7 +4,7 @@
     <div class="profile-box">
       <img :src="profileImage" class="profile-img" />
       <div class="profile-info">
-        <h2 class="nickname" :title="nickname">{{ nickname }}</h2>
+        <h2 class="nickname" :title="nickname" @click="goToProfileDetail">{{ nickname }}</h2>
         <button @click="changeProfile" class="change-btn">사진 변경</button>
         <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" class="hidden" />
       </div>
@@ -202,9 +202,17 @@ function goToItem(item, type) {
     router.push(`/posts/${item.id}`)
   }
 }
+
+function goToProfileDetail() {
+  router.push('/mypage/profile') // 원하는 라우터 경로로 변경 가능
+}
 </script>
 
 <style scoped>
+
+h2 {
+  cursor: pointer;
+}
 
 hr {
   border: none;               /* 기본 테두리 제거 */

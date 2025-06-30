@@ -27,9 +27,11 @@ public class myPageController {
   @GetMapping("profile")
   public ResponseEntity<?> profile(Authentication authentication) {
     
+    System.out.println("===============");
     //헤더에서 userid 추출
     User user = (User) authentication.getPrincipal();
     String userId = user.getUserId();
+    System.out.println(userId);
     
     ProfileResponse response = myService.getProfile(userId);
 

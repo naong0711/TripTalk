@@ -15,6 +15,10 @@ public class ProfileResponse {
     private String nickname;
     private String phone;
     private String loginType;
+    private String birthDate;
+    private String zipcode;
+    private String address;
+    private String addressDetail;
     
     private List<ReservationResponse> reservations;
 }

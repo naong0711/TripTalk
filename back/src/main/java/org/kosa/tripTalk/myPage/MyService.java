@@ -1,6 +1,7 @@
 package org.kosa.tripTalk.myPage;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.kosa.tripTalk.cart.Cart;
@@ -40,6 +41,10 @@ public class MyService {
         .email(user.getEmail())
         .nickname(user.getNickname())
         .phone(user.getPhone())
+        .birthDate(user.getBirthDate() != null ? user.getBirthDate().format(DateTimeFormatter.ISO_DATE) : null)
+        .zipcode(user.getZipcode())
+        .address(user.getAddress())
+        .addressDetail(user.getAddressDetail())
         .build();
   }
 

@@ -1,6 +1,10 @@
 package org.kosa.tripTalk.user;
 
+import java.util.Map;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -42,6 +46,24 @@ public class UserController {
     
     return ResponseEntity.ok(response);
   }
+  
+  @PostMapping("verify-password")
+  public ResponseEntity<?> verifyPassword(
+      @RequestBody Map<String, String> payload,
+      @AuthenticationPrincipal User user
+  ) {
+    
+    System.out.println("==========================");
+    System.out.println(payload);
+      boolean matched = userService.verifyPassword(user.getUserId(), payload.get("password"));
+      if (!matched) {
+          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호 불일치");
+      }
+      return ResponseEntity.ok().build();
+  }
+  
+  
+ 
 
   
 

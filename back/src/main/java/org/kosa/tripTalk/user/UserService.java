@@ -1,9 +1,6 @@
 package org.kosa.tripTalk.user;
 
-import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.UUID;
-import org.kosa.tripTalk.email.Email;
 import org.kosa.tripTalk.email.EmailRepository;
 import org.kosa.tripTalk.email.EmailService;
 import org.kosa.tripTalk.jwt.JwtUtil;
@@ -13,6 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -164,6 +162,15 @@ public class UserService {
           throw new IllegalArgumentException("전화번호 형식이 올바르지 않습니다. 예: 01012345678 또는 010-1234-5678");
       }
   }
+  
+  //정보수정 시 비밀번호 확인
+  public boolean verifyPassword(String userId, String inputPassword) {
+    User user = repository.findByUserId(userId)
+        .orElseThrow(() -> new EntityNotFoundException("User not found"));
+
+    return passwordEncoder.matches(inputPassword, user.getPassword());
+}
+
   
   
 

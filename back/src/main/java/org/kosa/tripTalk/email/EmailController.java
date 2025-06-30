@@ -29,19 +29,17 @@ public class EmailController {
   //이메일 재발급요청
   @PostMapping("reissue")
   public ResponseEntity<?> reissueEmail(@RequestBody Map<String, String> request) {
-    System.out.println("=========================");  
+    String userId = request.get("userId");
+    String email = request.get("email"); // ← 프론트에서 같이 보냄
     
-    String email = request.get("email");
-      System.out.println(email);
-
-      try {
-          emailService.reissueVerificationEmail(email);
-          return ResponseEntity.ok("인증 메일이 재발송되었습니다.");
-      } catch (UsernameNotFoundException e) {
-          return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 이메일을 가진 유저가 없습니다.");
-      } catch (IllegalStateException e) {
-          return ResponseEntity.badRequest().body(e.getMessage());
-      }
+    try {
+        emailService.reissueVerificationEmailByUserId(userId, email);
+        return ResponseEntity.ok("인증 메일이 재발송되었습니다.");
+    } catch (UsernameNotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 유저가 없습니다.");
+    } catch (IllegalStateException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
+    }
   }
   
 

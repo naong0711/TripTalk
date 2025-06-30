@@ -40,7 +40,7 @@ public class EmailService {
         String verificationUrl = verifyUrlBase + token;
         String subject = "이메일 인증을 완료해주세요.";
         String text = "아래 링크를 클릭하여 이메일 인증을 완료해주세요:\n" + verificationUrl;
-
+        System.out.println("sendVerificationEmail 호출됨 - 이메일: " + user.getEmail() + ", 토큰: " + token);
         sendEmail(user.getEmail(), subject, text);
     }
 
@@ -86,31 +86,36 @@ public class EmailService {
 
 
     //인증 이메일 재발급 요청
-    public void reissueVerificationEmail(String email) {
-        User user = repository.findByEmail(email)
-            .orElseThrow(() -> new UsernameNotFoundException("해당 이메일을 가진 유저가 없습니다."));
+    public void reissueVerificationEmailByUserId(String userId, String email) {
+      
+      User user = repository.findByUserId(userId)
+          .orElseThrow(() -> new UsernameNotFoundException("해당 유저가 없습니다."));
 
-        if (Boolean.TRUE.equals(user.getEmailVerified())) {
-            throw new IllegalStateException("이미 인증된 이메일입니다.");
-        }
+      if (Boolean.TRUE.equals(user.getEmailVerified())) {
+          throw new IllegalStateException("이미 인증된 이메일입니다.");
+      }
+      
+      // 이메일 임시 변경 (아직 DB 저장 X)
+      user.setEmail(email);
+      user.setEmailVerified(false); // 인증 필요 상태로 설정
 
-        // 기존 토큰이 있으면 갱신, 없으면 새로 생성
-        Email emailToken = emailRepository.findByUser(user)
-            .map(existing -> {
-                existing.setToken(UUID.randomUUID().toString());
-                existing.setExpiryDate(LocalDateTime.now().plusHours(24));
-                existing.setConfirmed(false);
-                return existing;
-            })
-            .orElseGet(() -> Email.builder()
-                .token(UUID.randomUUID().toString())
-                .user(user)
-                .expiryDate(LocalDateTime.now().plusHours(24))
-                .confirmed(false)
-                .build()
-            );
+      // 토큰 처리 및 발송
+      Email emailToken = emailRepository.findByUser(user)
+          .map(existing -> {
+              existing.setToken(UUID.randomUUID().toString());
+              existing.setExpiryDate(LocalDateTime.now().plusHours(24));
+              existing.setConfirmed(false);
+              return existing;
+          })
+          .orElseGet(() -> Email.builder()
+              .token(UUID.randomUUID().toString())
+              .user(user)
+              .expiryDate(LocalDateTime.now().plusHours(24))
+              .confirmed(false)
+              .build()
+          );
 
-        emailRepository.save(emailToken); //저장
-        sendVerificationEmail(user, emailToken.getToken()); //발송
-    }
+      emailRepository.save(emailToken);
+      sendVerificationEmail(user, emailToken.getToken());
+  }
 }

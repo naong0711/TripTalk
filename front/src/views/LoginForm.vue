@@ -5,12 +5,12 @@
       <div class="form-group">
         <label for="username">아이디</label>
         <input
-          id="username"
-          v-model="username"
+          id="userid"
+          v-model="userid"
           type="text"
           placeholder="아이디를 입력하세요"
           required
-          autocomplete="username"
+          autocomplete="userid"
         />
       </div>
 
@@ -58,18 +58,36 @@
 
 <script setup>
 import { ref } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
 
-const username = ref('')
+const userid = ref('')
 const password = ref('')
+const router = useRouter()
 
-function onSubmit() { //미연결
-  alert(`아이디: ${username.value}\n비밀번호: ${password.value}`)
-}
+async function onSubmit() {
+  console.log('userid:', userid.value)
+  console.log('password:', password.value)
 
-function socialLogin(provider) { //미연결
-  alert(`${provider} 로그인 버튼 클릭됨`)
+  try {
+    const response = await axios.post('/api/user/login', {
+      userId: userid.value,
+      password: password.value,
+    })
+
+    console.log('로그인 성공:', response.data)
+    
+    //응답 토큰 저장
+    localStorage.setItem('accessToken', response.data.token);
+    router.push('/')
+
+  } catch (error) {
+    console.error('로그인 실패:', error.response || error.message)
+    alert('로그인 실패: 아이디 또는 비밀번호를 확인하세요.')
+  }
 }
 </script>
+
 
 <style scoped>
 .login-form {

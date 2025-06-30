@@ -10,6 +10,8 @@
       </div>
     </div>
 
+    <hr>
+
     <!-- 예약 내역 섹션 -->
     <div class="section">
       <div class="section-header">
@@ -19,13 +21,23 @@
           <button @click="next('reservations')" :disabled="reservationPage >= maxPage('reservations')">›</button>
         </div>
       </div>
+
+      <div class="reservation-category">
+        <div class="category-buttons">
+          <button :class="{ active: activeCategory === '여행' }" @click="activeCategory = '여행'">여행</button>
+          <button :class="{ active: activeCategory === '교통' }" @click="activeCategory = '교통'">교통</button>
+          <button :class="{ active: activeCategory === '레저' }" @click="activeCategory = '레저'">레저</button>
+        </div>
+      </div>
+      
+
       <div class="card-list">
         <div
           v-for="(item, index) in paginatedReservations"
           :key="item.id || 'more-reservations' + index"
           class="card"
           :class="{ 'more-card': item.isMore }"
-          @click="item.isMore ? goToDetail('reservations') : null"
+          @click="item.isMore ? goToDetail('reservations') : goToItem(item, 'reservations')"
         >
           <template v-if="!item.isMore">
             <div class="card-title-wrapper">
@@ -40,10 +52,12 @@
       </div>
     </div>
 
-    <!-- 내가 쓴 글 섹션 -->
+    <hr>
+
+    <!-- 여행후기 섹션 -->
     <div class="section">
       <div class="section-header">
-        <h3>내가 쓴 글</h3>
+        <h3>나의 여행 후기</h3>
         <div class="nav-buttons">
           <button @click="prev('posts')" :disabled="postPage === 0">‹</button>
           <button @click="next('posts')" :disabled="postPage >= maxPage('posts')">›</button>
@@ -55,7 +69,7 @@
           :key="item.id || 'more-posts' + index"
           class="card"
           :class="{ 'more-card': item.isMore }"
-          @click="item.isMore ? goToDetail('posts') : null"
+          @click="item.isMore ? goToDetail('posts') : goToItem(item, 'posts')"
         >
           <template v-if="!item.isMore">
             <div class="card-title-wrapper">
@@ -72,21 +86,42 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import axios from 'axios'
 
 const router = useRouter()
 
 const profileImage = ref('/img/default-profile.jpg')
-const nickname = ref('나의 닉네임')
+const nickname = ref('닉네임 불러오는 중...')
 const fileInput = ref(null)
+const activeCategory = ref('여행')
 
+// ✅ 마운트 시 프로필 정보 가져오기
+onMounted(async () => {
+  try {
+    const res = await axios.get('/api/mypage/profile', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+    profileImage.value = res.data.profileImageUrl || '/img/default-profile.jpg'
+    nickname.value = res.data.nickname || '닉네임 없음'
+  } catch (err) {
+    console.error('프로필 불러오기 실패:', err)
+    nickname.value = '로그인 필요'
+  }
+})
+
+// 프로필 사진 변경 핸들러
 function changeProfile() {
-  fileInput.value.click()
+  fileInput.value?.click()
 }
+
 function onImageSelected(e) {
   const file = e.target.files[0]
   if (!file) return
+
   const reader = new FileReader()
   reader.onload = (ev) => {
     profileImage.value = ev.target.result
@@ -94,6 +129,7 @@ function onImageSelected(e) {
   reader.readAsDataURL(file)
 }
 
+// 예약/후기 목록 (임시 데이터 → 추후 API 연동 가능)
 const reservations = ref([
   { id: 1, title: '부산 여행', date: '2025-07-01' },
   { id: 2, title: '서울 호텔', date: '2025-08-12' },
@@ -120,7 +156,6 @@ const postPage = ref(0)
 function injectMoreCard(items, page) {
   const start = page * visibleCount
   const end = start + visibleCount
-
   const maxDisplayItems = 6
   let displayItems = items.slice(0, maxDisplayItems)
   const hasMore = items.length > maxDisplayItems
@@ -134,31 +169,47 @@ function injectMoreCard(items, page) {
   return displayItems.slice(start, end)
 }
 
-const paginatedReservations = computed(() => injectMoreCard(reservations.value, reservationPage.value))
-const paginatedPosts = computed(() => injectMoreCard(posts.value, postPage.value))
+const paginatedReservations = computed(() =>
+  injectMoreCard(reservations.value, reservationPage.value)
+)
+const paginatedPosts = computed(() =>
+  injectMoreCard(posts.value, postPage.value)
+)
 
 function maxPage(type) {
-  return 1 // 무조건 두 페이지만
+  return 1 // 향후 동적으로 변경 가능
 }
 
 function next(type) {
   if (type === 'reservations' && reservationPage.value < maxPage(type)) reservationPage.value++
   if (type === 'posts' && postPage.value < maxPage(type)) postPage.value++
 }
+
 function prev(type) {
   if (type === 'reservations' && reservationPage.value > 0) reservationPage.value--
   if (type === 'posts' && postPage.value > 0) postPage.value--
 }
 
 function goToDetail(type) {
+  if (type === 'reservations') router.push('/reservations')
+  if (type === 'posts') router.push('/posts')
+}
+
+function goToItem(item, type) {
   if (type === 'reservations') {
-    router.push('/reservations')
+    router.push(`/reservations/${item.id}`)
   } else if (type === 'posts') {
-    router.push('/posts')
+    router.push(`/posts/${item.id}`)
   }
 }
 </script>
+
 <style scoped>
+
+hr {
+  border: none;               /* 기본 테두리 제거 */
+  border-top: 1px solid #eee;
+}
 .mypage-container {
   max-width: 480px;
   margin: 40px auto;
@@ -215,7 +266,6 @@ function goToDetail(type) {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
 }
 .section-header h3 {
   font-size: 18px;
@@ -256,6 +306,7 @@ function goToDetail(type) {
   box-sizing: border-box;
   text-align: center;
   user-select: none;
+  cursor: pointer;
 }
 
 .more-card {
@@ -295,4 +346,48 @@ function goToDetail(type) {
   color: #555;
   margin-top: 6px;
 }
+
+.category-buttons {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0;
+  margin: 0;
+  border: 1px solid #c8ad7f;
+  border-bottom: none;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  overflow: hidden;
+  width: fit-content; /* 버튼 크기만큼만 차지 */
+  line-height: 1; /* 버튼 아래 여백 방지 */
+}
+
+.category-buttons button {
+  padding: 10px 30px;
+  font-size: 14px;
+  background-color: white;
+  color: #c8ad7f;
+  border: none;
+  border-right: 1px solid #c8ad7f;
+  cursor: pointer;
+  transition: 0.2s ease all;
+}
+
+.category-buttons button:last-child {
+  border-right: none;
+}
+
+.category-buttons button.active,
+.category-buttons button:hover {
+  background-color: #c8ad7f;
+  color: white;
+}
+
+.reservation-category {
+  display: flex;
+  align-items: flex-end;
+  border-bottom: 2px solid #c8ad7f;
+  height: 30px;
+  margin-bottom: 10px;
+}
+
 </style>

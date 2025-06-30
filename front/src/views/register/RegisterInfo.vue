@@ -14,9 +14,9 @@
         <legend>계정 정보</legend>
 
         <div class="form-group">
-          <label for="username">아이디<span class="required">*</span></label>
+          <label for="userId">아이디<span class="required">*</span></label>
           <div class="input-with-btn">
-            <input id="username" v-model.trim="form.username" type="text" placeholder="아이디를 입력하세요" required />
+            <input id="userId" v-model.trim="form.userId" type="text" placeholder="아이디를 입력하세요" required />
             <button type="button" class="check-btn" @click="checkDuplicateId">중복검사</button>
           </div>
         </div>
@@ -46,6 +46,10 @@
           />
           <p v-if="form.password && form.passwordConfirm && form.password !== form.passwordConfirm" class="pw-msg">
             비밀번호가 일치하지 않습니다.
+          </p>
+          <!-- 비밀번호 유효성 검증 메시지 -->
+          <p v-if="form.password && !isPasswordValid" class="pw-msg">
+            비밀번호는 8자 이상, 영문/숫자/특수문자를 모두 포함해야 합니다.
           </p>
         </div>
       </fieldset>
@@ -90,7 +94,7 @@
 
         <div class="form-group">
           <label for="birthdate">생년월일<span class="required">*</span></label>
-          <input id="birthdate" v-model="form.birthdate" type="date" class="date-input styled-input" required />
+          <input id="birthdate" v-model="form.birthDate" type="date" class="date-input styled-input" required />
         </div>
 
         <!-- 주소 -->
@@ -113,12 +117,14 @@
 
 <script setup>
 import { reactive, ref, watch } from 'vue'
+import axios from 'axios'
 import { useRouter } from 'vue-router'
 
+const router = useRouter()
 const currentStep = 2
 
 const form = reactive({
-  username: '',
+  userId: '',
   password: '',
   passwordConfirm: '',
   name: '',
@@ -127,52 +133,93 @@ const form = reactive({
   emailDomain: '',
   customEmailDomain: '',
   phone: '',
-  birthdate: '',
+  birthDate: '',
   zipcode: '',
   address: '',
   addressDetail: '',
 })
 
 const errorMsg = ref('')
-const router = useRouter()
+const isUserIdChecked = ref(false)
+const isPasswordValid = ref(true)
 
 watch(() => form.emailDomain, (newVal) => {
   if (newVal !== 'direct') form.customEmailDomain = ''
 })
 
-function checkDuplicateId() {
-  if (!form.username) {
+// 비밀번호 유효성 검사 함수
+function validatePassword(password) {
+  const regex = /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&]).{8,}$/
+  return regex.test(password)
+}
+
+async function checkDuplicateId() {
+  if (!form.userId) {
     alert('아이디를 입력해주세요.')
     return
   }
-  alert(`아이디 "${form.username}" 중복검사 결과: 사용 가능합니다.`)
+
+  try {
+    const response = await axios.get('/api/user/checkId', {
+      params: { userId: form.userId }
+    })
+
+    if (response.data) {
+      alert('이미 사용 중인 아이디입니다.')
+      isUserIdChecked.value = false
+    } else {
+      alert(`아이디 "${form.userId}"은 사용 가능합니다.`)
+      isUserIdChecked.value = true
+    }
+  } catch (error) {
+    alert('아이디 중복 확인 중 오류가 발생했습니다.')
+    isUserIdChecked.value = false
+  }
 }
 
 function searchAddress() {
-  alert('주소 찾기 기능은 아직 구현되지 않았습니다.')
+  new window.daum.Postcode({
+    oncomplete: function (data) {
+      form.zipcode = data.zonecode;
+      form.address = data.roadAddress || data.jibunAddress;
+    },
+  }).open();
 }
 
-function goNext() {
+function formatPhoneNumber(phone) {
+  if (!phone) return '';
+  // 하이픈 이미 있으면 그대로 리턴
+  if (phone.includes('-')) return phone;
+  if (phone.length === 11) return phone.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+  if (phone.length === 10) return phone.replace(/(\d{3})(\d{3})(\d{4})/, '$1-$2-$3');
+  return phone; // 형식 안 맞으면 그대로
+}
+
+async function goNext() {
   errorMsg.value = ''
 
   const requiredFields = [
-    form.username, form.password, form.passwordConfirm,
+    form.userId, form.password, form.passwordConfirm,
     form.name, form.nickname,
     form.emailId,
     form.emailDomain === 'direct' ? form.customEmailDomain : form.emailDomain,
-    form.phone, form.birthdate,
+    form.phone, form.birthDate,
     form.zipcode, form.address
   ]
 
-    // 빈 값 체크 및 로그 출력
-  for (const [key, value] of Object.entries(requiredFields)) {
-    if (!value) {
-      console.log(`필수 항목 비어 있음: ${key} = '${value}'`)
-    }
-  }
-
   if (requiredFields.some(v => !v)) {
     errorMsg.value = '모든 필수 항목을 입력해주세요.'
+    return
+  }
+
+  if (!isUserIdChecked.value) {
+    errorMsg.value = '아이디 중복 확인을 해주세요.'
+    return
+  }
+
+  isPasswordValid.value = validatePassword(form.password)
+  if (!isPasswordValid.value) {
+    errorMsg.value = '비밀번호는 8자 이상, 영문/숫자/특수문자를 모두 포함해야 합니다.'
     return
   }
 
@@ -181,10 +228,44 @@ function goNext() {
     return
   }
 
-  router.push('/register/complete')
+  const fullEmail = `${form.emailId}@${form.emailDomain === 'direct' ? form.customEmailDomain : form.emailDomain}`
+  const formattedPhone = formatPhoneNumber(form.phone);
+  
+  try {
+    const requestData = {
+      userId: form.userId,
+      password: form.password,
+      name: form.name,
+      nickname: form.nickname,
+      email: fullEmail,
+      phone: formattedPhone,
+      birthDate: form.birthDate,
+      zipcode: form.zipcode,
+      address: form.address,
+      addressDetail: form.addressDetail || null
+
+    }
+
+    console.log(requestData)
+
+    const response = await axios.post('/api/user/register', requestData)
+    console.log(response)
+    console.log(response.data)
+    const email = response.data.email
+    console.log(email)
+
+    alert('회원가입 성공! 이메일을 확인해 인증을 완료해주세요.')
+    router.push({
+      path: '/register/complete',
+      query: { email }  // 쿼리 파라미터로 email 전달
+    });
+    
+  } catch (error) {
+    console.error(error)
+    errorMsg.value = '회원가입에 실패했습니다.'
+  }
 }
 </script>
-
 
 <style scoped>
 .register-info {

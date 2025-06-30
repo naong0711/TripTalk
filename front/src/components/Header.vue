@@ -19,20 +19,50 @@
       <button class="burger">☰</button>
 
       <!-- 버튼 / 네비게이션 영역 -->
-    <nav class="nav-buttons">
-        <router-link to="/boardList" class="nav-btn">여행 게시판</router-link>
-        <router-link to="/registerForm" class="nav-btn">회원가입</router-link>
-        <router-link to="/loginForm" class="nav-btn">로그인</router-link>
-        <router-link to="/MyPage" class="nav-btn">마이페이지</router-link>
+      <nav class="nav-buttons">
+          <router-link to="/boardList" class="nav-btn">여행 게시판</router-link>
+        <template v-if="!isLoggedIn">
+          <router-link to="/register/agree" class="nav-btn">회원가입</router-link>
+          <router-link to="/loginForm" class="nav-btn">로그인</router-link>
+        </template>
+        <template v-else>
+          <button class="nav-btn" @click="logout">로그아웃</button>
+          <router-link to="/MyPage" class="nav-btn">마이페이지</router-link>
+        </template>
       </nav>
     </div>
   </header>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 
-const searchQuery = ref('')
+const route = useRoute()
+const router = useRouter()
+
+
+const isLoggedIn = ref(false)
+
+function checkLoginStatus() {
+  isLoggedIn.value = !!localStorage.getItem('accessToken')
+}
+
+
+onMounted(() => {
+  checkLoginStatus()
+})
+
+watch(() => route.fullPath, () => {
+  checkLoginStatus()
+})
+
+function logout() {
+  localStorage.removeItem("accessToken")
+  localStorage.removeItem("refreshToken")
+  isLoggedIn.value = false
+  router.push('/')
+}
 </script>
 
 <style scoped>

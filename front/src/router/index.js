@@ -1,11 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HelloWorld from '@/components/HelloWorld.vue'
-import LoginForm from '@/components/LoginForm.vue'
-import RegisterAgree from '@/components/register/RegisterAgree.vue'
-import RegisterInfo from '@/components/register/RegisterInfo.vue'
-import RegisterComplete from '@/components/register/RegisterComplete.vue'
-import Mypage from '@/components/mypage/Mypage.vue'
-import Reservation from '@/components/Reservation.vue'
+
+import HelloWorld from '@/views/HelloWorld.vue'
+import LoginForm from '@/views/LoginForm.vue'
+import Reservation from '@/views/Reservation.vue'
+import RegisterAgree from '@/views/register/RegisterAgree.vue'
+import RegisterInfo from '@/views/register/RegisterInfo.vue'
+import RegisterComplete from '@/views/register/RegisterComplete.vue'
+import Mypage from '@/views/mypage/Mypage.vue'
 
 
 const routes = [

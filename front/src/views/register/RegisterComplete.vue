@@ -15,8 +15,8 @@
     </p>
 
     <div class="btn-group">
-      <button class="main-btn" @click="goMain">메인으로</button>
-      <button class="login-btn" @click="goLogin">로그인</button>
+      <router-link to="/" class="main-btn">메인으로</router-link>
+      <router-link to="/loginForm" class="login-btn">로그인</router-link>
     </div>
 
     <div class="email-help">
@@ -30,25 +30,30 @@
 
 <script setup>
 import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 
-const router = useRouter()
 const route = useRoute()
 
 const currentStep = 3
 
-const userEmail = route.query.email || 'aaaaaa@aaaa.com'
+const userEmail = route.query.email || 'unknown@example.com';
 
-function goMain() {
-  router.push('/')  // 메인 페이지 경로에 맞게 수정하세요
+async function goReissue() {
+  try {
+    console.log(userEmail)
+    console.log(route.query.email)
+    await axios.post('/api/email/reissue', {
+      email: userEmail
+    });
+    alert('인증 메일이 재발송되었습니다.');
+  } catch (error) {
+    console.error(error);
+    alert('메일 재발급에 실패했습니다.');
+  }
 }
 
-function goLogin() {
-  router.push('/login')  // 로그인 페이지 경로에 맞게 수정하세요
-}
 
-function goReissue() {
-  router.push('/email/reissue')  // 이메일 재발급 요청 페이지 경로로 수정하세요
-}
+
 </script>
 
 <style scoped>
@@ -133,6 +138,7 @@ h2 {
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
   box-shadow: 0 3px 6px rgba(200, 173, 127, 0.4);
   user-select: none;
+  text-decoration: none;
 }
 
 .main-btn {

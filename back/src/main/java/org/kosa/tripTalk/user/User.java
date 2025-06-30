@@ -60,4 +60,11 @@ public class User {
       USER, SELLER, ADMIN
   }
 
+
+
+	public boolean isDel() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

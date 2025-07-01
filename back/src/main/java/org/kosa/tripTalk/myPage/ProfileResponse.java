@@ -2,11 +2,13 @@ package org.kosa.tripTalk.myPage;
 
 import java.util.List;
 import org.kosa.tripTalk.reservation.ReservationResponse;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ProfileResponse {
 
     private String userId;

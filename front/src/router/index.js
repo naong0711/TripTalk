@@ -9,6 +9,8 @@ import RegisterComplete from '@/views/register/RegisterComplete.vue'
 import Mypage from '@/views/mypage/Mypage.vue'
 import Profile from '@/views/mypage/Profile.vue'
 import ProfileUpdate from '@/views/mypage/ProfileUpdate.vue'
+import CartList from '@/views/mypage/CartList.vue'
+import Favorite from '@/views/mypage/Favorite.vue'
 
 
 const routes = [
@@ -21,7 +23,8 @@ const routes = [
   { path: '/reservation', name: 'Reservation', component: Reservation }, // 예약페이지
   { path: '/mypage/profile', name: 'Profile', component: Profile }, // 내정보
   { path: '/mypage/update', name: 'ProfileUpdate', component: ProfileUpdate }, // 내정보 수정
-
+  { path: '/cart', name: 'CartList', component: CartList }, //  장바구니 목록
+  { path: '/favorite', name: 'Favorite', component: Favorite }, //  찜 목록
 
 
 ]

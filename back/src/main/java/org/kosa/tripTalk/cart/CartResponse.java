@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.cart;
 
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,5 +10,8 @@ public class CartResponse {
   private Long id;
   private String title;
   private int price;
+  private Long categoryId;
+  private LocalDateTime startDate;
+  private LocalDateTime endDate;
 
 }

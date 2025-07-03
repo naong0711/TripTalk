@@ -6,7 +6,6 @@
     </div>
 
 
-
     <!-- ✅ 검색창 추가 -->
     <div class="search-box">
       <input type="text" v-model="searchQuery" placeholder="여행지를 검색해보세요" class="search-input" />
@@ -26,6 +25,12 @@
           <router-link to="/loginForm" class="nav-btn">로그인</router-link>
         </template>
         <template v-else>
+        <!-- 채팅 아이콘 -->
+          <button @click="isChatOpen = true">💬</button>
+          <!-- 채팅 모달 -->
+          <ChatModal v-if="isChatOpen" @close="isChatOpen = false">
+            <ChatList @selectRoom="goToChatRoom" />
+          </ChatModal>
           <button class="nav-btn" @click="logout">로그아웃</button>
           <router-link to="/MyPage" class="nav-btn">마이페이지</router-link>
         </template>
@@ -37,17 +42,24 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import ChatModal from '@/components/chat/ChatModal.vue'
+import ChatList from '@/components/chat/ChatList.vue'
 
 const route = useRoute()
 const router = useRouter()
 
 
 const isLoggedIn = ref(false)
+const isChatOpen = ref(false)
+
+function goToChatRoom(roomId) {
+  router.push(`/chat/room/${roomId}`)
+  isChatOpen.value = false
+}
 
 function checkLoginStatus() {
   isLoggedIn.value = !!localStorage.getItem('accessToken')
 }
-
 
 onMounted(() => {
   checkLoginStatus()

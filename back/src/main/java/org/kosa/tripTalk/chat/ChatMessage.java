@@ -44,10 +44,15 @@ public class ChatMessage {
     @Column(nullable = false)
     private String message;
 
+    @Column(name = "sent_at")
     private LocalDateTime sentAt;
 
     @PrePersist
     public void prePersist() {
         this.sentAt = LocalDateTime.now();
+    }
+    
+    public Long getSenderId() {
+        return sender != null ? sender.getId() : null;
     }
 }

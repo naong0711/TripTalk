@@ -5,6 +5,9 @@ import path from 'path'
 
 // https://vite.dev/config/
 export default defineConfig({
+    define: {
+    global: {},
+  },
   plugins: [
     vue(),
     vueDevTools(),
@@ -21,6 +24,11 @@ export default defineConfig({
         target: "http://localhost:8080",
         changeOrigin: true,
       },
-    },
+      "/chat-ws": {
+        target: "http://localhost:8080",
+        ws: true,
+        changeOrigin: true,
+      },
+        },
   },
 })

@@ -3,10 +3,12 @@ import org.kosa.tripTalk.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -25,28 +27,21 @@ import lombok.Setter;
 @Builder
 public class Seller {
 	
-	@Id
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seller_seq_gen")
+  private Long id;  // seller 고유 PK
 
-	@OneToOne
-	@JoinColumn(name = "id")
-	@MapsId
-	private User user;
-	
-	@Column(nullable = false)
-	private String userid;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)  // seller.userid 컬럼이 user.id를 참조하는 FK
+  private User user;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
-    private User userId;
+  @Column(nullable = false)
+  private String businessName;
 
-    @Column(unique = true)
-    private String businessNumber;
+  @Column(unique = true, nullable = false)
+  private String businessNumber;
 
-    @Column(nullable = false)
-    private String businessName;
-
-    @Column(nullable = false)
-    private String contact;
+  @Column(nullable = false)
+  private String contact;
 
 }

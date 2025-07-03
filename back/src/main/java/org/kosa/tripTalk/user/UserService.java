@@ -49,7 +49,7 @@ public class UserService {
   }
     
     //토큰 생성
-    String accessToken  = jwtUtil.generateAccessToken(user.getUserId(), user.getRole());
+    String accessToken  = jwtUtil.generateAccessToken(user);
     String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
     
     RefreshToken token = new RefreshToken();
@@ -59,7 +59,7 @@ public class UserService {
     tokenRepository.save(token);
     
     // LoginResponse 객체 생성 후 반환
-    return new LoginResponse(accessToken, user.getName(), user.getRole());
+    return new LoginResponse(user.getId(), accessToken, user.getName(), user.getRole());
   }
   
   //비밀번호 패턴 확인
@@ -171,9 +171,13 @@ public class UserService {
 }
 
   public boolean isEmailVerified(String userId) {
-    // TODO Auto-generated method stub
     return false;
   }
+
+  public User findByUserId(String userId) {
+    return repository.findByUserId(userId)
+        .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+}
 
   
   

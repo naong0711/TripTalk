@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
 import HelloWorld from '@/views/HelloWorld.vue'
-import LoginForm from '@/views/LoginForm.vue'
+import LoginForm from '@/views/login/LoginForm.vue'
 import Reservation from '@/views/Reservation.vue'
 import RegisterAgree from '@/views/register/RegisterAgree.vue'
 import RegisterInfo from '@/views/register/RegisterInfo.vue'
@@ -11,6 +11,7 @@ import Profile from '@/views/mypage/Profile.vue'
 import ProfileUpdate from '@/views/mypage/ProfileUpdate.vue'
 import CartList from '@/views/mypage/CartList.vue'
 import Favorite from '@/views/mypage/Favorite.vue'
+import OAuthCallback from '@/views/login/OAuthCallback.vue'
 
 
 const routes = [
@@ -25,7 +26,7 @@ const routes = [
   { path: '/mypage/update', name: 'ProfileUpdate', component: ProfileUpdate }, // 내정보 수정
   { path: '/cart', name: 'CartList', component: CartList }, //  장바구니 목록
   { path: '/favorite', name: 'Favorite', component: Favorite }, //  찜 목록
-
+  { path: '/oauth2/callback', name: 'OAuthCallback', component: OAuthCallback}, //소셜로그인-카카오
 
 ]
 

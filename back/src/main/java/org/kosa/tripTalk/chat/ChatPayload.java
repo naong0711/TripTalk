@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatPayload {
 
-  private Long receiverId;
-  private String message;
-  
+  private String roomId;    // 방 아이디
+  private Long senderId;    // 보낸 사람
+  private Long receiverId;  // 받는 사람
+  private String senderRole; // "USER" or "SELLER"
+  private String message;   // 내용
   
 }

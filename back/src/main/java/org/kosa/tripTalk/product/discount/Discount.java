@@ -36,7 +36,8 @@ public class Discount {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private DiscountType discountType; // FIXED, RATE, NONE
-
+    
+    @Column(nullable = true)
     private Integer discountAmount; // 정액 할인용 (예: 1000)
     private Double discountRate;    // 정률 할인용 (예: 0.1)
 

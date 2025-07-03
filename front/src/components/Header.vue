@@ -2,7 +2,7 @@
   <header class="header">
     <!-- 로고 / 배너 영역 -->
     <div class="logo-area">
-      <img src="@/assets/logo.png" alt="TripTalk 로고" class="logo-img" />
+      <img src="@/assets/logo.png" alt="TripTalk 로고" class="logo-img" @click="goHome" />
     </div>
 
 
@@ -20,7 +20,7 @@
 
       <!-- 버튼 / 네비게이션 영역 -->
       <nav class="nav-buttons">
-          <router-link to="/boardList" class="nav-btn">여행 게시판</router-link>
+          <router-link to="/productList" class="nav-btn">여행 게시판</router-link>
         <template v-if="!isLoggedIn">
           <router-link to="/register/agree" class="nav-btn">회원가입</router-link>
           <router-link to="/loginForm" class="nav-btn">로그인</router-link>
@@ -37,6 +37,8 @@
 <script setup>
 import { ref, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+
+const searchQuery = ref('')
 
 const route = useRoute()
 const router = useRouter()
@@ -56,6 +58,10 @@ onMounted(() => {
 watch(() => route.fullPath, () => {
   checkLoginStatus()
 })
+
+function goHome() {
+  router.push('/')
+}
 
 function logout() {
   localStorage.removeItem("accessToken")
@@ -89,6 +95,7 @@ function logout() {
 .logo-img {
   height: 70px;
   object-fit: contain;
+  cursor: pointer;
 }
 
 .search-box {

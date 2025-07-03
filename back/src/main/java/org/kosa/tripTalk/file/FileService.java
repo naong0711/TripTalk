@@ -42,7 +42,7 @@ public class FileService {
         Path fullPath = uploadPath.resolve(storedName);
         Files.copy(multipartFile.getInputStream(), fullPath, StandardCopyOption.REPLACE_EXISTING);
 
-    	// 4. 기존 썸네일 비활성화
+        // 4. 기존 썸네일 비활성화
         if (isThumbnail == 1) {
             List<File> existingThumbnails = fileRepository.findByOwnerTypeAndOwnerId(ownerType, ownerId);
             for (File f : existingThumbnails) {
@@ -52,7 +52,7 @@ public class FileService {
                 }
             }
         }
-        
+
         System.out.println("isThumbnail 값 = " + isThumbnail);
 
         // 5. DB 저장
@@ -74,8 +74,17 @@ public class FileService {
         return fileRepository.findByOwnerTypeAndOwnerId(ownerType, ownerId);
     }
 
+    public File getThumbnailFile(String ownerType, Long ownerId) {
+        return fileRepository.findByOwnerTypeAndOwnerId(ownerType, ownerId)
+                .stream()
+                .filter(f -> f.getIsThumbnail() == 1)
+                .findFirst()
+                .orElse(null);
+    }
+
     public void deleteFile(Long fileId) throws IOException {
-        File file = fileRepository.findById(fileId).orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다."));
+        File file = fileRepository.findById(fileId)
+                .orElseThrow(() -> new IllegalArgumentException("파일을 찾을 수 없습니다."));
         Path fullPath = Paths.get(uploadDir).resolve(file.getStoredName());
         Files.deleteIfExists(fullPath);
         fileRepository.delete(file);

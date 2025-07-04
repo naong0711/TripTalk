@@ -52,20 +52,19 @@ public class MyService {
 
 
   public List<ReservationResponse> reservationList(String userId) {
-
     List<Reservation> reservations = reservationRepository.findByUserUserId(userId);
-    
-    return reservations.stream()
-    .map(reservation -> ReservationResponse.builder()
-        .id(reservation.getId())
-        .reservationDate(reservation.getReservationDate())
-        .status(reservation.getStatus())
-        .totalPrice(reservation.getTotalPrice())
-        .title(reservation.getProduct().getTitle())
-        .build())
-    .collect(Collectors.toList());
 
-  }
+    return reservations.stream()
+        .map(res -> ReservationResponse.builder()
+            .id(res.getId())
+            .reservationDate(res.getReservationDate())
+            .status(res.getStatus())
+            .totalPrice(res.getTotalPrice())
+            .title(res.getProduct().getTitle())
+            .build())
+        .collect(Collectors.toList());
+}
+
 
 
 

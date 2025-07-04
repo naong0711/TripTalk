@@ -207,8 +207,10 @@
         startDate: toIso(product.startDate),
         endDate: toIso(product.endDate),
         discount: product.discount.discountRate ? {
-          discountType: product.discount.discountType,
-          discountRate: product.discount.discountRate,
+        discountType: product.discount.discountType,
+        discountRate: product.discount.discountType === 'RATE' 
+        ? product.discount.discountRate / 100 
+        : product.discount.discountRate,
           name: product.discount.name,
           startAt: toIso(product.discount.startAt),
           endAt: toIso(product.discount.endAt)

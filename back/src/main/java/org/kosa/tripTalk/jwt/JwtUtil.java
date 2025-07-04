@@ -1,10 +1,12 @@
 package org.kosa.tripTalk.jwt;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.User.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -16,10 +18,11 @@ public class JwtUtil {
   private String secretKey;
   
   //엑세스 토큰 생성(1시간)
-  public String generateAccessToken(String userId, Role role) {
+  public String generateAccessToken(User user) {
     return Jwts.builder()
-            .setSubject(userId)
-            .claim("role", role.name())
+             .setSubject(user.getUserId()) // 사용자 로그인 ID (예: "user1")
+             .claim("id", user.getId())    // DB PK (예: 2202)
+             .claim("role", user.getRole().name())
              .setIssuedAt(new Date(System.currentTimeMillis()))
              .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1시간
              .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
@@ -38,12 +41,17 @@ public class JwtUtil {
   
   //토큰값으로 userId 추출
   public String extractUserId(String token) {
-    return Jwts.parserBuilder()
-            .setSigningKey(secretKey.getBytes())
-            .build()
-            .parseClaimsJws(token)
-            .getBody()
-            .getSubject();
+    try {
+      return Jwts.parserBuilder()
+          .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
+          .build()
+          .parseClaimsJws(token)
+          .getBody()
+          .getSubject();
+  } catch (JwtException e) {
+      // 로그 남기고 null 리턴 혹은 예외 재처리
+      throw new IllegalArgumentException("Invalid JWT token", e);
+  }
   }
 
    //토큰 유효성 검사

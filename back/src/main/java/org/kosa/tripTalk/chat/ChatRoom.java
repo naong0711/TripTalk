@@ -1,6 +1,7 @@
 package org.kosa.tripTalk.chat;
 
 import java.time.LocalDateTime;
+import org.kosa.tripTalk.seller.Seller;
 import org.kosa.tripTalk.user.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,8 +38,8 @@ public class ChatRoom {
 
     //사용자 2 (판매자)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id")
-    private User seller;
+    @JoinColumn(name = "seller_id", referencedColumnName = "id")
+    private Seller seller;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

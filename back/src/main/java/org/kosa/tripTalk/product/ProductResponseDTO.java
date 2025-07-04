@@ -30,7 +30,7 @@ public class ProductResponseDTO {
             .price(product.getPrice())
             .address(product.getAddress())
             .categoryName(product.getCategory().getKind())
-            .sellerName(product.getSeller().getUserid())
+            .sellerName(product.getSeller().getUser().getName())
             .discount(DiscountDTO.from(product.getDiscount()))
             .build();
     }

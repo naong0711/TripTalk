@@ -51,17 +51,22 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
                   .socialId(kakaoId)
                   .email(null) // 이메일 받아올 경우 설정
                   .name(nickname)
-                  .nickname(userId) // 임시 nickname
-                  .password("") // 소셜은 비밀번호 미사용
+                  .nickname(nickname) // 임시 nickname
+                  .password("password") // 소셜은 비밀번호 미사용
                   .role(User.Role.USER)
                   .phone("000-0000-0000") // 임시 처리, 나중에 수집
                   .loginType("KAKAO")
                   .emailVerified(true)
+                  .zipcode("00000")
+                  .address(".")
+                  .addressDetail(".")
                   .build());
           });
+      
+      System.out.println("========"+user);
 
       // JWT 토큰 생성
-      String accessToken = jwtUtil.generateAccessToken(user.getUserId(), user.getRole());
+      String accessToken = jwtUtil.generateAccessToken(user);
       String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
 
       //리프레시 토큰 쿠키 저장
@@ -80,6 +85,12 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
       accessTokenCookie.setMaxAge(60 * 60); // 1시간
       response.addCookie(accessTokenCookie);
 
-      response.sendRedirect("http://localhost:3000/oauth2");
+      // ✅ 프론트로 리다이렉트 + 토큰 전달
+      String redirectUrl = "http://localhost:5173/oauth2/callback"
+          + "?accessToken=" + accessToken
+          + "&refreshToken=" + refreshToken;
+
+      response.sendRedirect(redirectUrl);
+      System.out.println("========"+redirectUrl);
   }
 }

@@ -3,6 +3,7 @@ package org.kosa.tripTalk.product;
 import java.time.LocalDateTime;
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.product.discount.Discount;
+import org.kosa.tripTalk.product.discount.DiscountPolicy;
 import org.kosa.tripTalk.seller.Seller;
 
 import jakarta.persistence.CascadeType;
@@ -75,10 +76,11 @@ public class Product {
 	
 	// 할인 가격 계산 메소드
 	public int getDiscountedPrice() {
-		if(discount != null && discount.isActive())
-			return discount.toPolicy().applyDiscount(price);
-		
-		return price;
+	    if (discount == null) {
+	        return price;
+	    }
+	    DiscountPolicy policy = discount.toPolicy();
+	    return policy.applyDiscount(price);
 	}
 	
 	// 할인 적용 및 양방향 연관 관계 설정

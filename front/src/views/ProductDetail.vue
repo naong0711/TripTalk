@@ -9,54 +9,56 @@
       <p class="description">{{ product.description }}</p>
       <p><strong>주소:</strong> {{ product.address }}</p>
 
-      <p><strong>가격:</strong> {{ product.price.toLocaleString() }}원 / 박</p>
-      
-      <p>
-        <strong>시작일:</strong>
-        {{ formatDate(product.startDate) }}
-      </p>
-      <p>
-        <strong>종료일:</strong>
-        {{ formatDate(product.endDate) }}
-      </p>
-      
+      <div class="price-wrap">
+        <p class="price">
+          <span class="label">가격</span>
+          <span class="amount">{{ product.price.toLocaleString() }}원 / 박</span>
+        </p>
+        <p v-if="product.discount && product.discountedPrice !== product.price" class="discounted-price">
+          할인 가격: {{ product.discountedPrice.toLocaleString() }}원
+        </p>
+      </div>
+
+      <p><strong>시작일:</strong> {{ formatDate(product.startDate) }}</p>
+      <p><strong>종료일:</strong> {{ formatDate(product.endDate) }}</p>
+
       <p><strong>판매자 ID:</strong> {{ product.sellerId }}</p>
       <p><strong>카테고리 ID:</strong> {{ product.categoryId }}</p>
 
-      <div v-if="product.discount">
+      <div v-if="product.discount" class="discount-info">
         <h3>할인 정보</h3>
         <p><strong>할인 타입:</strong> {{ product.discount.discountType }}</p>
         <p><strong>할인 이름:</strong> {{ product.discount.name }}</p>
-        <p><strong>할인율:</strong> {{ product.discount.discountRate }}%</p>
+        <p><strong>할인율:</strong> {{ (product.discount.discountRate * 100).toFixed(1) }}%</p>
         <p><strong>할인 시작일:</strong> {{ formatDate(product.discount.startAt) }}</p>
         <p><strong>할인 종료일:</strong> {{ formatDate(product.discount.endAt) }}</p>
       </div>
     </div>
 
     <div class="booking-box">
-      <label>체크인</label>
-      <input type="date" v-model="checkIn" />
+      <h3>예약하기</h3>
 
-      <label>체크아웃</label>
-      <input type="date" v-model="checkOut" />
+      <label for="checkin">체크인</label>
+      <input id="checkin" type="date" v-model="checkIn" :min="today" />
 
-      <label>성인</label>
-      <input type="number" min="1" v-model.number="adults" />
+      <label for="checkout">체크아웃</label>
+      <input id="checkout" type="date" v-model="checkOut" :min="checkIn" />
 
-      <label>결제 방법</label>
-      <select v-model="paymentMethod">
-        <option value="">선택하세요</option>
+      <label for="adults">성인</label>
+      <input id="adults" type="number" min="1" v-model.number="adults" placeholder="인원 수" />
+
+      <select id="paymentMethod" v-model="paymentMethod">
+        <option disabled value="">-- 결제 방법 선택 --</option>
         <option value="CARD">신용카드</option>
+        <option value="KAKAO_PAY">카카오페이</option>
         <option value="PAYPAL">PayPal</option>
         <option value="BANK_TRANSFER">무통장입금</option>
       </select>
 
+
       <div class="price-info">
-        <p>{{ product.price.toLocaleString() }}원 / 박</p>
-        <p>정가: {{ product.price.toLocaleString() }}원</p>
-        <p v-if="product.discountedPrice !== product.price" class="text-red">
-        할인 가격: {{ product.discountedPrice.toLocaleString() }}원
-        </p>
+        <p>총 숙박일: <strong>{{ totalNights }}</strong> 박</p>
+        <p>총 금액: <strong>{{ totalAmount.toLocaleString() }}원</strong></p>
       </div>
 
       <button @click="reserve">예약하기</button>
@@ -72,7 +74,9 @@ import axios from 'axios'
 const route = useRoute()
 const productId = route.params.id
 
-const checkIn = ref(route.query.checkIn || new Date().toISOString().slice(0, 10))
+const today = new Date().toISOString().slice(0, 10)
+
+const checkIn = ref(route.query.checkIn || today)
 const checkOut = ref(route.query.checkOut || '')
 const adults = ref(route.query.adults || 2)
 const paymentMethod = ref('')
@@ -90,10 +94,8 @@ const product = ref({
   discountedPrice: 0
 })
 
-// 이미지 URL도 상품 리스트랑 동일하게 경로 설정
 const imageUrl = computed(() => `/api/files/image/product/${productId}`)
-
-const userId = 1 // 임시 하드코딩 (로그인 정보로 교체 필요)
+const userId = 1 // 로그인 연동 전까지는 하드코딩
 
 const totalNights = computed(() => {
   if (!checkIn.value || !checkOut.value) return 0
@@ -111,17 +113,16 @@ const fetchProduct = async () => {
   try {
     const res = await axios.get(`/api/product/${productId}`)
     product.value = res.data
-      console.log(product.value)
+    console.log(product.value)
   } catch (e) {
     console.error('상품 상세 로딩 실패:', e)
   }
 }
 
-// 날짜 문자열 포맷 함수 (예: 2025-07-03T12:00:00 -> 2025-07-03 12:00)
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   const d = new Date(dateStr)
-  if (isNaN(d)) return dateStr // 변환 불가시 원본 반환
+  if (isNaN(d)) return dateStr
   return d.toLocaleString('ko-KR', {
     year: 'numeric',
     month: '2-digit',
@@ -142,28 +143,26 @@ const reserve = async () => {
   }
 
   try {
-    const reservationData = {
+    const paymentRequest = {
+      userId: 'user001', // 실제 로그인 사용자 ID로 바꿔야 함
       productId: Number(productId),
-      userId,
       amount: totalAmount.value,
-      paymentDate: new Date().toISOString(),
       paymentMethod: paymentMethod.value,
-      refundDate: null,
-      status: '예약대기',
-      transactionId: null,
-      checkIn: checkIn.value,
-      checkOut: checkOut.value,
-      adults: adults.value
+      paymentId: '', // 백엔드에서 처리될 값
+      status: ''     // 백엔드에서 처리될 값
     }
 
-    console.log('예약 요청 데이터:', reservationData)
+    const response = await axios.post('/api/payments/create', paymentRequest)
 
-    await axios.post('/api/reservations', reservationData)
-
-    alert('예약이 완료되었습니다.')
+    const redirectUrl = response.data.next_redirect_pc_url
+    if (redirectUrl) {
+      window.location.href = redirectUrl
+    } else {
+      alert('카카오페이 결제 URL이 없습니다.')
+    }
   } catch (error) {
-    console.error('예약 실패:', error)
-    alert('예약 중 오류가 발생했습니다.')
+    console.error('결제 준비 중 오류 발생:', error)
+    alert('결제 준비 중 오류가 발생했습니다.')
   }
 }
 
@@ -172,60 +171,157 @@ onMounted(() => {
 })
 </script>
 
+
 <style scoped>
 .product-detail {
-  display: flex;
-  flex-direction: column;
   max-width: 960px;
-  margin: auto;
+  margin: 40px auto;
   padding: 24px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #333;
+  background-color: #fafafa;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 32px;
 }
+
+.image-section {
+  flex: 1 1 400px;
+  max-width: 480px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
 .image-section img {
   width: 100%;
   height: 320px;
   object-fit: cover;
-  border-radius: 8px;
+  display: block;
 }
+
 .info-section {
-  margin-top: 24px;
+  flex: 1 1 400px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   line-height: 1.6;
 }
-.booking-box {
+
+.info-section h2 {
+  margin-bottom: 12px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #222;
+}
+
+.description {
+  font-size: 16px;
+  margin-bottom: 16px;
+  color: #555;
+}
+
+.price-wrap {
+  margin: 16px 0;
+}
+
+.price {
+  font-size: 18px;
+  font-weight: 700;
+  color: #444;
+  margin-bottom: 8px;
+}
+
+.price .label {
+  color: #888;
+  font-weight: 400;
+  margin-right: 8px;
+}
+
+.discounted-price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #e63946; /* 진한 빨간색 */
+  margin-top: 0;
+}
+
+.discount-info {
   margin-top: 24px;
-  padding: 16px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
 }
+
+.discount-info h3 {
+  font-weight: 700;
+  color: #1d3557;
+  margin-bottom: 12px;
+}
+
+.booking-box {
+  flex: 1 1 320px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+.booking-box h3 {
+  margin-bottom: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+}
+
 .booking-box label {
-  display: block;
-  margin-top: 8px;
-  font-weight: bold;
+  margin-top: 12px;
+  font-weight: 600;
+  color: #444;
 }
+
 .booking-box input,
 .booking-box select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  box-sizing: border-box;
+  margin-top: 6px;
+  padding: 10px 12px;
+  font-size: 16px;
+  border: 1.5px solid #ccc;
+  border-radius: 8px;
+  transition: border-color 0.3s ease;
 }
+
+.booking-box input:focus,
+.booking-box select:focus {
+  border-color: #4caf50;
+  outline: none;
+}
+
 .price-info {
-  margin-top: 16px;
+  margin-top: 20px;
+  font-weight: 700;
+  font-size: 18px;
+  color: #222;
+  text-align: center;
 }
+
 button {
-  margin-top: 16px;
-  width: 100%;
-  padding: 12px;
-  background-color: #4CAF50;
+  margin-top: 28px;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  background-color: #2a9d8f;
   color: white;
-  font-weight: bold;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
+  transition: background-color 0.25s ease;
 }
+
 button:hover {
-  background-color: #45a049;
-}
-.description {
-  margin-top: 8px;
+  background-color: #21867a;
 }
 </style>

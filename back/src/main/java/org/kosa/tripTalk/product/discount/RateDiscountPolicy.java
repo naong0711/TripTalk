@@ -8,9 +8,10 @@ public class RateDiscountPolicy implements DiscountPolicy {
 
 	private final double rate;
 	
+	// rate 값이 0.1이라면 → 10% 할인
 	@Override
 	public int applyDiscount(int price) {
-		return (int)(price * (1 - (rate / 100.0)));
+	    return (int)(price * (1 - rate)); // ✅ 수정된 부분
 	}
 
 }

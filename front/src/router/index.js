@@ -12,7 +12,9 @@ import ProfileUpdate from '@/views/mypage/ProfileUpdate.vue'
 import CartList from '@/views/mypage/CartList.vue'
 import Favorite from '@/views/mypage/Favorite.vue'
 import OAuthCallback from '@/views/login/OAuthCallback.vue'
-
+import ProductList from '@/views/ProductList.vue'
+import ProductRegister from '../views/ProductRegister.vue'
+import ProductDetail from '../views/ProductDetail.vue'
 
 const routes = [
   { path: '/', name: 'HelloWorld', component: HelloWorld } , //메인
@@ -27,7 +29,9 @@ const routes = [
   { path: '/cart', name: 'CartList', component: CartList }, //  장바구니 목록
   { path: '/favorite', name: 'Favorite', component: Favorite }, //  찜 목록
   { path: '/oauth2/callback', name: 'OAuthCallback', component: OAuthCallback}, //소셜로그인-카카오
-
+  { path: '/productList', name: 'productList', component: ProductList},
+  { path: '/productRegister', name: 'ProductRegister', component: ProductRegister},
+  { path: '/productDetail/:id', name: 'ProductDetail', component: ProductDetail },
 ]
 
 const router = createRouter({

@@ -17,52 +17,58 @@
     </div>
 
     <div class="results">
-      <div
+      <router-link
         class="hotel-card"
         v-for="hotel in hotels"
         :key="hotel.id"
+        :to="`/product/${hotel.id}`"
       >
         <img :src="hotel.image" alt="hotel photo" />
         <div class="hotel-info">
-          <h3>{{ hotel.name }}</h3>
-          <p>{{ hotel.location }}</p>
+          <h3>{{ hotel.title }}</h3>
+          <p>{{ hotel.address }}</p>
           <p>{{ checkIn }} ~ {{ checkOut }} · 성인 {{ adults }}명</p>
         </div>
         <div class="hotel-price">
-          <p>{{ hotel.pricePerNight }}원 / 박</p>
+          <p>{{ hotel.price.toLocaleString() }}원 / 박</p>
         </div>
-      </div>
+      </router-link>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue'
+import axios from 'axios'
 
-const checkIn = ref(new Date().toISOString().slice(0, 10));
-const checkOut = ref('');
-const adults = ref(2);
+const checkIn = ref(new Date().toISOString().slice(0, 10))
+const checkOut = ref('')
+const adults = ref(2)
+const hotels = ref([])
 
-const hotels = ref([
-  {
-    id: 1,
-    name: '우연 한동 프라이빗 펜션',
-    location: '제주도 한림읍',
-    image: 'https://example.com/your-image.jpg',
-    pricePerNight: '120,000',
-  },
-  {
-    id: 2,
-    name: '제주 바다펜션',
-    location: '서귀포시',
-    image: 'https://example.com/another-image.jpg',
-    pricePerNight: '90,000',
-  },
-]);
+async function fetchHotels() {
+  try {
+    const response = await axios.get('/api/product')
+    hotels.value = response.data.content.map(product => ({
+      id: product.id,
+      title: product.title,
+      address: product.address,
+      price: product.price,
+      image: `/api/files/image/product/${product.id}`
+    }))
+  } catch (err) {
+    console.error('숙소 목록 불러오기 실패:', err)
+  }
+}
 
 function searchHotels() {
-  console.log(`검색 → ${checkIn.value} ~ ${checkOut.value}, 인원: ${adults.value}`);
+  console.log(`검색 → ${checkIn.value} ~ ${checkOut.value}, 인원: ${adults.value}`)
+  // TODO: 검색 파라미터 API 연동 시 여기에 쿼리 파라미터 처리
 }
+
+onMounted(() => {
+  fetchHotels()
+})
 </script>
 
 <style scoped>
@@ -110,6 +116,8 @@ function searchHotels() {
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+  color: inherit;
 }
 
 .hotel-card img {

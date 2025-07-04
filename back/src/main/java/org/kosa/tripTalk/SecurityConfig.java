@@ -8,15 +8,11 @@ import org.kosa.tripTalk.user.UserRepository;
 import org.kosa.tripTalk.user.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.messaging.support.ChannelInterceptor;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.messaging.MessageSecurityMetadataSourceRegistry;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.messaging.access.intercept.AuthorizationChannelInterceptor;
-import org.springframework.security.messaging.access.intercept.MessageMatcherDelegatingAuthorizationManager;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -37,8 +33,7 @@ public class SecurityConfig {
   //스프링 시큐리티 설정
   @Bean
   public SecurityFilterChain filterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthenticationFilter) throws Exception {
-      
-    
+ 
     CustomAuthorizationRequestResolver customResolver = new CustomAuthorizationRequestResolver(
         clientRegistrationRepository, "/oauth2/authorization");
     
@@ -114,6 +109,4 @@ public class SecurityConfig {
       source.registerCorsConfiguration("/**", configuration);
       return source;
   }
-
-  
 }

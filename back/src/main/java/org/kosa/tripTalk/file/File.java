@@ -1,15 +1,19 @@
 package org.kosa.tripTalk.file;
 
-import java.time.LocalDateTime;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "files")
-@Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class File {
-    @Id @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
 
     @Column(name = "origin_name", nullable = false, length = 255)
@@ -30,11 +34,13 @@ public class File {
     @Column(name = "owner_type", nullable = false, length = 30)
     private String ownerType;
 
-    // 작성자 (예: 사용자, 게시글 등 다양한 엔티티의 FK 역할)
     @Column(name = "owner_id", nullable = false)
     private Long ownerId;
 
     @Column(name = "is_thumbnail", nullable = false)
-    private int isThumbnail; // 썸네일 여부 (nullable 허용)
-}
+    private int isThumbnail;
 
+    public String getImageUrl() {
+        return "/api/files/image/" + ownerType + "/" + id;
+    }
+}

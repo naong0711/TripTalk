@@ -70,6 +70,7 @@ dependencies {
     testImplementation 'org.springframework:spring-websocket'
     testImplementation 'org.springframework:spring-web'
 
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.15.2'
     
 
 }

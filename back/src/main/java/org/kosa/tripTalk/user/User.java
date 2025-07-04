@@ -81,11 +81,5 @@ public class User {
     public boolean isDel() {
       return Boolean.TRUE.equals(this.isDel);
   }
-
-
-
-    public boolean isDel() {
-      return Boolean.TRUE.equals(this.isDel);
-  }
     
 }

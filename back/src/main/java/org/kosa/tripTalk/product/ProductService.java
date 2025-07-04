@@ -56,10 +56,10 @@ public class ProductService {
 
 	// 상세
 	public ProductResponseDTO getProductById(Long id) {
-		System.out.println("getProductById" + id);
-		Product product = notFoundProductId(id);
-		
-		return ProductResponseDTO.from(product);
+	    System.out.println("++++++++++++++getProductById+++++++++++++" + id);
+	    Product product = productRepository.findByIdWithDiscount(id).orElse(null);	       
+	    
+	    return ProductResponseDTO.from(product);
 	}
 
 	// 수정

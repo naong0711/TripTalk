@@ -52,8 +52,9 @@ public class Discount {
     
     // 할인 유효 기간 여부 판단
     public boolean isActive() {
-    	LocalDateTime now = LocalDateTime.now();
-    	return now.isAfter(startAt) && now.isBefore(endAt);
+        LocalDateTime now = LocalDateTime.now();
+        System.out.println("[할인 유효성 확인] now=" + now + ", startAt=" + startAt + ", endAt=" + endAt);
+        return now.isAfter(startAt) && now.isBefore(endAt);
     }
     
     // 할인 타입에 따라 해당 전략 객체 직접 반환

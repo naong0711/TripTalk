@@ -86,7 +86,8 @@ const product = ref({
   endDate: '',
   sellerId: null,
   categoryId: null,
-  discount: null
+  discount: null,
+  discountedPrice: 0
 })
 
 // 이미지 URL도 상품 리스트랑 동일하게 경로 설정
@@ -110,6 +111,7 @@ const fetchProduct = async () => {
   try {
     const res = await axios.get(`/api/product/${productId}`)
     product.value = res.data
+      console.log(product.value)
   } catch (e) {
     console.error('상품 상세 로딩 실패:', e)
   }

@@ -1,14 +1,18 @@
 package org.kosa.tripTalk.chat;
 
 import java.util.List;
+import org.kosa.tripTalk.reservation.Reservation;
+import org.kosa.tripTalk.reservation.ReservationRequest;
+import org.kosa.tripTalk.reservation.ReservationService;
 import org.kosa.tripTalk.user.User;
-import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,7 +26,16 @@ import lombok.RequiredArgsConstructor;
 public class ChatMessageController {
 
     private final ChatMessageService chatMessageService;
+    private final ReservationService reservationService;
 
+    //테스트
+    @PostMapping("/test-reservation")
+    public ResponseEntity<Reservation> createTestReservation(@RequestBody ReservationRequest request) {
+        // 결제 관련 검증 없이 바로 예약 생성
+        return ResponseEntity.ok(reservationService.createReservation(request));
+    }
+
+    
     //채팅 메시지 수신 및 처리 (웹소켓 메시지 핸들링)
     @MessageMapping("/chat/message")
     public void sendMessage(@Payload ChatPayload payload,  Authentication authentication) {

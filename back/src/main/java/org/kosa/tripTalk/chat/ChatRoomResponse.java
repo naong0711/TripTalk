@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.chat;
 
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,4 +17,6 @@ public class ChatRoomResponse {
   private String lastMessage;
   private String userRole; // "BUYER" or "SELLER"
   private String lastMessageSenderRole;
+  private LocalDateTime sentAt;
+  private int unreadCount;
 }

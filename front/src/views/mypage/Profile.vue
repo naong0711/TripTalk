@@ -1,20 +1,25 @@
 <template>
   <div class="profile-detail">
     <h2>회원 상세 정보</h2>
-    <div class="info-row" v-for="(value, key) in userInfo" :key="key">
-      <strong>{{ labels[key] }}:</strong>
-      <span>{{ value || '정보 없음' }}</span>
+
+    <dl class="info-list">
+      <template v-for="(value, key) in userInfo" :key="key">
+        <dt>{{ labels[key] || key }}</dt>
+        <dd :title="value || '정보 없음'">{{ value || '정보 없음' }}</dd>
+      </template>
+    </dl>
+
+    <div class="btn-group">
+      <button class="btn-back" @click="goBack">뒤로 가기</button>
+      <button class="btn-edit" @click="showPasswordModal = true">정보 수정</button>
     </div>
-    <button @click="goBack">돌아가기</button>    
-    <button @click="showPasswordModal = true">수정하기</button>
-    
+
     <PasswordConfirmModal
-    v-if="showPasswordModal"
-    @confirm="handlePasswordConfirm"
-    @cancel="showPasswordModal = false"
+      v-if="showPasswordModal"
+      @confirm="handlePasswordConfirm"
+      @cancel="showPasswordModal = false"
     />
-    
-</div>
+  </div>
 </template>
 
 <script setup>
@@ -24,14 +29,9 @@ import axios from 'axios'
 import PasswordConfirmModal from './PasswordConfirmModal.vue'
 
 const router = useRouter()
-
 const userInfo = ref({})
-
 const showPasswordModal = ref(false)
-function handlePasswordConfirm() {
-  showPasswordModal.value = false
-  router.push('/mypage/update')
-}
+
 const labels = {
   userId: '아이디',
   name: '이름',
@@ -45,6 +45,11 @@ const labels = {
   loginType: '로그인 유형',
 }
 
+function handlePasswordConfirm() {
+  showPasswordModal.value = false
+  router.push('/mypage/update')
+}
+
 onMounted(async () => {
   try {
     const res = await axios.get('/api/mypage/profile', {
@@ -53,7 +58,6 @@ onMounted(async () => {
       }
     })
     userInfo.value = res.data
-    console.log('profile data:', userInfo.value) 
   } catch (error) {
     console.error('회원 정보 조회 실패:', error)
   }
@@ -66,47 +70,102 @@ function goBack() {
 
 <style scoped>
 .profile-detail {
-  max-width: 500px;
+  max-width: 480px;
   margin: 40px auto;
-  padding: 20px;
-  border: 1px solid #ddd;
+  padding: 32px 36px;
   border-radius: 12px;
-  background: #fefefe;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   font-family: 'Noto Sans KR', sans-serif;
+  color: #444;
+  user-select: none;
 }
+
 h2 {
+  font-weight: 700;
+  font-size: 30px;
+  color: #3a3a3a;
+  margin-bottom: 36px;
   text-align: center;
-  margin-bottom: 24px;
+  letter-spacing: 0.02em;
 }
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #eee;
+
+/* 정보 리스트: dt는 label, dd는 값 */
+.info-list {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  row-gap: 18px;
+  column-gap: 24px;
+  margin-bottom: 48px;
 }
-.info-row strong {
-  color: #666;
-  width: 130px;
-}
-.info-row span {
-  color: #333;
-  flex: 1;
-  text-align: right;
-}
-button {
-  margin-top: 24px;
-  display: block;
-  width: 100%;
-  background-color: #c8ad7f;
-  color: white;
-  border: none;
-  padding: 12px;
+
+.info-list dt {
+  font-weight: 600;
+  color: #9b8e6f;
   font-size: 16px;
-  border-radius: 6px;
-  cursor: pointer;
+  align-self: center;
+  user-select: text;
 }
-button:hover {
-  background-color: #b4976f;
+
+.info-list dd {
+  margin: 0;
+  font-size: 16px;
+  color: #222;
+  text-align: left;
+  user-select: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 버튼 그룹 */
+.btn-group {
+  display: flex;
+  gap: 18px;
+  justify-content: center;
+}
+
+.btn-back,
+.btn-edit {
+  flex: 1;
+  padding: 14px 0;
+  font-size: 18px;
+  font-weight: 700;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.25s ease;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* 뒤로가기 버튼 */
+.btn-back {
+  background-color: #f2f1ee;
+  color: #555;
+}
+
+.btn-back:hover {
+  background-color: #d3cfc2;
+  color: #222;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+/* 수정하기 버튼 */
+.btn-edit {
+  background-color: #c8ad7f;
+  color: #fff;
+}
+
+.btn-edit:hover {
+  background-color: #a88d4d;
+  box-shadow: 0 4px 10px rgba(168,141,77,0.6);
+}
+
+/* 반응형: 모바일 세로 정렬 */
+@media (max-width: 400px) {
+  .btn-group {
+    flex-direction: column;
+  }
 }
 </style>

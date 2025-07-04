@@ -51,37 +51,6 @@
         </div>
       </div>
     </div>
-
-    <hr>
-
-    <!-- 여행후기 섹션 -->
-    <div class="section">
-      <div class="section-header">
-        <h3>나의 여행 후기</h3>
-        <div class="nav-buttons">
-          <button @click="prev('posts')" :disabled="postPage === 0">‹</button>
-          <button @click="next('posts')" :disabled="postPage >= maxPage('posts')">›</button>
-        </div>
-      </div>
-      <div class="card-list">
-        <div
-          v-for="(item, index) in paginatedPosts"
-          :key="item.id || 'more-posts' + index"
-          class="card"
-          :class="{ 'more-card': item.isMore }"
-          @click="item.isMore ? goToDetail('posts') : goToItem(item, 'posts')"
-        >
-          <template v-if="!item.isMore">
-            <div class="card-title-wrapper">
-              <p class="card-title" :title="item.title">{{ item.title }}</p>
-            </div>
-          </template>
-          <template v-else>
-            <div class="more-text">…</div>
-          </template>
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 

@@ -12,6 +12,7 @@ import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -99,7 +100,8 @@ public class ChatMessageService {
 
                 Optional<ChatMessage> lastMsgOpt = messageRepository.findLatestMessageByRoomId(room.getId());
                 String lastMessage = lastMsgOpt.map(ChatMessage::getMessage).orElse("메시지가 없습니다");
-
+                LocalDateTime sentAt = lastMsgOpt.map(ChatMessage::getSentAt).orElse(null);
+                
                 Long lastSenderId = lastMsgOpt.map(msg -> msg.getSender().getId()).orElse(null);
 
                 String lastMessageSenderRole = "";
@@ -110,6 +112,8 @@ public class ChatMessageService {
                         lastMessageSenderRole = "SELLER";
                     }
                 }
+                
+                int unreadCount = messageRepository.countUnreadMessages(room.getId(), userId);
 
                 return new ChatRoomResponse(
                     room.getId(),
@@ -117,7 +121,9 @@ public class ChatMessageService {
                     opponentUser.getNickname(),
                     lastMessage,
                     isBuyer ? "BUYER" : "SELLER",
-                    lastMessageSenderRole
+                    lastMessageSenderRole,
+                    sentAt,
+                    unreadCount
                 );
             })
             .collect(Collectors.toList());
@@ -136,8 +142,12 @@ public class ChatMessageService {
     }
 
     //채팅방 대화기록
+    @Transactional
     public List<ChatMessageResponse> getMessagesByRoomId(String roomId, Long currentUserId) {
-      List<ChatMessage> messages = messageRepository.findByRoom_Id(roomId);
+      messageRepository.markMessagesAsReadForUser(roomId, currentUserId); //읽음 여부 확인
+
+      List<ChatMessage> messages = messageRepository.findByRoom_Id(roomId); // 최신 상태로 다시 조회
+
       return messages.stream()
           .map(msg -> new ChatMessageResponse(msg, currentUserId))
           .collect(Collectors.toList());

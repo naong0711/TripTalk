@@ -26,7 +26,10 @@
         </template>
         <template v-else>
         <!-- 채팅 아이콘 -->
-          <button @click="isChatOpen = true">💬</button>
+          <div class="chat-icon-wrapper">
+            <button class="chat-btn" @click="isChatOpen = true">💬</button>
+            <span v-if="hasUnreadMessages" class="red-dot"></span>
+          </div>
           <!-- 채팅 모달 -->
           <ChatModal v-if="isChatOpen" @close="isChatOpen = false">
             <ChatList @selectRoom="goToChatRoom" />
@@ -40,25 +43,61 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ChatModal from '@/components/chat/ChatModal.vue'
 import ChatList from '@/components/chat/ChatList.vue'
+import axios from 'axios' // ✅ 추가
 
 const route = useRoute()
 const router = useRouter()
 
-
 const isLoggedIn = ref(false)
 const isChatOpen = ref(false)
+const hasUnreadMessages = ref(false) // ✅ 읽지 않은 메시지 여부 상태
+let unreadCheckInterval = null // ✅ interval 핸들 저장
+
 
 function goToChatRoom(roomId) {
   router.push(`/chat/room/${roomId}`)
   isChatOpen.value = false
 }
 
+// ✅ 읽지 않은 메시지 확인
+async function checkUnreadMessages() {
+  try {
+    const res = await axios.get('/api/chat/rooms', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+
+    hasUnreadMessages.value = res.data.some(room => room.unreadCount > 0)
+  } catch (error) {
+    console.error('읽지 않은 메시지 확인 실패', error)
+  }
+}
+
 function checkLoginStatus() {
   isLoggedIn.value = !!localStorage.getItem('accessToken')
+  if (isLoggedIn.value) {
+    startUnreadPolling()
+  } else {
+    stopUnreadPolling()
+    hasUnreadMessages.value = false
+  }
+}
+
+function startUnreadPolling() {
+  checkUnreadMessages() // 첫 실행
+  unreadCheckInterval = setInterval(checkUnreadMessages, 2000) // 2초마다 확인
+}
+
+function stopUnreadPolling() {
+  if (unreadCheckInterval) {
+    clearInterval(unreadCheckInterval)
+    unreadCheckInterval = null
+  }
 }
 
 onMounted(() => {
@@ -67,6 +106,10 @@ onMounted(() => {
 
 watch(() => route.fullPath, () => {
   checkLoginStatus()
+})
+
+onUnmounted(() => {
+  stopUnreadPolling()
 })
 
 function logout() {
@@ -186,6 +229,11 @@ function logout() {
   color: #ffffff;
 }
 
+.chat-btn {
+  background-color: #f6f2ec;
+  border: none;
+}
+
 @media (max-width: 768px) {
   .burger {
     display: block;
@@ -219,5 +267,20 @@ function logout() {
     flex-direction: row;
     align-items: center;
   }
+}
+
+.chat-icon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.red-dot {
+  position: absolute;
+  top: 0;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  background-color: red;
+  border-radius: 50%;
 }
 </style>

@@ -88,8 +88,8 @@
     </div>
 
     <div class="button-group">
-      <button class="save-btn" @click="submitUpdate">저장</button>
       <button class="cancel-btn" @click="goBack">취소</button>
+      <button class="save-btn" @click="submitUpdate">저장</button>
     </div>
   </div>
 </template>

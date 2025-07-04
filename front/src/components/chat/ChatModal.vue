@@ -1,7 +1,7 @@
 <template>
   <div class="modal-overlay">
     <div class="modal-content">
-      <button class="close-btn" @click="$emit('close')">X</button>
+      <button class="close-btn" @click="$emit('close')">✕</button>
 
       <div v-if="!selectedRoom">
         <!-- ✅ 이벤트로 roomId + receiverId 받기 -->
@@ -56,8 +56,8 @@ function enterRoom({ roomId, receiverId, userRole, opponentName }) {
 
 .close-btn {
   position: absolute;
-  top: 10px;
-  right: 15px;
+  top: 21px;
+  right: 25px;
   background: transparent;
   border: none;
   font-size: 1.5rem;

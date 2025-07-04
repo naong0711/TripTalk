@@ -3,6 +3,7 @@ package org.kosa.tripTalk.chat;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -15,4 +16,13 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>{
   Optional<ChatMessage> findLatestMessageByRoomId(@Param("roomId") String roomId);
 
   List<ChatMessage> findByRoom_Id(String roomId);
+  
+  //읽지 않은 메세지만 조회해서 읽음처리
+  @Modifying
+  @Query("UPDATE ChatMessage m SET m.isRead = true WHERE m.room.id = :roomId AND m.sender.id <> :userId AND m.isRead = false")
+  void markMessagesAsReadForUser(@Param("roomId") String roomId, @Param("userId") Long currentUserId);
+
+  //안읽은 메세지 카운트
+  @Query("SELECT COUNT(m) FROM ChatMessage m WHERE m.room.id = :roomId AND m.sender.id <> :userId AND m.isRead = false")
+  int countUnreadMessages(@Param("roomId") String roomId, @Param("userId") Long userId);
 }

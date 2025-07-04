@@ -16,16 +16,23 @@
       </ul>
       <p v-else>예약 정보가 없습니다.</p>
     </div> -->
-
+    
     <!-- ✅ 채팅 메시지 목록 -->
     <div class="chat-messages">
       <div
-        v-for="msg in messages"
+        v-for="(msg, index) in messages"
         :key="msg.id || msg.sentAt"
-        :class="['chat-bubble', msg.senderId === userId ? 'my-msg' : 'other-msg']"
       >
-        <span class="bubble-content">{{ msg.message }}</span>
-        <span class="msg-time">{{ formatTime(msg.sentAt) }}</span>
+        <!-- 날짜 구분선 -->
+        <div v-if="shouldShowDateDivider(index)" class="date-divider">
+          {{ formatDate(msg.sentAt) }}
+        </div>
+
+        <!-- 메세지 -->
+        <div :class="['chat-bubble', msg.senderId === userId ? 'my-msg' : 'other-msg']">
+          <span class="bubble-content">{{ msg.message }}</span>
+          <span class="msg-time">{{ formatTime(msg.sentAt) }}</span>
+        </div>
       </div>
     </div>
 
@@ -42,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick  } from 'vue'
 import SockJS from 'sockjs-client/dist/sockjs.min.js'
 import { Client } from '@stomp/stompjs'
 import axios from 'axios'
@@ -102,12 +109,33 @@ function send() {
   }
 }
 
+//날짜 및 시간 비교
+function shouldShowDateDivider(index) {
+  if (index === 0) return true
+  const currentDate = new Date(messages.value[index].sentAt).toDateString()
+  const prevDate = new Date(messages.value[index - 1].sentAt).toDateString()
+  return currentDate !== prevDate
+}
+
+function formatDate(dateString) {
+  const date = new Date(dateString)
+  return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`
+}
+
 function formatTime(dateString) {
   if (!dateString) return ''
   const date = new Date(dateString)
   const hours = date.getHours().toString().padStart(2, '0')
   const minutes = date.getMinutes().toString().padStart(2, '0')
   return `${hours}:${minutes}`
+}
+
+//로드 시 채팅방 맨 아래로
+function scrollToBottom() {
+  const container = document.querySelector('.chat-messages')
+  if (container) {
+    container.scrollTop = container.scrollHeight
+  }
 }
 
 
@@ -132,6 +160,9 @@ onMounted(async () => {
         endDate: '2025-07-14',
         guestCount: 2,
       }]
+
+    await nextTick() // DOM 렌더링 완료 후
+    scrollToBottom()
 
   } catch (error) {
     console.error('데이터 불러오기 실패:', error)
@@ -251,5 +282,13 @@ onMounted(async () => {
   border: none;
   border-radius: 4px;
   cursor: pointer;
+}
+
+.date-divider {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #aaa;
+  margin: 0.75rem 0;
+  user-select: none;
 }
 </style>

@@ -8,8 +8,8 @@
         placeholder="비밀번호를 입력하세요"
       />
       <div class="buttons">
-        <button @click="confirm">확인</button>
-        <button @click="$emit('cancel')">취소</button>
+        <button class="cancel-btn" @click="$emit('cancel')">취소</button>
+        <button class="save-btn" @click="confirm">확인</button>
       </div>
       <p v-if="error" class="error">{{ error }}</p>
     </div>
@@ -61,7 +61,7 @@ async function confirm() {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 input {
-  width: 100%;
+  width: 94%;
   padding: 10px;
   margin-top: 12px;
   font-size: 16px;
@@ -82,12 +82,19 @@ button {
   border-radius: 4px;
   cursor: pointer;
 }
-button:hover {
+.save-btn:hover {
   background: #b4976f;
 }
 .error {
   margin-top: 10px;
   color: red;
   font-size: 14px;
+}
+
+.cancel-btn {
+  background: #888;
+  color: white;
+  border: none;
+  cursor: pointer;
 }
 </style>

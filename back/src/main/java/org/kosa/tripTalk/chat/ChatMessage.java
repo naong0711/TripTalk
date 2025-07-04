@@ -1,8 +1,10 @@
 package org.kosa.tripTalk.chat;
 
 import java.time.LocalDateTime;
+import org.kosa.tripTalk.BooleanToYNConverter;
 import org.kosa.tripTalk.user.User;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -46,7 +48,11 @@ public class ChatMessage {
 
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
-
+    
+    @Column(name = "is_read", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'F'")
+    @Convert(converter = BooleanToYNConverter.class) //false -> 'F', true -> 'T' 자동 변환
+    private Boolean isRead; //읽음여부
+    
     @PrePersist
     public void prePersist() {
         this.sentAt = LocalDateTime.now();
@@ -55,4 +61,12 @@ public class ChatMessage {
     public Long getSenderId() {
         return sender != null ? sender.getId() : null;
     }
+
+    public Boolean getIsReadForUser(Long currentUserId) {
+      return this.isRead != null ? this.isRead : false;
+    }
+
+    public ChatMessageResponse toResponse(Long currentUserId) {
+      return new ChatMessageResponse(this, currentUserId);
+  }
 }

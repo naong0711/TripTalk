@@ -73,10 +73,11 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
-            PageRequestDTO pageRequestDTO,
-            Search search
+            @ModelAttribute PageRequestDTO pageRequestDTO,  
+            @ModelAttribute Search search
     ) {
-    	System.out.print("");
+        System.out.println("요청 받은 페이지: " + pageRequestDTO.getPage() + ", 사이즈: " + pageRequestDTO.getSize() + ", 정렬: " + pageRequestDTO.getSort());
+        
         Pageable pageable = pageRequestDTO.toPageable();
         Page<ProductResponseDTO> result = productService.getAllProducts(pageable, search);
         return ResponseEntity.ok(result);

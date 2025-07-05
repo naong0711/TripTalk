@@ -22,12 +22,8 @@
       <p><strong>시작일:</strong> {{ formatDate(product.startDate) }}</p>
       <p><strong>종료일:</strong> {{ formatDate(product.endDate) }}</p>
 
-      <p><strong>판매자 ID:</strong> {{ product.sellerId }}</p>
-      <p><strong>카테고리 ID:</strong> {{ product.categoryId }}</p>
-
       <div v-if="product.discount" class="discount-info">
         <h3>할인 정보</h3>
-        <p><strong>할인 타입:</strong> {{ product.discount.discountType }}</p>
         <p><strong>할인 이름:</strong> {{ product.discount.name }}</p>
         <p><strong>할인율:</strong> {{ (product.discount.discountRate * 100).toFixed(1) }}%</p>
         <p><strong>할인 시작일:</strong> {{ formatDate(product.discount.startAt) }}</p>

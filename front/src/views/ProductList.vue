@@ -42,60 +42,85 @@
         </div>
       </div>
     </div>
+
+    <div class="pagination">
+      <button @click="goToPage(page - 1)" :disabled="page === 0">이전</button>
+      <span>{{ page + 1 }} / {{ totalPages }}</span>
+      <button @click="goToPage(page + 1)" :disabled="page + 1 >= totalPages">다음</button>
+    </div>
   </template>
 
-  <script setup>
-  import { ref, onMounted } from 'vue'
-  import { useRouter } from 'vue-router'
-  import axios from 'axios'
+<script setup>
+import { ref, onMounted } from 'vue'
+import { useRouter } from 'vue-router'
+import axios from 'axios'
 
-  const router = useRouter()
+const router = useRouter()
 
-  const checkIn = ref(new Date().toISOString().slice(0, 10))
-  const checkOut = ref('')
-  const adults = ref(2)
+const checkIn = ref(new Date().toISOString().slice(0, 10))
+const checkOut = ref('')
+const adults = ref(2)
 
-  const products = ref([])
+const products = ref([])
+const totalPages = ref(0)
+const page = ref(0)       // ✅ 프론트는 0부터 시작
+const size = 9            // ✅ 9개씩 보여주기
 
-  const fetchProducts = async () => {
-    try {
-      const response = await axios.get('/api/product')
-      products.value = response.data.content.map(p => ({
-        id: p.id,
-        title: p.title,
-        address: p.address,
-        price: p.price,
-        image: `/api/files/image/product/${p.id}`
-      }))
-    } catch (err) {
-      console.error('상품 목록 로딩 실패:', err)
-    }
-  }
-
-  const searchProducts = () => {
-    console.log(`검색: ${checkIn.value} ~ ${checkOut.value}, 성인 ${adults.value}명`)
-    // 추후 백엔드에 검색 조건 전송 예정
-  }
-
-  const goToDetail = (id) => {
-    router.push({
-      path: `/productDetail/${id}`,
-      query: {
-        checkIn: checkIn.value,
-        checkOut: checkOut.value,
-        adults: adults.value
+const fetchProducts = async () => {
+  try {
+    const response = await axios.get('/api/product', {
+      params: {
+        page: page.value + 1,  // 혹은 그냥 page.value (서버 쪽 1부터 시작이면 +1 해야 함)
+        size: size,
+        sort: 'id,desc'
       }
-    })
-  }
+    });
 
-  const goToRegister = () => {
-    router.push('/productRegister')
+    products.value = response.data.content.map(p => ({
+      id: p.id,
+      title: p.title,
+      address: p.address,
+      price: p.price,
+      image: `/api/files/image/product/${p.id}`
+    }))
+    totalPages.value = response.data.totalPages
+  } catch (err) {
+    console.error('상품 목록 로딩 실패:', err)
   }
+}
 
-  onMounted(() => {
+const goToPage = (newPage) => {
+  if (newPage >= 0 && newPage < totalPages.value) {
+    page.value = newPage
     fetchProducts()
+  }
+}
+
+const searchProducts = () => {
+  page.value = 0
+  fetchProducts()
+}
+
+const goToDetail = (id) => {
+  router.push({
+    path: `/productDetail/${id}`,
+    query: {
+      checkIn: checkIn.value,
+      checkOut: checkOut.value,
+      adults: adults.value
+    }
   })
-  </script>
+}
+
+const goToRegister = () => {
+  router.push('/productRegister')
+}
+
+onMounted(() => {
+  fetchProducts()
+})
+
+</script>
 
   <style scoped>
   .product-page {
@@ -169,4 +194,28 @@
     font-weight: bold;
     text-align: right;
   }
+  .pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 24px;
+  gap: 12px;
+}
+
+.pagination button {
+  padding: 6px 12px;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.pagination span {
+  font-weight: bold;
+}
   </style>

@@ -3,14 +3,13 @@
     <!-- 프로필 -->
     <div class="top-box">
       <div class="profile-box">
-        <img :src="profileImage" class="profile-img" />
+        <img :src="profileImage" class="profile-img" @error="profileImage = '/img/default-profile.jpg'" />
         <div class="profile-info">
           <h2 class="nickname" :title="nickname" @click="goToProfileDetail">{{ nickname }}</h2>
           <button @click="changeProfile" class="change-btn">사진 변경</button>
           <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" class="hidden" />
         </div>
       </div>
-
     
     <hr>
 
@@ -23,12 +22,18 @@
             <span class="icon"><img src="@/assets/myPageBtn/favoriteBtn.png"></span>
             <span class="label">찜 내역</span>
           </div>
-          <div class="menu-item" @click="goToChat">
+          <!-- ✨ 채팅 메뉴 항목 (ChatModal 포함) -->
+          <div class="menu-item" @click="openChat">
             <span class="icon"><img src="@/assets/myPageBtn/chatBtn.png"></span>
             <span class="label">채팅</span>
           </div>
+        </div>
+
+          <!-- 메뉴 바깥에서 모달 출력 -->
+          <ChatModal v-if="isChatOpen" @close="isChatOpen = false">
+            <ChatList @selectRoom="goToChatRoom" />
+          </ChatModal>
       </div>
-    </div>
 
     <hr>
 
@@ -81,6 +86,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import ChatModal from '@/components/chat/ChatModal.vue'
+import ChatList from '@/components/chat/ChatList.vue'
 
 const router = useRouter()
 
@@ -90,6 +97,17 @@ const fileInput = ref(null)
 const activeCategory = ref('여행')
 const reservations = ref([])
 
+const isChatOpen = ref(false)
+
+function goToChatRoom(roomId) {
+  router.push(`/chat/room/${roomId}`)
+  isChatOpen.value = false
+}
+
+function openChat() {
+  isChatOpen.value = true
+}
+
 // ✅ 마운트 시 프로필 정보 가져오기
 onMounted(async () => {
   try {
@@ -98,6 +116,8 @@ onMounted(async () => {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
     })
+    console.log(res.data)
+    console.log(res.data.profileImageUrl)
     profileImage.value = res.data.profileImageUrl || '/img/default-profile.jpg'
     nickname.value = res.data.nickname || '닉네임 없음'
   } catch (err) {
@@ -135,15 +155,42 @@ function changeProfile() {
   fileInput.value?.click()
 }
 
-function onImageSelected(e) {
+async function onImageSelected(e) {
   const file = e.target.files[0]
   if (!file) return
 
+  // 미리보기
   const reader = new FileReader()
   reader.onload = (ev) => {
     profileImage.value = ev.target.result
   }
   reader.readAsDataURL(file)
+
+  // 업로드
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const res = await axios.post('/api/user/profile/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+
+    if(res.data.url) {
+      profileImage.value = res.data.url
+      window.location.reload(true)
+    }
+
+    alert('변경이 완료되었습니다')
+
+  } catch (err) {
+    console.error('프로필 업로드 실패:', err)
+    alert('프로필 업로드에 실패했습니다.')
+  }
+
+  fileInput.value.value = null // 같은 파일 다시 선택할 수 있게 초기화
 }
 
 const visibleCount = 3
@@ -185,16 +232,11 @@ function prev(type) {
 }
 
 function goToDetail(type) {
-  if (type === 'reservations') router.push('/reservations')
-  if (type === 'posts') router.push('/posts')
+  router.push('/reservations')
 }
 
 function goToItem(item, type) {
-  if (type === 'reservations') {
     router.push(`/reservations/${item.id}`)
-  } else if (type === 'posts') {
-    router.push(`/posts/${item.id}`)
-  }
 }
 
 function goToProfileDetail() {
@@ -212,13 +254,12 @@ function goToFavorites() {
 </script>
 
 <style scoped>
-
 h2 {
   cursor: pointer;
 }
 
 hr {
-  border: none;               /* 기본 테두리 제거 */
+  border: none;
   border-top: 1px solid #eee;
 }
 .mypage-container {
@@ -309,12 +350,12 @@ hr {
 
 .card-list {
   display: flex;
-  flex-direction: column; /* ← 가로 → 세로 */
+  flex-direction: column;
   gap: 12px;
 }
 
 .card {
-  flex: 1; /* 너비 자동 */
+  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -345,7 +386,6 @@ hr {
 }
 
 .reservation-id {
-
   font-size: 12px;
   color: #999;
   margin-bottom: 6px;
@@ -398,12 +438,6 @@ hr {
   stroke: #c8ad7f;
 }
 
-.reservation-id {
-  font-size: 12px;
-  color: #999;
-  margin-bottom: 6px;
-}
-
 .category-buttons {
   display: flex;
   justify-content: flex-start;
@@ -414,8 +448,8 @@ hr {
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   overflow: hidden;
-  width: fit-content; /* 버튼 크기만큼만 차지 */
-  line-height: 1; /* 버튼 아래 여백 방지 */
+  width: fit-content;
+  line-height: 1;
 }
 
 .category-buttons button {
@@ -489,5 +523,4 @@ hr {
   font-weight: 500;
   color: #333;
 }
-
 </style>

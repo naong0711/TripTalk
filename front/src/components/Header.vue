@@ -47,7 +47,7 @@ import { ref, onMounted, watch, onUnmounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import ChatModal from '@/components/chat/ChatModal.vue'
 import ChatList from '@/components/chat/ChatList.vue'
-import axios from 'axios' // ✅ 추가
+import axios from '@/axios.js'
 
 const searchQuery = ref('')
 
@@ -67,21 +67,42 @@ function goToChatRoom(roomId) {
 
 // ✅ 읽지 않은 메시지 확인
 async function checkUnreadMessages() {
+  const token = localStorage.getItem('accessToken')
+  if (!token) {
+    stopUnreadPolling()
+    hasUnreadMessages.value = false
+    return
+  }
+
   try {
     const res = await axios.get('/api/chat/rooms', {
       headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+        Authorization: `Bearer ${token}`
       }
     })
 
     hasUnreadMessages.value = res.data.some(room => room.unreadCount > 0)
   } catch (error) {
     console.error('읽지 않은 메시지 확인 실패', error)
+
+     // 401, 403 같은 인증 에러면 polling 멈추고 로그아웃 권장
+  if (error.response?.status === 401 || error.response?.status === 403) {
+    logout()
+  } else {
+    // 500 에러 등 서버 에러는 polling 멈추고 잠시 기다렸다 재시도 할 수도 있음
+    stopUnreadPolling()
+    // 필요하면 5초 후 polling 다시 시작하게 할 수도 있음
+    setTimeout(() => {
+      if (isLoggedIn.value) startUnreadPolling()
+    }, 5000)
+  }
   }
 }
 
+
 function checkLoginStatus() {
   isLoggedIn.value = !!localStorage.getItem('accessToken')
+
   if (isLoggedIn.value) {
     startUnreadPolling()
   } else {
@@ -91,8 +112,9 @@ function checkLoginStatus() {
 }
 
 function startUnreadPolling() {
-  checkUnreadMessages() // 첫 실행
-  unreadCheckInterval = setInterval(checkUnreadMessages, 2000) // 2초마다 확인
+  checkUnreadMessages()
+  unreadCheckInterval = setInterval(checkUnreadMessages, 2000)
+
 }
 
 function stopUnreadPolling() {
@@ -126,6 +148,7 @@ function logout() {
   router.push('/')
 }
 </script>
+
 
 <style scoped>
 .header {

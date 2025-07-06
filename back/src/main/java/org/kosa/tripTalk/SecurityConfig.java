@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -57,25 +58,29 @@ public class SecurityConfig {
                           "/api/files/**",
                           "/email/verify"
                       ).permitAll()
-                      .requestMatchers("/api/mypage/**").authenticated()  //로그인한 사용자만 접근 가능
+                      .requestMatchers("/api/mypage/**", "/api/chat/**").authenticated()  //로그인한 사용자만 접근 가능
                       .anyRequest().authenticated())
               .oauth2Login(oauth2 -> oauth2
-                  .authorizationEndpoint(endpoint -> 
-                  endpoint.authorizationRequestResolver(customResolver)
-              )
+                  .authorizationEndpoint(endpoint ->
+                      endpoint.authorizationRequestResolver(customResolver)
+                  )
                   .successHandler(oAuth2LoginSuccessHandler())
               )
               .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-              // 폼 로그인은 현재 사용하지 않음         
-//            .formLogin(formLogin -> formLogin
-//                    .loginPage("/login")
-//                    .defaultSuccessUrl("/home"))
-              .logout((logout) -> logout //로그아웃 요청시
-                      .logoutSuccessUrl("/")
-                      .invalidateHttpSession(true))
-              .sessionManagement(session -> session //세션 삭제
-                  .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
-
+              .exceptionHandling(exception -> exception
+                  .authenticationEntryPoint((request, response, authException) -> {
+                      response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                      response.setContentType("application/json;charset=UTF-8");
+                      response.getWriter().write("{\"error\": \"Unauthorized\"}");
+                  })
+              )
+              .logout(logout -> logout
+                  .logoutSuccessUrl("/")
+                  .invalidateHttpSession(true)
+              )
+              .sessionManagement(session -> session
+                  .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+              );
       return http.build();
   }
   

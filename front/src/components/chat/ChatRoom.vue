@@ -79,6 +79,7 @@ stompClient = new Client({
     stompClient.subscribe(`/sub/chat/room/${props.roomId}`, (message) => {
       const chatMessage = JSON.parse(message.body)
       messages.value.push(chatMessage)
+      messages.value.sort((a, b) => new Date(a.sentAt) - new Date(b.sentAt))
       setTimeout(() => {
         const container = document.querySelector('.chat-messages')
         if (container) container.scrollTop = container.scrollHeight

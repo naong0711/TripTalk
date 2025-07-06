@@ -84,9 +84,10 @@ async function onSubmit() {
     console.log('로그인 성공:', response.data)
     
     //응답 토큰 저장
-    localStorage.setItem('accessToken', response.data.token);
+    localStorage.setItem('accessToken', response.data.accessToken);
+    localStorage.setItem('refreshToken', response.data.refreshToken);
 
-    const userId = getUserIdFromToken(response.data.token);
+    const userId = getUserIdFromToken(response.data.accessToken);
     if (userId) {
       localStorage.setItem('userId', userId);
       console.log(userId);

@@ -30,15 +30,10 @@ public class myPageController {
   //토큰에서 가져온 userid값으로 프로필 조회
   @GetMapping("profile")
   public ResponseEntity<?> profile(Authentication authentication) {
-    
-    //헤더에서 userid 추출
     User user = (User) authentication.getPrincipal();
     String userId = user.getUserId();
-    
-    ProfileResponse response = myService.getProfile(userId);
-
-    return ResponseEntity.ok(response);
-  }
+    return ResponseEntity.ok(myService.getMyPageProfile(userId));
+}
   
   //마이페이지 정보수정
   @PutMapping("profile/update")

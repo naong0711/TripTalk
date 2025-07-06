@@ -3,7 +3,6 @@ package org.kosa.tripTalk.jwt;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import org.kosa.tripTalk.user.User;
-import org.kosa.tripTalk.user.User.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.JwtException;
@@ -24,8 +23,9 @@ public class JwtUtil {
              .claim("id", user.getId())    // DB PK (예: 2202)
              .claim("role", user.getRole().name())
              .setIssuedAt(new Date(System.currentTimeMillis()))
-             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1시간
-             .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
+//             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1시간
+             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // 1분(테스트용)
+             .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
              .compact();
   }
   
@@ -34,25 +34,30 @@ public class JwtUtil {
     return Jwts.builder()
             .setSubject(userId)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일
-            .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()), SignatureAlgorithm.HS256)
+//            .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일
+            .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60)) // 1시간(테스트용)
+            .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
             .compact();
   }
   
   //토큰값으로 userId 추출
   public String extractUserId(String token) {
+    System.out.println("🟡 전달된 토큰: " + token);
     try {
-      return Jwts.parserBuilder()
-          .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
-          .build()
-          .parseClaimsJws(token)
-          .getBody()
-          .getSubject();
-  } catch (JwtException e) {
-      // 로그 남기고 null 리턴 혹은 예외 재처리
-      throw new IllegalArgumentException("Invalid JWT token", e);
-  }
-  }
+        var claims = Jwts.parserBuilder()
+                .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))  // ✅ 이 값도 null이면 안 됨
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        String subject = claims.getSubject();
+        System.out.println("🟢 추출된 subject(userId): " + subject);
+        return subject;
+    } catch (Exception e) {
+        System.err.println("🔴 토큰 파싱 오류: " + e.getClass().getSimpleName() + " - " + e.getMessage());
+        return null; // or throw
+    }
+}
 
    //토큰 유효성 검사
   public boolean validateToken(String token, User user) {
@@ -65,7 +70,7 @@ public class JwtUtil {
   //토큰 만료여부 검사
   private boolean isTokenExpired(String token) {
     Date expiration = Jwts.parserBuilder()
-            .setSigningKey(secretKey.getBytes())
+            .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
             .build()
             .parseClaimsJws(token)
             .getBody()

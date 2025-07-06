@@ -1,6 +1,7 @@
 package org.kosa.tripTalk.chat;
 
 import java.util.List;
+import java.util.Map;
 import org.kosa.tripTalk.reservation.Reservation;
 import org.kosa.tripTalk.reservation.ReservationRequest;
 import org.kosa.tripTalk.reservation.ReservationService;
@@ -8,6 +9,7 @@ import org.kosa.tripTalk.user.User;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -66,12 +68,13 @@ public class ChatMessageController {
     
     //채팅리스트 출력
     @GetMapping("rooms")
-    public ResponseEntity<List<ChatRoomResponse>> getChatRooms(Authentication authentication) {
-        User user = (User) authentication.getPrincipal();
-        Long userId = user.getId();
-        
-        List<ChatRoomResponse> rooms = chatMessageService.getChatRoomsByUser(userId);
-        
+    public ResponseEntity<?> getChatRooms(Authentication authentication) {
+        if (!(authentication instanceof UsernamePasswordAuthenticationToken auth) || !auth.isAuthenticated()) {
+            return ResponseEntity.status(401).body(Map.of("error", "인증이 필요합니다."));
+        }
+
+        User user = (User) auth.getPrincipal();
+        List<ChatRoomResponse> rooms = chatMessageService.getChatRoomsByUser(user.getId());
         return ResponseEntity.ok(rooms);
     }
     

@@ -1,8 +1,12 @@
 package org.kosa.tripTalk.user;
 
+import java.io.IOException;
 import java.util.Date;
+import java.util.Map;
 import org.kosa.tripTalk.email.EmailRepository;
 import org.kosa.tripTalk.email.EmailService;
+import org.kosa.tripTalk.file.File;
+import org.kosa.tripTalk.file.FileService;
 import org.kosa.tripTalk.jwt.JwtUtil;
 import org.kosa.tripTalk.jwt.RefreshToken;
 import org.kosa.tripTalk.jwt.RefreshTokenRepository;
@@ -10,6 +14,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
@@ -25,6 +30,7 @@ public class UserService {
   private final JwtUtil jwtUtil;
   private final PasswordEncoder passwordEncoder;
   private final EmailService emailService;
+  private final FileService fileService;
 
   //로그인 요청
   public LoginResponse login(@Valid LoginRequest request) {
@@ -55,11 +61,12 @@ public class UserService {
     RefreshToken token = new RefreshToken();
     token .setUserId(user.getUserId());
     token .setToken(refreshToken);
-    token .setExpiryDate(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7));
+//    token .setExpiryDate(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7));
+    token .setExpiryDate(new Date(System.currentTimeMillis() + 1000L * 60 * 60)); //테스트용 1시간
     tokenRepository.save(token);
     
     // LoginResponse 객체 생성 후 반환
-    return new LoginResponse(user.getId(), accessToken, user.getName(), user.getRole());
+    return new LoginResponse(user.getId(), accessToken, refreshToken, user.getName(), user.getRole());
   }
   
   //비밀번호 패턴 확인
@@ -78,6 +85,35 @@ public class UserService {
     
     return user;
   }
+  
+  //토큰 만료여부 및 재발급
+  public String refreshAccessToken(String refreshToken) {
+    
+    String userId = jwtUtil.extractUserId(refreshToken);
+    
+    System.out.println("++++++++++++++++++");
+    System.out.println("리프레시 토큰 요청"+userId);
+    System.out.println("++++++++++++++++++");
+
+    RefreshToken savedToken = tokenRepository.findByuserId(userId)
+        .orElseThrow(() -> new IllegalStateException("리프레시 토큰 없음"));
+    
+//    System.out.println("저장된 refreshToken DB: " + savedToken.getToken());
+//    System.out.println("요청 받은 refreshToken: " + refreshToken);
+
+    if (!savedToken.getToken().equals(refreshToken)) {
+        throw new IllegalArgumentException("리프레시 토큰 불일치");
+    }
+
+    if (savedToken.getExpiryDate().before(new Date())) {
+        throw new IllegalArgumentException("리프레시 토큰 만료");
+    }
+
+    User user = repository.findByUserId(userId)
+        .orElseThrow(() -> new UsernameNotFoundException("유저 없음"));
+
+    return jwtUtil.generateAccessToken(user);
+}
   
   //회원가입-아이디 중복 확인
   public boolean checkUserId(String userId) {
@@ -178,7 +214,28 @@ public class UserService {
     return repository.findByUserId(userId)
         .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 }
+  
+  
+  //프로필 올리기
+  public Map<String, Object> uploadProfileImage(MultipartFile file, Long userId) throws IOException {
+    User user = repository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
 
+    // 기존 이미지 삭제
+    if (user.getProfileImage() != null) {
+      user.setProfileImage(null);
+      repository.save(user);
+    }
+
+    File savedFile = fileService.saveFile(file, "USERS", userId, 1);
+    user.updateProfileImage(savedFile);
+    repository.save(user);
+
+    return Map.of(
+            "message", "프로필 이미지 변경 완료",
+            "url", savedFile.getImageUrl()
+    );
+}
   
   
 

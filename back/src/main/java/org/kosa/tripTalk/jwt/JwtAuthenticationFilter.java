@@ -10,6 +10,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,21 +32,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
       if (authHeader != null && authHeader.startsWith("Bearer ")) {
           String token = authHeader.substring(7);
-          String userId = jwtUtil.extractUserId(token);
+          try {
+              String userId = jwtUtil.extractUserId(token);
 
-          if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-              User user = userService.loadUserByUserId(userId);
+              if (userId != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                  User user = userService.loadUserByUserId(userId);
 
-              if (jwtUtil.validateToken(token, user)) {
-                  UsernamePasswordAuthenticationToken authentication =
-                          new UsernamePasswordAuthenticationToken(user, null, List.of(new SimpleGrantedAuthority(user.getRole().name())));
+                  if (jwtUtil.validateToken(token, user)) {
+                      UsernamePasswordAuthenticationToken authentication =
+                              new UsernamePasswordAuthenticationToken(user, null,
+                                      List.of(new SimpleGrantedAuthority(user.getRole().name())));
 
-                  authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                  SecurityContextHolder.getContext().setAuthentication(authentication);
+                      authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                      SecurityContextHolder.getContext().setAuthentication(authentication);
+                  }
               }
-          }
-      }
 
-      filterChain.doFilter(request, response);
+          } catch (JwtException | IllegalArgumentException e) {
+              SecurityContextHolder.clearContext();
+              // 필요 시 응답 상태 설정하거나 로그 남김
+          }
+          filterChain.doFilter(request, response);  // 한 번 호출
+      } else {
+          // 토큰 없을 때 그냥 필터 체인 진행
+          filterChain.doFilter(request, response);  // 한 번 호출
+      }
   }
 }

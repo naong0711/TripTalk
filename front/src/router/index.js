@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HelloWorld from '@/views/HelloWorld.vue'
 import LoginForm from '@/views/login/LoginForm.vue'
 import Reservation from '@/views/Reservation.vue'
+import ReservationDetail from '@/views/mypage/ReservationDetail.vue'
 import RegisterAgree from '@/views/register/RegisterAgree.vue'
 import RegisterInfo from '@/views/register/RegisterInfo.vue'
 import RegisterComplete from '@/views/register/RegisterComplete.vue'
@@ -23,7 +24,9 @@ const routes = [
   { path: '/register/info', name: 'RegisterInfo', component: RegisterInfo }, //회원가입폼(가입정보입력)
   { path: '/register/complete', name: 'RegisterComplete', component: RegisterComplete }, //회원가입폼(완료페이지)
   { path: '/mypage', name: 'Mypage', component: Mypage }, //마이페이지
-  { path: '/reservation', name: 'Reservation', component: Reservation }, // 예약페이지
+  { path: '/productDetail/:id', name: 'ProductDetail', component: ProductDetail }, //상품상세페이지
+  { path: '/reservation', name: 'Reservation', component: Reservation }, // 상품리스트
+  { path: '/mypage/reservationDetail/:id', name: 'reservationDetail', component: ReservationDetail }, // 예약상세페이지
   { path: '/mypage/profile', name: 'Profile', component: Profile }, // 내정보
   { path: '/mypage/update', name: 'ProfileUpdate', component: ProfileUpdate }, // 내정보 수정
   { path: '/cart', name: 'CartList', component: CartList }, //  장바구니 목록

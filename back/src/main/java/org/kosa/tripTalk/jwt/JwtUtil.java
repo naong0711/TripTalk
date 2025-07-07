@@ -23,8 +23,8 @@ public class JwtUtil {
              .claim("id", user.getId())    // DB PK (예: 2202)
              .claim("role", user.getRole().name())
              .setIssuedAt(new Date(System.currentTimeMillis()))
-//             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1시간
-             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // 1분(테스트용)
+             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // 1시간
+//             .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60)) // 1분(테스트용)
              .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
              .compact();
   }
@@ -34,15 +34,15 @@ public class JwtUtil {
     return Jwts.builder()
             .setSubject(userId)
             .setIssuedAt(new Date(System.currentTimeMillis()))
-//            .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일
-            .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60)) // 1시간(테스트용)
+            .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60 * 24 * 7)) // 7일
+//            .setExpiration(new Date(System.currentTimeMillis() + 1000L * 60 * 60)) // 1시간(테스트용)
             .signWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
             .compact();
   }
   
   //토큰값으로 userId 추출
   public String extractUserId(String token) {
-    System.out.println("🟡 전달된 토큰: " + token);
+//    System.out.println("🟡 전달된 토큰: " + token);
     try {
         var claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))  // ✅ 이 값도 null이면 안 됨
@@ -51,7 +51,7 @@ public class JwtUtil {
                 .getBody();
 
         String subject = claims.getSubject();
-        System.out.println("🟢 추출된 subject(userId): " + subject);
+//        System.out.println("🟢 추출된 subject(userId): " + subject);
         return subject;
     } catch (Exception e) {
         System.err.println("🔴 토큰 파싱 오류: " + e.getClass().getSimpleName() + " - " + e.getMessage());

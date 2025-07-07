@@ -1,8 +1,10 @@
 package org.kosa.tripTalk.myPage;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 import org.kosa.tripTalk.cart.CartResponse;
 import org.kosa.tripTalk.favorite.FavoriteResponse;
+import org.kosa.tripTalk.reservation.Reservation;
 import org.kosa.tripTalk.reservation.ReservationResponse;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRequest;
@@ -75,6 +77,17 @@ public class myPageController {
     List<ReservationResponse> responseList = myService.reservationList(userId);
 
     return ResponseEntity.ok(responseList);
+  }
+  
+  //예약 상세 정보 조회
+  @GetMapping("/reservation/{reservationId}")
+  public ResponseEntity<?> getReservationDetail(@PathVariable("reservationId") Long id, Authentication authentication) throws AccessDeniedException {
+     User user = (User) authentication.getPrincipal();
+     String userId = user.getUserId();
+  
+     Reservation detail = myService.getReservationDetail(id, userId);
+     
+     return ResponseEntity.ok(detail);
   }
   
   //찜 목록 확인

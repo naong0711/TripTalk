@@ -43,7 +43,7 @@ public class UserController {
   public ResponseEntity<?> refresh(HttpServletRequest request) {
       String header = request.getHeader("Authorization");
 
-      System.out.println("🔁 Refresh 요청 헤더: " + header);
+//      System.out.println("🔁 Refresh 요청 헤더: " + header);
       
       if (header == null || !header.startsWith("Bearer ")) {
           return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰 없음");

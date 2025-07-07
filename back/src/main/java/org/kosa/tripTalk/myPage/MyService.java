@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.myPage;
 
+import java.nio.file.AccessDeniedException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -168,6 +169,18 @@ public class MyService {
         throw new IllegalArgumentException("해당 찜 항목이 존재하지 않습니다.");
     }
     favoriteRepository.deleteById(favoriteId);
+}
+
+
+  public Reservation getReservationDetail(Long reservationId, String userId) throws AccessDeniedException {
+    Reservation reservation = reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new RuntimeException("예약 정보 없음"));
+
+    if (!reservation.getUser().getUserId().equals(userId)) {
+        throw new AccessDeniedException("권한이 없습니다");
+    }
+
+    return reservation;
 }
   
 }

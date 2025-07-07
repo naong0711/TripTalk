@@ -223,20 +223,14 @@ function maxPage(type) {
 
 function next(type) {
   if (type === 'reservations' && reservationPage.value < maxPage(type)) reservationPage.value++
-  if (type === 'posts' && postPage.value < maxPage(type)) postPage.value++
 }
 
 function prev(type) {
   if (type === 'reservations' && reservationPage.value > 0) reservationPage.value--
-  if (type === 'posts' && postPage.value > 0) postPage.value--
 }
 
-function goToDetail(type) {
-  router.push('/reservations')
-}
-
-function goToItem(item, type) {
-    router.push(`/reservations/${item.id}`)
+function goToItem(item) {
+    router.push(`/mypage/reservationDetail/${item.id}`)
 }
 
 function goToProfileDetail() {

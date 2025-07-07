@@ -146,7 +146,7 @@ public class ChatMessageService {
     public List<ChatMessageResponse> getMessagesByRoomId(String roomId, Long currentUserId) {
       messageRepository.markMessagesAsReadForUser(roomId, currentUserId); //읽음 여부 확인
 
-      List<ChatMessage> messages = messageRepository.findByRoom_Id(roomId); // 최신 상태로 다시 조회
+      List<ChatMessage> messages = messageRepository.findByRoom_IdOrderBySentAtAsc(roomId); // 최신 상태로 다시 조회
 
       return messages.stream()
           .map(msg -> new ChatMessageResponse(msg, currentUserId))

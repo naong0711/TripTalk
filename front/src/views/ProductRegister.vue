@@ -258,20 +258,19 @@ const submitProduct = async () => {
     return
   }
 
-  try {
-    const adjustedProduct = {
-      ...product,
-      startDate: toIso(product.startDate),
-      endDate: toIso(product.endDate),
-      discount: product.discount.discountRate ? {
-        discountType: product.discount.discountType,
-        discountRate: product.discount.discountRate / 100, 
-        name: product.discount.name,
-        startAt: toIso(product.discount.startAt),
-        endAt: toIso(product.discount.endAt)
-      } : null
-    }
-    console.log("📦 전송 직전 payload", adjustedProduct)
+    try {
+      const adjustedProduct = {
+        ...product,
+        startDate: toIso(product.startDate),
+        endDate: toIso(product.endDate),
+        discount: product.discount.discountRate ? {
+          discountType: product.discount.discountType,
+          discountRate: product.discount.discountRate,
+          name: product.discount.name,
+          startAt: toIso(product.discount.startAt),
+          endAt: toIso(product.discount.endAt)
+        } : null
+      }
 
     const formData = new FormData()
     formData.append('product', JSON.stringify(adjustedProduct))

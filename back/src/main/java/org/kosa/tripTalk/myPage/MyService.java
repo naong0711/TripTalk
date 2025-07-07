@@ -31,11 +31,18 @@ public class MyService {
   private final CartRepository cartRepository;
   
   
-  public ProfileResponse getProfile(String userId) {
-    
-    //userId로 사용자 조회
+  public ProfileResponse getMyPageProfile(String userId) {
     User user = userRepository.findByUserId(userId)
         .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+    String imageUrl = (user.getProfileImage() != null)
+        ? "/api/files/image/user/" + user.getId()
+        : "/img/default-profile.jpg";
+    
+    System.out.println("+++++++++++");
+    System.out.println(imageUrl);
+    System.out.println("+++++++++++");
+
     return ProfileResponse.builder()
         .userId(user.getUserId())
         .name(user.getName())
@@ -47,25 +54,25 @@ public class MyService {
         .zipcode(user.getZipcode())
         .address(user.getAddress())
         .addressDetail(user.getAddressDetail())
+        .profileImageUrl(imageUrl)
         .build();
 }
 
 
   public List<ReservationResponse> reservationList(String userId) {
-
     List<Reservation> reservations = reservationRepository.findByUserUserId(userId);
-    
-    return reservations.stream()
-    .map(reservation -> ReservationResponse.builder()
-        .id(reservation.getId())
-        .reservationDate(reservation.getReservationDate())
-        .status(reservation.getStatus())
-        .totalPrice(reservation.getTotalPrice())
-        .title(reservation.getProduct().getTitle())
-        .build())
-    .collect(Collectors.toList());
 
-  }
+    return reservations.stream()
+        .map(res -> ReservationResponse.builder()
+            .id(res.getId())
+            .reservationDate(res.getReservationDate())
+            .status(res.getStatus())
+            .totalPrice(res.getTotalPrice())
+            .title(res.getProduct().getTitle())
+            .build())
+        .collect(Collectors.toList());
+}
+
 
 
 

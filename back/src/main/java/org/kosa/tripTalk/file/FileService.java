@@ -58,6 +58,8 @@ public class FileService {
                 .ownerId(ownerId)
                 .isThumbnail(isThumbnail)
                 .build();
+        
+        System.out.println("+++++++++++++++++++++++++++++++++"+file);
 
         return fileRepository.save(file);
     }

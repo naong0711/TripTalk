@@ -68,6 +68,7 @@ public class FileController {
             }
 
             Path path = Paths.get(uploadDir).resolve(file.getStoredName());
+            System.out.println("++++++++++++++"+path);
             if (!Files.exists(path)) {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                         .body("파일 없음".getBytes());
@@ -89,6 +90,33 @@ public class FileController {
     public ResponseEntity<byte[]> serveThumbnailByProductId(@PathVariable("productId") Long productId) {
         try {
             File thumbnail = fileService.getThumbnailFile("product", productId);
+            if (thumbnail == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Path path = Paths.get(uploadDir).resolve(thumbnail.getStoredName());
+            if (!Files.exists(path)) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body("파일 없음".getBytes());
+            }
+
+            byte[] imageBytes = Files.readAllBytes(path);
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(thumbnail.getFileType()));
+            return new ResponseEntity<>(imageBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(("서버 오류: " + e.getMessage()).getBytes());
+        }
+    }
+    
+    // 🔹 프로필 이미지 가져오기
+    @GetMapping("/image/user/{userId}")
+    public ResponseEntity<byte[]> getThumbnailProfile(@PathVariable("userId") Long userId) {
+        try {
+            // USERS 라는 ownerType 기준으로 썸네일 가져오기
+            File thumbnail = fileService.getThumbnailFile("USERS", userId);
             if (thumbnail == null) {
                 return ResponseEntity.notFound().build();
             }

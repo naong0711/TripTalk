@@ -1,14 +1,39 @@
 <template>
   <div class="mypage-container">
     <!-- 프로필 -->
-    <div class="profile-box">
-      <img :src="profileImage" class="profile-img" />
-      <div class="profile-info">
-        <h2 class="nickname" :title="nickname" @click="goToProfileDetail">{{ nickname }}</h2>
-        <button @click="changeProfile" class="change-btn">사진 변경</button>
-        <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" class="hidden" />
+    <div class="top-box">
+      <div class="profile-box">
+        <img :src="profileImage" class="profile-img" @error="profileImage = '/img/default-profile.jpg'" />
+        <div class="profile-info">
+          <h2 class="nickname" :title="nickname" @click="goToProfileDetail">{{ nickname }}</h2>
+          <button @click="changeProfile" class="change-btn">사진 변경</button>
+          <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" class="hidden" />
+        </div>
       </div>
-    </div>
+    
+    <hr>
+
+        <div class="quick-menu">
+          <div class="menu-item" @click="goToCart">
+            <span class="icon"><img src="@/assets/myPageBtn/cartBtn.png"></span>
+            <span class="label">장바구니</span>
+          </div>
+          <div class="menu-item" @click="goToFavorites">
+            <span class="icon"><img src="@/assets/myPageBtn/favoriteBtn.png"></span>
+            <span class="label">찜 내역</span>
+          </div>
+          <!-- ✨ 채팅 메뉴 항목 (ChatModal 포함) -->
+          <div class="menu-item" @click="openChat">
+            <span class="icon"><img src="@/assets/myPageBtn/chatBtn.png"></span>
+            <span class="label">채팅</span>
+          </div>
+        </div>
+
+          <!-- 메뉴 바깥에서 모달 출력 -->
+          <ChatModal v-if="isChatOpen" @close="isChatOpen = false">
+            <ChatList @selectRoom="goToChatRoom" />
+          </ChatModal>
+      </div>
 
     <hr>
 
@@ -29,7 +54,6 @@
           <button :class="{ active: activeCategory === '레저' }" @click="activeCategory = '레저'">레저</button>
         </div>
       </div>
-      
 
       <div class="card-list">
         <div
@@ -40,10 +64,14 @@
           @click="item.isMore ? goToDetail('reservations') : goToItem(item, 'reservations')"
         >
           <template v-if="!item.isMore">
+            <div class="reservation-id">예약번호: {{ item.id }}</div>
             <div class="card-title-wrapper">
               <p class="card-title" :title="item.title">{{ item.title }}</p>
             </div>
-            <p class="card-date">{{ item.date }}</p>
+            <div class="card-footer">
+              <svg class="icon-calendar" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <p class="card-date">{{ item.date }}</p>
+            </div>
           </template>
           <template v-else>
             <div class="more-text">…</div>
@@ -58,6 +86,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import ChatModal from '@/components/chat/ChatModal.vue'
+import ChatList from '@/components/chat/ChatList.vue'
 
 const router = useRouter()
 
@@ -65,6 +95,18 @@ const profileImage = ref('/img/default-profile.jpg')
 const nickname = ref('닉네임 불러오는 중...')
 const fileInput = ref(null)
 const activeCategory = ref('여행')
+const reservations = ref([])
+
+const isChatOpen = ref(false)
+
+function goToChatRoom(roomId) {
+  router.push(`/chat/room/${roomId}`)
+  isChatOpen.value = false
+}
+
+function openChat() {
+  isChatOpen.value = true
+}
 
 // ✅ 마운트 시 프로필 정보 가져오기
 onMounted(async () => {
@@ -74,49 +116,82 @@ onMounted(async () => {
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`
       }
     })
+    console.log(res.data)
+    console.log(res.data.profileImageUrl)
     profileImage.value = res.data.profileImageUrl || '/img/default-profile.jpg'
     nickname.value = res.data.nickname || '닉네임 없음'
   } catch (err) {
     console.error('프로필 불러오기 실패:', err)
     nickname.value = '로그인 필요'
   }
+
+   // ✅ 예약 목록 요청
+  try {
+    const res = await axios.get('/api/mypage/reservationList', {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+
+    // 서버에서 받은 예약 데이터를 Vue 형식에 맞게 변환
+    reservations.value = res.data.map(item => ({
+      id: item.id,
+      title: item.title,  // ← 서버 응답 필드에 맞게 수정
+      date: formatDate(item.reservationDate) // ← 예: '2025-07-01'
+    }))
+    console.log(reservations.value)
+  } catch (err) {
+    console.error('예약 목록 불러오기 실패:', err)
+  }
 })
+
+function formatDate(timestamp) {
+  const date = new Date(timestamp)
+  return date.toISOString().slice(0, 10) // yyyy-MM-dd 형식으로 자르기
+}
 
 // 프로필 사진 변경 핸들러
 function changeProfile() {
   fileInput.value?.click()
 }
 
-function onImageSelected(e) {
+async function onImageSelected(e) {
   const file = e.target.files[0]
   if (!file) return
 
+  // 미리보기
   const reader = new FileReader()
   reader.onload = (ev) => {
     profileImage.value = ev.target.result
   }
   reader.readAsDataURL(file)
+
+  // 업로드
+  try {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const res = await axios.post('/api/user/profile/image', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+      }
+    })
+
+    if(res.data.url) {
+      profileImage.value = res.data.url
+      window.location.reload(true)
+    }
+
+    alert('변경이 완료되었습니다')
+
+  } catch (err) {
+    console.error('프로필 업로드 실패:', err)
+    alert('프로필 업로드에 실패했습니다.')
+  }
+
+  fileInput.value.value = null // 같은 파일 다시 선택할 수 있게 초기화
 }
-
-// 예약/후기 목록 (임시 데이터 → 추후 API 연동 가능)
-const reservations = ref([
-  { id: 1, title: '부산 여행', date: '2025-07-01' },
-  { id: 2, title: '서울 호텔', date: '2025-08-12' },
-  { id: 3, title: '서울 호텔2', date: '2025-08-12' },
-  { id: 4, title: '서울 호텔3', date: '2025-08-12' },
-  { id: 5, title: '서울 호텔4', date: '2025-08-12' },
-  { id: 6, title: '서울 호텔5', date: '2025-08-12' },
-])
-
-const posts = ref([
-  { id: 1, title: '부산 맛집 후기' },
-  { id: 2, title: '서울 여행기1' },
-  { id: 3, title: '서울 여행기2' },
-  { id: 4, title: '서울 여행기3' },
-  { id: 5, title: '서울 여행기4' },
-  { id: 6, title: '서울 여행기5' },
-  { id: 7, title: '서울 여행기6' },
-])
 
 const visibleCount = 3
 const reservationPage = ref(0)
@@ -141,9 +216,6 @@ function injectMoreCard(items, page) {
 const paginatedReservations = computed(() =>
   injectMoreCard(reservations.value, reservationPage.value)
 )
-const paginatedPosts = computed(() =>
-  injectMoreCard(posts.value, postPage.value)
-)
 
 function maxPage(type) {
   return 1 // 향후 동적으로 변경 가능
@@ -160,31 +232,34 @@ function prev(type) {
 }
 
 function goToDetail(type) {
-  if (type === 'reservations') router.push('/reservations')
-  if (type === 'posts') router.push('/posts')
+  router.push('/reservations')
 }
 
 function goToItem(item, type) {
-  if (type === 'reservations') {
     router.push(`/reservations/${item.id}`)
-  } else if (type === 'posts') {
-    router.push(`/posts/${item.id}`)
-  }
 }
 
 function goToProfileDetail() {
   router.push('/mypage/profile') // 원하는 라우터 경로로 변경 가능
 }
+
+function goToCart() {
+  router.push('/cart')
+}
+
+function goToFavorites() {
+  router.push('/favorites')
+}
+
 </script>
 
 <style scoped>
-
 h2 {
   cursor: pointer;
 }
 
 hr {
-  border: none;               /* 기본 테두리 제거 */
+  border: none;
   border-top: 1px solid #eee;
 }
 .mypage-container {
@@ -195,14 +270,17 @@ hr {
   box-sizing: border-box;
 }
 
+.top-box {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  background: #faf7f2;
+}
+
 .profile-box {
   display: flex;
   gap: 16px;
   align-items: center;
-  border: 1px solid #ddd;
-  border-radius: 8px;
   padding: 16px;
-  background: #faf7f2;
   margin-bottom: 30px;
 }
 .profile-img {
@@ -216,6 +294,7 @@ hr {
   flex: 1;
   max-width: 360px;
 }
+
 .nickname {
   font-size: 20px;
   font-weight: 700;
@@ -232,6 +311,7 @@ hr {
   cursor: pointer;
   text-decoration: underline;
 }
+
 .hidden {
   display: none;
 }
@@ -270,20 +350,25 @@ hr {
 
 .card-list {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: 12px;
 }
 
 .card {
-  flex: 0 0 calc((100% - 24px) / 3);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   background: #fff;
   border: 1px solid #ddd;
   border-radius: 8px;
-  padding: 12px;
-  box-sizing: border-box;
-  text-align: center;
-  user-select: none;
+  padding: 16px;
   cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .more-card {
@@ -300,11 +385,19 @@ hr {
   box-shadow: none !important;
 }
 
+.reservation-id {
+  font-size: 12px;
+  color: #999;
+  margin-bottom: 6px;
+  text-align: left;
+  user-select: none;
+}
+
 .card-title-wrapper {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  justify-content: center;
-  gap: 6px;
+  width: 100%;
 }
 
 .card-title {
@@ -324,6 +417,27 @@ hr {
   margin-top: 6px;
 }
 
+.card-footer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  color: #666;
+  font-size: 14px;
+}
+
+.icon img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.icon-calendar {
+  width: 18px;
+  height: 18px;
+  stroke: #c8ad7f;
+}
+
 .category-buttons {
   display: flex;
   justify-content: flex-start;
@@ -334,8 +448,8 @@ hr {
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   overflow: hidden;
-  width: fit-content; /* 버튼 크기만큼만 차지 */
-  line-height: 1; /* 버튼 아래 여백 방지 */
+  width: fit-content;
+  line-height: 1;
 }
 
 .category-buttons button {
@@ -367,4 +481,46 @@ hr {
   margin-bottom: 10px;
 }
 
+.more-text {
+  font-size: 30px;
+  font-weight: 700;
+  color: #c8ad7f;
+}
+
+@media (max-width: 600px) {
+  .card {
+    flex: 0 0 calc((100% - 12px) / 2);
+  }
+}
+.quick-menu {
+  display: flex;
+  justify-content: space-around;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.menu-item {
+  flex: 1;
+  cursor: pointer;
+  padding: 12px 0;
+  transition: background-color 0.2s;
+  border-radius: 8px;
+}
+
+.menu-item:hover {
+  background-color: #f5efe3;
+}
+
+.menu-item .icon {
+  display: block;
+  font-size: 24px;
+  margin-bottom: 6px;
+  color: #c8ad7f;
+}
+
+.menu-item .label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
 </style>

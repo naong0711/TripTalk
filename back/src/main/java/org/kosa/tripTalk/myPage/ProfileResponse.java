@@ -21,6 +21,7 @@ public class ProfileResponse {
     private String zipcode;
     private String address;
     private String addressDetail;
+    private String profileImageUrl;
     
     private List<ReservationResponse> reservations;
 }

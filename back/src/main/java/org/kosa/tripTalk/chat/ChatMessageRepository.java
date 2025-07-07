@@ -15,7 +15,8 @@ public interface ChatMessageRepository extends JpaRepository<ChatMessage, Long>{
   @Query(value = "SELECT * FROM chat_message WHERE room_id = :roomId ORDER BY sent_at DESC FETCH FIRST 1 ROW ONLY", nativeQuery = true)
   Optional<ChatMessage> findLatestMessageByRoomId(@Param("roomId") String roomId);
 
-  List<ChatMessage> findByRoom_Id(String roomId);
+  //sentAt 내림차순 정렬해서 메세지 가져옴
+  List<ChatMessage> findByRoom_IdOrderBySentAtAsc(String roomId);
   
   //읽지 않은 메세지만 조회해서 읽음처리
   @Modifying

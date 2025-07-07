@@ -56,7 +56,7 @@ public class ProductResponseDTO {
                 .title(product.getTitle())
                 .description(product.getDescription())
                 .price(product.getPrice())
-                .discountedPrice(product.getDiscountedPrice())
+                .discountedPrice(product.getDiscountedPrice()) // 여기 반드시 할인 적용된 값
                 .address(product.getAddress())
 
                 .categoryName(categoryName)
@@ -70,5 +70,5 @@ public class ProductResponseDTO {
                 .startDate(product.getStartDate())
                 .endDate(product.getEndDate())
                 .build();
-    }
-}
+    	}
+	}

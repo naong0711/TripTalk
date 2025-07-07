@@ -69,17 +69,41 @@
       </form>
     </div>
   </div>
+
+  <div class="recommended-section">
+  <h2>추천 상품</h2>
+  <div class="recommended-list">
+    <div
+      class="recommended-card"
+      v-for="product in recommendedProducts.slice(0, 5)"
+      :key="product.id"
+      @click="goToDetail(product.id)"
+>
+    
+      <img :src="product.image" alt="추천 상품 이미지" />
+      <div class="recommended-info">
+        <h4>{{ product.title }}</h4>
+        <p>{{ product.address }}</p>
+        <p class="price">{{ product.price.toLocaleString() }}원 / 박</p>
+      </div>
+    </div>
+  </div>
+</div>
 </template>
 
 <script setup>
+import axios from 'axios'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/autoplay'
 
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Pagination, Autoplay } from 'swiper/modules'
-import { ref } from 'vue'
+import { ref , onMounted  } from 'vue'
+import { useRouter } from 'vue-router'
 
+
+const router = useRouter()
 const modules = [Pagination, Autoplay]
 const swiperRef = ref(null)
 const swiperInstance = ref(null)
@@ -151,6 +175,35 @@ const goPrev = () => {
 const goNext = () => {
   swiperInstance.value?.slideNext()
 }
+
+const recommendedProducts = ref([])
+
+function goToDetail(productId) {
+  router.push({
+    path: `/productDetail/${productId}`,
+    query: {
+      checkIn: startDate.value,
+      checkOut: endDate.value,
+      adults: peopleCount.value
+    }
+  })
+}
+
+onMounted(async () => {
+  // 기존 swiper 등 초기화 외에 추천 상품도 불러오기
+  try {
+    const res = await axios.get('/api/product?size=5') // 추천용으로 4개만
+    recommendedProducts.value = res.data.content.map(p => ({
+      id: p.id,
+      title: p.title,
+      address: p.address,
+      price: p.price,
+      image: `/api/files/image/product/${p.id}`
+    }))
+  } catch (e) {
+    console.error('추천 상품 불러오기 실패:', e)
+  }
+})
 </script>
 
 <style scoped>
@@ -344,5 +397,65 @@ const goNext = () => {
 
 .search-btn.small-btn:hover {
   background-color: #357ABD;
+}
+
+.recommended-section {
+  padding: 40px 0; /* ✅ 좌우 여백 제거 */
+  background-color: #f9f9f9;
+  margin-top: 60px;
+  text-align: center;
+}
+
+.recommended-section h2 {
+  font-size: 2rem;
+  margin-bottom: 24px;
+  color: #333;
+}
+
+.recommended-list {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* ✅ 무조건 5개 */
+  gap: 24px;
+  width: 1200px; /* ✅ 5개 카드 * 평균 220~240px + 여백 */
+  margin: 0 auto; /* ✅ 중앙 정렬 */
+}
+.recommended-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.recommended-card:hover {
+  transform: translateY(-5px);
+}
+
+.recommended-card img {
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+
+.recommended-info {
+  padding: 12px;
+}
+
+.recommended-info h4 {
+  font-size: 1.1rem;
+  margin-bottom: 4px;
+}
+
+.recommended-info p {
+  font-size: 0.9rem;
+  color: #666;
+  margin: 2px 0;
+}
+
+.recommended-info .price {
+  color: #4A90E2;
+  font-weight: bold;
+  margin-top: 8px;
 }
 </style>

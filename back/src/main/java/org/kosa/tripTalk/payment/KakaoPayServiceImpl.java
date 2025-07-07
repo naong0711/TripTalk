@@ -44,7 +44,7 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         Long paymentId = this.Payment.getId();
 
         // 2. approval_url에 paymentId 포함
-        String approvalUrl = "http://localhost:8080/payments/approve?paymentId=" + paymentId;
+        String approvalUrl = "http://localhost:8080/api/payments/approve?paymentId=" + paymentId;
 
         // HTTP 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
@@ -62,8 +62,8 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         payload.put("vat_amount", 0);
         payload.put("tax_free_amount", 0);
         payload.put("approval_url", approvalUrl);
-        payload.put("cancel_url", "http://localhost:8080/payments/cancel");
-        payload.put("fail_url", "http://localhost:8080/payments/fail");
+        payload.put("cancel_url", "http://localhost:8080/api/payments/cancel");
+        payload.put("fail_url", "http://localhost:8080/api/payments/fail");
 
         HttpEntity<Map<String,Object>> body = new HttpEntity<>(payload, headers);
 

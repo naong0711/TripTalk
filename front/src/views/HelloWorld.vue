@@ -45,7 +45,7 @@
             <label for="region">지역 선택</label>
             <select id="region" v-model="selectedRegion" required>
               <option disabled value="">지역을 선택하세요</option>
-              <option v-for="(region, i) in backgroundTexts" :key="i" :value="region">{{ region }}</option>
+              <option v-for="(region, i) in regions" :key="i" :value="region">{{ region }}</option>
             </select>
           </div>
 
@@ -99,9 +99,8 @@ import 'swiper/css/autoplay'
 
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Pagination, Autoplay } from 'swiper/modules'
-import { ref , onMounted  } from 'vue'
+import { ref , onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-
 
 const router = useRouter()
 const modules = [Pagination, Autoplay]
@@ -112,10 +111,22 @@ const onSwiperInit = (swiper) => {
   swiperInstance.value = swiper
 }
 
+// ✅ 지역 목록 동적 할당용
+const regions = ref([]) // backgroundTexts 대신 사용
 const selectedRegion = ref('')
 const startDate = ref('')
 const endDate = ref('')
 const peopleCount = ref(1)
+
+// ✅ 지역 목록 불러오기
+const fetchRegions = async () => {
+  try {
+    const res = await axios.get('/api/product/locations')
+    regions.value = res.data
+  } catch (e) {
+    console.error('지역 목록 불러오기 실패:', e)
+  }
+}
 
 const images = [
   new URL('@/assets/busan.jpg', import.meta.url).href,
@@ -165,8 +176,16 @@ function onSlideChange(swiper) {
   }, 600)
 }
 
-function onSearch() {
-  alert(`지역: ${selectedRegion.value}\n출발일: ${startDate.value}\n종료일: ${endDate.value}\n인원수: ${peopleCount.value}명`)
+const onSearch = () => {
+  router.push({
+    path: '/productList',
+    query: {
+      location: selectedRegion.value,
+      checkIn: startDate.value,
+      checkOut: endDate.value,
+      people: peopleCount.value
+    }
+  })
 }
 
 const goPrev = () => {
@@ -190,9 +209,10 @@ function goToDetail(productId) {
 }
 
 onMounted(async () => {
-  // 기존 swiper 등 초기화 외에 추천 상품도 불러오기
+  await fetchRegions()
+
   try {
-    const res = await axios.get('/api/product?size=5') // 추천용으로 4개만
+    const res = await axios.get('/api/product?size=5')
     recommendedProducts.value = res.data.content.map(p => ({
       id: p.id,
       title: p.title,
@@ -205,6 +225,7 @@ onMounted(async () => {
   }
 })
 </script>
+
 
 <style scoped>
 @keyframes glow {

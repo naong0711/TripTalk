@@ -33,6 +33,11 @@ public class ProductResponseDTO {
 
     private LocalDateTime startDate;
     private LocalDateTime endDate;
+    
+    private Integer minPeople;
+    private Integer maxPeople;
+    
+    private String location;
 
     public static ProductResponseDTO from(Product product) {
         if (product == null) return null;
@@ -69,6 +74,9 @@ public class ProductResponseDTO {
 
                 .startDate(product.getStartDate())
                 .endDate(product.getEndDate())
+                .minPeople(product.getMinPeople())
+                .maxPeople(product.getMaxPeople())
+                .location(product.getLocation())
                 .build();
     	}
 	}

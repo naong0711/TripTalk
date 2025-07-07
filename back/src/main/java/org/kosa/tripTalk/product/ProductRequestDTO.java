@@ -16,8 +16,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -50,6 +52,11 @@ public class ProductRequestDTO {
 
     private DiscountDTO discount;
     
+    private Integer minPeople;
+    private Integer maxPeople;
+    
+    private String location;
+    
 
 
     public Product toEntity(Seller seller, Category category) {
@@ -62,7 +69,11 @@ public class ProductRequestDTO {
                 .endDate(this.endDate)
                 .seller(seller)
                 .category(category)
+                .minPeople(this.minPeople)
+                .maxPeople(this.maxPeople)
+                .location(this.location)
                 .build();
+        
 
         Discount discount = DiscountDTO.toEntity(this.discount);
         if (discount != null) {
@@ -71,4 +82,6 @@ public class ProductRequestDTO {
 
         return product;
     }
+
+
 }

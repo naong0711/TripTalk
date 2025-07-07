@@ -55,6 +55,7 @@ public class SecurityConfig {
                           "/oauth2/**",
                           "/payments/**",
                           "/api/files/**",
+                          "/api/sellers/**",
                           "/email/verify"
                       ).permitAll()
                       .requestMatchers("/api/mypage/**").authenticated()  //로그인한 사용자만 접근 가능

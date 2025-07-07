@@ -52,6 +52,9 @@ public class Product {
 	@OneToOne(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Discount discount;
 	
+	@Column(length = 255)
+	private String location;
+	
 	@Column(nullable = false)
 	private Integer price;
 
@@ -64,6 +67,12 @@ public class Product {
 	@Column(nullable = false)
 	private LocalDateTime endDate;
 
+	@Column(name = "min_people", nullable = false)
+	private Integer minPeople;
+
+	@Column(name = "max_people", nullable = false)
+	private Integer maxPeople;
+	
 	// 수정DTO
 	public void updateFromDTO(ProductRequestDTO dto) {
 		this.title = dto.getTitle();

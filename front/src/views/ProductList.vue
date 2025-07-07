@@ -34,7 +34,8 @@
           <div class="product-info">
             <h3>{{ product.title }}</h3>
             <p>{{ product.address }}</p>
-            <p>{{ checkIn }} ~ {{ checkOut }} · 성인 {{ adults }}명</p>
+            <p>{{ checkIn }} ~ {{ checkOut }} </p>
+            <p>인원수: {{ product.minPeople }} ~ {{ product.maxPeople }}명</p>
           </div>
           <div class="product-price">
             <p>{{ product.price.toLocaleString() }}원 / 박</p>
@@ -54,6 +55,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import { useRoute } from 'vue-router'   //검색 서치 임시
 
 const router = useRouter()
 
@@ -65,6 +67,11 @@ const products = ref([])
 const totalPages = ref(0)
 const page = ref(0)       // ✅ 프론트는 0부터 시작
 const size = 9            // ✅ 9개씩 보여주기
+
+
+const route = useRoute()
+const location = route.query.location
+const people = parseInt(route.query.people || 1) //검색 서치 임시
 
 const fetchProducts = async () => {
   try {
@@ -81,6 +88,8 @@ const fetchProducts = async () => {
       title: p.title,
       address: p.address,
       price: p.price,
+      minPeople: p.minPeople,
+      maxPeople: p.maxPeople,
       image: `/api/files/image/product/${p.id}`
     }))
     totalPages.value = response.data.totalPages
@@ -120,6 +129,17 @@ onMounted(() => {
   fetchProducts()
 })
 
+
+onMounted(async () => {
+  try {
+    const res = await axios.get('/api/product/search', {
+      params: { location, checkIn, checkOut, people }
+    })
+    productList.value = res.data
+  } catch (err) {
+    console.error('상품 검색 실패:', err)
+  }
+})
 </script>
 
   <style scoped>

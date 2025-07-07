@@ -8,7 +8,7 @@
       <h2>{{ product.title }}</h2>
       <p class="description">{{ product.description }}</p>
       <p><strong>주소:</strong> {{ product.address }}</p>
-
+      <p><strong>지역:</strong> {{ product.location }}</p>
       <div class="price-wrap">
         <p class="price">
           <span class="label">가격</span>
@@ -21,7 +21,7 @@
 
       <p><strong>시작일:</strong> {{ formatDate(product.startDate) }}</p>
       <p><strong>종료일:</strong> {{ formatDate(product.endDate) }}</p>
-
+      <p><strong>인원수:</strong> {{ product.minPeople }}명 ~ {{ product.maxPeople }}명</p>
       <div v-if="product.discount" class="discount-info">
         <h3>할인 정보</h3>
         <p><strong>할인 이름:</strong> {{ product.discount.name }}</p>
@@ -40,7 +40,7 @@
       <label for="checkout">체크아웃</label>
       <input id="checkout" type="date" v-model="checkOut" :min="checkIn" />
 
-      <label for="adults">성인</label>
+      <label for="adults">인원</label>
       <input id="adults" type="number" min="1" v-model.number="adults" placeholder="인원 수" />
 
       <select id="paymentMethod" v-model="paymentMethod">
@@ -87,7 +87,9 @@ const product = ref({
   sellerId: null,
   categoryId: null,
   discount: null,
-  discountedPrice: 0
+  discountedPrice: 0,
+  minPeople: 1,    // 기본값 추가
+  maxPeople: 1,
 })
 
 const imageUrl = computed(() => `/api/files/image/product/${productId}`)
@@ -135,6 +137,16 @@ const reserve = async () => {
   }
   if (totalNights.value <= 0) {
     alert('체크아웃 날짜는 체크인 날짜보다 늦어야 합니다.')
+    return
+  }
+
+    // 인원수 범위 체크
+  if (adults.value < product.value.minPeople) {
+    alert(`최소 인원수는 ${product.value.minPeople}명 입니다.`)
+    return
+  }
+  if (adults.value > product.value.maxPeople) {
+    alert(`최대 인원수는 ${product.value.maxPeople}명 입니다.`)
     return
   }
 

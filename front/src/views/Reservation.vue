@@ -125,7 +125,6 @@ onMounted(() => {
   height: 160px;
   object-fit: cover;
 }
-
 .hotel-info {
   padding: 12px;
   flex: 1;

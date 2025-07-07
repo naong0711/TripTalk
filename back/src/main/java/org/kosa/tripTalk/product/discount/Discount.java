@@ -60,13 +60,15 @@ public class Discount {
     // 할인 타입에 따라 해당 전략 객체 직접 반환
     // 추후 정책이 복잡해질 경우 별도 Factory 클래스로 리팩토링
     public DiscountPolicy toPolicy() {
-    	if (discountType == null) return price -> price;
-    	
-    	return switch (discountType) {
-    		case FIXED -> new FixedDiscountPolicy(discountAmount);
-    		case RATE -> new RateDiscountPolicy(discountRate);
-    		default -> price -> price;
-    	};
+        if (discountType == null || !isActive()) {
+            return price -> price;  // 할인 안함
+        }
+
+        return switch (discountType) {
+            case FIXED -> new FixedDiscountPolicy(discountAmount);
+            case RATE -> new RateDiscountPolicy(discountRate);
+            default -> price -> price;
+        };
     }
 
     // 방향 연관관계를 맞추기 위해 사용

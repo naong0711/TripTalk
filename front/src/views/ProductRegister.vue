@@ -207,10 +207,8 @@
         startDate: toIso(product.startDate),
         endDate: toIso(product.endDate),
         discount: product.discount.discountRate ? {
-        discountType: product.discount.discountType,
-        discountRate: product.discount.discountType === 'RATE' 
-        ? product.discount.discountRate / 100 
-        : product.discount.discountRate,
+          discountType: product.discount.discountType,
+          discountRate: product.discount.discountRate / 100,
           name: product.discount.name,
           startAt: toIso(product.discount.startAt),
           endAt: toIso(product.discount.endAt)
@@ -220,9 +218,10 @@
       const formData = new FormData()
       formData.append('product', JSON.stringify(adjustedProduct))
       formData.append('file', thumbnailFile.value)
-
+      
+      console.log(formData)
+      console.log(JSON.stringify(adjustedProduct, null, 2))
       await axios.post('/api/product', formData)
-
       alert('상품 등록 성공')
       router.push('/productList')
     } catch (error) {

@@ -28,7 +28,7 @@ public class ProductController {
     // ✅ 상품 등록 + 썸네일 이미지 포함 처리
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createProduct(
-            @RequestPart("product") String productJson,
+    		@RequestParam("product") String productJson,
             @RequestPart(value = "file", required = false) MultipartFile file
     ) {
         try {
@@ -73,10 +73,11 @@ public class ProductController {
 
     @GetMapping
     public ResponseEntity<Page<ProductResponseDTO>> getAllProducts(
-            PageRequestDTO pageRequestDTO,
-            Search search
+            @ModelAttribute PageRequestDTO pageRequestDTO,  
+            @ModelAttribute Search search
     ) {
-    	System.out.print("");
+        System.out.println("요청 받은 페이지: " + pageRequestDTO.getPage() + ", 사이즈: " + pageRequestDTO.getSize() + ", 정렬: " + pageRequestDTO.getSort());
+        
         Pageable pageable = pageRequestDTO.toPageable();
         Page<ProductResponseDTO> result = productService.getAllProducts(pageable, search);
         return ResponseEntity.ok(result);

@@ -3,18 +3,16 @@
     <div class="modal-content">
       <button class="close-btn" @click="$emit('close')">✕</button>
 
-      <div v-if="!selectedRoom">
-        <!-- ✅ 이벤트로 roomId + receiverId 받기 -->
+      <div v-if="!localRoom">
         <ChatList @selectRoom="enterRoom" />
       </div>
       <div v-else>
-        <!-- ✅ 정확하게 바인딩 -->
         <ChatRoom
-          :roomId="selectedRoom.roomId"
-          :receiverId="selectedRoom.receiverId"
-          :userRole="selectedRoom.userRole"
-          :opponentName="selectedRoom.opponentName"
-          @back="selectedRoom = null"
+          :roomId="localRoom.roomId"
+          :receiverId="localRoom.receiverId"
+          :userRole="localRoom.userRole"
+          :opponentName="localRoom.opponentName"
+          @back="localRoom = null"
         />
       </div>
     </div>
@@ -22,14 +20,27 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import ChatList from '@/components/chat/ChatList.vue'
 import ChatRoom from '@/components/chat/ChatRoom.vue'
 
-const selectedRoom = ref(null)
+const props = defineProps({
+  selectedRoom: Object
+})
 
-function enterRoom({ roomId, receiverId, userRole, opponentName }) {
-  selectedRoom.value = { roomId, receiverId, userRole, opponentName }
+const emit = defineEmits(['close', 'selectRoom'])
+
+const localRoom = ref(props.selectedRoom || null)
+
+// 
+watch(() => props.selectedRoom, (val) => {
+  localRoom.value = val
+})
+
+
+function enterRoom(roomInfo) {
+  emit('selectRoom', roomInfo)
+  localRoom.value = roomInfo
 }
 </script>
 

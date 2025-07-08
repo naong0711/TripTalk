@@ -2,6 +2,7 @@ package org.kosa.tripTalk.payment;
 
 
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +35,6 @@ public class KakaoPayServiceImpl implements KakaoPayService {
     private static final String HOST = "https://open-api.kakaopay.com"; // 카카오페이 API 기본 URL
     private KakaoPayReadyResponse kakaoPayReadyResponse;
     private final PaymentService paymentService;
-    private final ReservationService reservationService;
     private Payment Payment;
 
     @Override
@@ -105,4 +107,47 @@ public class KakaoPayServiceImpl implements KakaoPayService {
 
         return res.getBody();
     }
+
+    @Override
+    public KakaoPayRefundResponse kakaoPayRefund(String tid, Integer cancelAmount) {
+        RestTemplate rt = new RestTemplate();
+
+        // 🔍 DB에서 결제 정보 확인 (transactionId == tid)
+        Payment payment = paymentService.getPaymentByTransactionId(tid)
+            .orElseThrow(() -> new IllegalArgumentException("해당 거래 ID에 대한 결제 내역이 없습니다."));
+
+        // ✅ 상태 확인
+        if (!"APPROVED".equalsIgnoreCase(payment.getStatus())) {
+            throw new IllegalStateException("이미 환불되었거나 승인되지 않은 거래입니다.");
+        }
+        if (cancelAmount > payment.getAmount()) {
+            throw new IllegalArgumentException("환불 금액이 결제 금액보다 클 수 없습니다.");
+        }
+
+        // 📡 HTTP 요청 구성
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        headers.set("Authorization", "KakaoAK " + secretKey);
+        System.out.println("🔍 Authorization Header: " + headers.getFirst("Authorization"));
+
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("cid", "TC0ONETIME");
+        params.add("tid", tid);
+        params.add("cancel_amount", cancelAmount.toString());
+        params.add("cancel_tax_free_amount", "0");
+
+        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+
+        ResponseEntity<KakaoPayRefundResponse> response = rt.postForEntity(
+            HOST + "/v1/payment/cancel",
+            request,
+            KakaoPayRefundResponse.class
+        );
+
+        // 💾 DB 업데이트
+        paymentService.markAsRefunded(tid, LocalDateTime.now());
+
+        return response.getBody();
+    }
+
 }

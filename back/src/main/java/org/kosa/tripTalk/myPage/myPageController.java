@@ -84,8 +84,11 @@ public class myPageController {
   public ResponseEntity<?> getReservationDetail(@PathVariable("reservationId") Long id, Authentication authentication) throws AccessDeniedException {
      User user = (User) authentication.getPrincipal();
      String userId = user.getUserId();
+     
+     System.out.println(userId+"==================");
+     System.out.println(id+"==================");
   
-     Reservation detail = myService.getReservationDetail(id, userId);
+     ReservationResponse detail = myService.getReservationDetail(id, userId);
      
      return ResponseEntity.ok(detail);
   }

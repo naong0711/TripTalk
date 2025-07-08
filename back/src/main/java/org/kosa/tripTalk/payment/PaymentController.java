@@ -4,8 +4,9 @@ import lombok.RequiredArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
+import org.kosa.tripTalk.user.User;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -19,14 +20,18 @@ public class PaymentController {
 
     // ✅ 결제 준비 (POST /api/payments/create)
     @PostMapping("/create")
-    public ResponseEntity<KakaoPayReadyResponse> create(@RequestBody PaymentRequest request) {
-        // 1. DB에 결제 준비 상태로 저장
-        paymentService.createPayment(request);
+    public ResponseEntity<KakaoPayReadyResponse> create(@RequestBody PaymentRequest request, Authentication authentication) {
+      // 1. 인증 정보에서 사용자 추출
+      User user = (User) authentication.getPrincipal();
+      request.setUserId(user.getUserId()); // ✅ 먼저 userId를 설정
 
-        // 2. 카카오페이 결제 요청
-        KakaoPayReadyResponse response = kakaoPayService.kakaoPayReady(request);
+      // 2. DB에 결제 준비 상태로 저장 (여기서 userId 포함됨)
+      paymentService.createPayment(request);
 
-        return ResponseEntity.ok(response);
+      // 3. 카카오페이 결제 요청
+      KakaoPayReadyResponse response = kakaoPayService.kakaoPayReady(request);
+
+      return ResponseEntity.ok(response);
     }
 
     // ✅ 결제 승인 (프론트로 리다이렉트)
@@ -69,4 +74,34 @@ public class PaymentController {
                         .build()))
                 .orElse(ResponseEntity.notFound().build());
     }
+    
+    @PostMapping("/refund")
+    public ResponseEntity<?> refund(@RequestBody RefundRequest request) {
+        try {
+          System.out.println("TID = " + request.getTid());
+          System.out.println("CancelAmount = " + request.getCancelAmount());
+
+          KakaoPayRefundResponse refundResponse = kakaoPayService.kakaoPayRefund(request.getTid(), request.getCancelAmount());
+          paymentService.markAsRefunded(request.getTid(), LocalDateTime.now());
+
+          return ResponseEntity.ok(refundResponse);
+        } catch (Exception e) {
+          e.printStackTrace(); // 에러 자세히 출력
+          return ResponseEntity.badRequest().body("환불 실패: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/refund/test")
+    public ResponseEntity<?> refundTest(@RequestBody RefundRequest request) {
+          System.out.println("TID = " + request.getTid());
+          System.out.println("CancelAmount = " + request.getCancelAmount());
+          
+          PaymentResponse paymentResponse = paymentService.refundTest(request.getTid(), request.getCancelAmount());
+          
+          return ResponseEntity.ok(paymentResponse);
+
+          
+    }
+    
+    
 }

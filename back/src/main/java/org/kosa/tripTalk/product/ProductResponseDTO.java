@@ -26,8 +26,10 @@ public class ProductResponseDTO {
     private String categoryName;
     private Long categoryId;
 
-    private String sellerName;
+    private String sellerNickname;
     private Long sellerId;
+    private String sellerPhone; 
+    private String sellerEmail; 
 
     private DiscountDTO discount;
 
@@ -44,11 +46,16 @@ public class ProductResponseDTO {
             categoryId = product.getCategory().getId();
         }
 
-        String sellerName = null;
+        String sellerNickname = null;
         Long sellerId = null;
+        String sellerPhone = null;
+        String sellerEmail = null;
+        
         if (product.getSeller() != null && product.getSeller().getUser() != null) {
-            sellerName = product.getSeller().getUser().getName();
+            sellerNickname = product.getSeller().getUser().getNickname();
             sellerId = product.getSeller().getId();
+            sellerPhone = product.getSeller().getUser().getPhone();
+            sellerEmail = product.getSeller().getUser().getEmail();
         }
 
         return ProductResponseDTO.builder()
@@ -62,8 +69,10 @@ public class ProductResponseDTO {
                 .categoryName(categoryName)
                 .categoryId(categoryId)
 
-                .sellerName(sellerName)
+                .sellerNickname(sellerNickname)
                 .sellerId(sellerId)
+                .sellerPhone(sellerPhone)
+                .sellerEmail(sellerEmail)
 
                 .discount(DiscountDTO.from(product.getDiscount()))
 

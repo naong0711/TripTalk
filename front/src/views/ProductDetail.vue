@@ -91,7 +91,6 @@ const product = ref({
 })
 
 const imageUrl = computed(() => `/api/files/image/product/${productId}`)
-const userId = 1 // 로그인 연동 전까지는 하드코딩
 
 const totalNights = computed(() => {
   if (!checkIn.value || !checkOut.value) return 0
@@ -140,7 +139,6 @@ const reserve = async () => {
 
   try {
     const paymentRequest = {
-      userId: 'user001', // 실제 로그인 사용자 ID로 바꿔야 함
       productId: Number(productId),
       amount: totalAmount.value,
       paymentMethod: paymentMethod.value,
@@ -148,8 +146,14 @@ const reserve = async () => {
       status: ''     // 백엔드에서 처리될 값
     }
 
-    const response = await axios.post('/api/payments/create', paymentRequest)
-
+  const token = localStorage.getItem('accessToken')
+   const response = await axios.post('/api/payments/create', paymentRequest,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  }
+  )
     const redirectUrl = response.data.next_redirect_pc_url
     if (redirectUrl) {
       window.location.href = redirectUrl

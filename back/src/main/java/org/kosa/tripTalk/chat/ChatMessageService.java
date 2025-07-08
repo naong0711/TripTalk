@@ -129,14 +129,21 @@ public class ChatMessageService {
             .collect(Collectors.toList());
     }
     
-    //로그인 유저가 판매자인지 확인
-    public boolean isSeller(User user) {
-        return sellerRepository.findByUser(user).isPresent();
+    // 상대방이 판매자인지 여부 확인
+    public boolean isUserSeller(Long userId) {
+        return sellerRepository.findByUserId(userId).isPresent();
     }
     
-    //로그인 유저의 Seller ID 조회 (없으면 예외 or null)
-    public Long getSellerIdByUser(User user) {
-        return sellerRepository.findByUser(user)
+    // 상대방이 판매자일 경우 해당 Seller ID 반환
+    public Long getSellerIdByUserId(Long userId) {
+        return sellerRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("판매자 정보가 없습니다"))
+                .getId();
+    }
+    
+    // 상대방이 판매자일 경우 해당 Seller ID 반환
+    public Long getSellerIdByUser(User seller) {
+        return sellerRepository.findByUser(seller)
                 .orElseThrow(() -> new IllegalArgumentException("판매자 정보가 없습니다"))
                 .getId();
     }

@@ -47,21 +47,43 @@ public class ChatMessageController {
     
     //상대와의 채팅방 ID 조회
     @GetMapping("room")
-    public ResponseEntity<String> getRoomId(@RequestParam Long opponentId, Authentication authentication) {
+    public ResponseEntity<String> getRoomId(@RequestParam("opponentId") Long opponentId, Authentication authentication) {
       
-      User user = (User) authentication.getPrincipal(); // 현재 로그인한 유저
-      String roomId;
+      User currentUser = (User) authentication.getPrincipal();
+      Long currentUserUserId = currentUser.getId();
+      Long currentUserSellerId = chatMessageService.getSellerIdByUserId(currentUserUserId);
+
+      boolean currentUserIsSeller = chatMessageService.isUserSeller(currentUserUserId);
+      boolean opponentIsSeller = chatMessageService.isUserSeller(opponentId);
+
+      Long userId;   // 구매자 User PK (User 테이블 PK)
+      Long sellerId; // 판매자 Seller PK (Seller 테이블 PK)
+
+      if (currentUserIsSeller && !opponentIsSeller) {
+          // 현재 로그인 유저가 판매자 → 상대는 구매자
+          userId = opponentId;                       // 상대방 User PK
+          sellerId = currentUserSellerId;            // 로그인 유저 Seller PK
+      } else if (!currentUserIsSeller && opponentIsSeller) {
+          // 현재 로그인 유저가 구매자 → 상대는 판매자
+          userId = currentUserUserId;                 // 로그인 유저 User PK
+          sellerId = chatMessageService.getSellerIdByUserId(opponentId);  // 상대방 Seller PK
+      } else {
+          throw new IllegalArgumentException("유효하지 않은 사용자 조합입니다.");
+      }
+
+      String roomId = chatMessageService.generateRoomId(userId, sellerId);
+
+      return ResponseEntity.ok(roomId);
+  }
+    
+    @GetMapping("room/{sellerId}")
+    public ResponseEntity<String> getRoomId2(@PathVariable("sellerId") Long sellerId, Authentication authentication) {
       
-      //유저 롤 체크
-      if (chatMessageService.isSeller(user)) {
-        Long sellerId = chatMessageService.getSellerIdByUser(user);
-        Long customerId = opponentId; // 상대는 구매자
-        roomId = chatMessageService.generateRoomId(customerId, sellerId);
-    } else {
-        Long userId = user.getId();
-        Long sellerId = opponentId; // 상대가 판매자
-        roomId = chatMessageService.generateRoomId(userId, sellerId);
-    }    
+      User user = (User) authentication.getPrincipal();
+      Long userId = user.getId();
+      
+      String roomId = chatMessageService.generateRoomId(userId, sellerId);
+      System.out.println("+++++++++++++" + roomId);
       
       return ResponseEntity.ok(roomId);
     }

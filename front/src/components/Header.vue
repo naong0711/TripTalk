@@ -57,6 +57,7 @@ const router = useRouter()
 const isLoggedIn = ref(false)
 const isChatOpen = ref(false)
 const hasUnreadMessages = ref(false) // ✅ 읽지 않은 메시지 여부 상태
+let isCheckingUnread = false
 let unreadCheckInterval = null // ✅ interval 핸들 저장
 
 
@@ -67,10 +68,15 @@ function goToChatRoom(roomId) {
 
 // ✅ 읽지 않은 메시지 확인
 async function checkUnreadMessages() {
+  if (isCheckingUnread) return // 이전 요청이 끝나기 전이면 실행 안 함
+  isCheckingUnread = true
+
   const token = localStorage.getItem('accessToken')
   if (!token) {
     stopUnreadPolling()
     hasUnreadMessages.value = false
+    isLoggedIn.value = false
+    isCheckingUnread = false
     return
   }
 
@@ -82,27 +88,27 @@ async function checkUnreadMessages() {
     })
 
     hasUnreadMessages.value = res.data.some(room => room.unreadCount > 0)
+    isCheckingUnread = false
   } catch (error) {
     console.error('읽지 않은 메시지 확인 실패', error)
 
-     // 401, 403 같은 인증 에러면 polling 멈추고 로그아웃 권장
-  if (error.response?.status === 401 || error.response?.status === 403) {
-    logout()
-  } else {
-    // 500 에러 등 서버 에러는 polling 멈추고 잠시 기다렸다 재시도 할 수도 있음
-    stopUnreadPolling()
-    // 필요하면 5초 후 polling 다시 시작하게 할 수도 있음
-    setTimeout(() => {
-      if (isLoggedIn.value) startUnreadPolling()
-    }, 5000)
-  }
+    if (error.response?.status === 401 || error.response?.status === 403) {
+      logout()
+    } else {
+      stopUnreadPolling()
+      setTimeout(() => {
+        if (isLoggedIn.value) startUnreadPolling()
+      }, 5000)
+    }
+    isCheckingUnread = false
   }
 }
 
 
+
+
 function checkLoginStatus() {
   isLoggedIn.value = !!localStorage.getItem('accessToken')
-
   if (isLoggedIn.value) {
     startUnreadPolling()
   } else {
@@ -112,9 +118,9 @@ function checkLoginStatus() {
 }
 
 function startUnreadPolling() {
+  if (unreadCheckInterval) return
   checkUnreadMessages()
   unreadCheckInterval = setInterval(checkUnreadMessages, 2000)
-
 }
 
 function stopUnreadPolling() {
@@ -131,7 +137,6 @@ onMounted(() => {
 watch(() => route.fullPath, () => {
   checkLoginStatus()
 })
-
 
 onUnmounted(() => {
   stopUnreadPolling()

@@ -3,12 +3,14 @@ package org.kosa.tripTalk.payment;
 import lombok.RequiredArgsConstructor;
 import org.kosa.tripTalk.product.Product;
 import org.kosa.tripTalk.product.ProductRepository;
+import org.kosa.tripTalk.reservation.Reservation;
+import org.kosa.tripTalk.reservation.ReservationRepository;
 import org.kosa.tripTalk.reservation.ReservationRequest;
 import org.kosa.tripTalk.reservation.ReservationService;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.stereotype.Service;
-
+import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,6 +24,7 @@ public class PaymentService {
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
     private final ReservationService reservationService;
+    private final ReservationRepository reservationRepository;
 
     // 결제 생성 메서드
     public Payment createPayment(PaymentRequest request) {
@@ -77,5 +80,41 @@ public class PaymentService {
         // 예약 생성
         reservationService.createReservation(reservationRequest);
     }
+
+    //환불
+    @Transactional
+    public void markAsRefunded(String tid, LocalDateTime refundedAt) {
+        Payment payment = paymentRepository.findByTransactionId(tid)
+            .orElseThrow(() -> new IllegalArgumentException("해당 TID의 결제 정보를 찾을 수 없습니다."));
+
+        payment.setStatus("REFUNDED");
+        payment.setRefundDate(refundedAt);
+
+        paymentRepository.save(payment);
+    }
+
+    public Optional<Payment> getPaymentByTransactionId(String tid) {
+      return paymentRepository.findByTransactionId(tid);
+    }
+
+    //환불테스트
+    public PaymentResponse refundTest(String tid, Integer cancelAmount) {
+      Payment payment = paymentRepository.findByTransactionId(tid)
+          .orElseThrow(() -> new IllegalArgumentException("해당 TID의 결제 정보를 찾을 수 없습니다."));
+
+      payment.setStatus("REFUNDED");
+      payment.setRefundDate(LocalDateTime.now());
+      
+      Reservation reservation = reservationRepository.findByTransactionId(tid)
+          .orElseThrow(() -> new IllegalArgumentException("해당 TID의 결제 정보를 찾을 수 없습니다."));
+
+      reservation.setStatus("환불완료");
+      
+      paymentRepository.save(payment);
+      reservationRepository.save(reservation);
+      
+      return PaymentResponse.from(payment);
+    }
+
 
 }

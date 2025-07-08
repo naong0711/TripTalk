@@ -15,6 +15,8 @@ import org.kosa.tripTalk.product.Product;
 import org.kosa.tripTalk.reservation.Reservation;
 import org.kosa.tripTalk.reservation.ReservationRepository;
 import org.kosa.tripTalk.reservation.ReservationResponse;
+import org.kosa.tripTalk.seller.Seller;
+import org.kosa.tripTalk.seller.SellerRepository;
 import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.kosa.tripTalk.user.UserRequest;
@@ -30,6 +32,8 @@ public class MyService {
   private final ReservationRepository reservationRepository;
   private final FavoriteRepository favoriteRepository;
   private final CartRepository cartRepository;
+  private final SellerRepository sellerRepository;
+  
   
   
   public ProfileResponse getMyPageProfile(String userId) {
@@ -66,6 +70,7 @@ public class MyService {
     return reservations.stream()
         .map(res -> ReservationResponse.builder()
             .id(res.getId())
+            .tid(res.getTransactionId())
             .reservationDate(res.getReservationDate())
             .status(res.getStatus())
             .totalPrice(res.getTotalPrice())
@@ -172,15 +177,32 @@ public class MyService {
 }
 
 
-  public Reservation getReservationDetail(Long reservationId, String userId) throws AccessDeniedException {
+  //예약 상세정보
+  public ReservationResponse getReservationDetail(Long reservationId, String userId) throws AccessDeniedException {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new RuntimeException("예약 정보 없음"));
 
     if (!reservation.getUser().getUserId().equals(userId)) {
         throw new AccessDeniedException("권한이 없습니다");
     }
+    
+    // 상품 가져오기
+    Product product = reservation.getProduct();
+    if (product == null) {
+        throw new RuntimeException("예약에 상품 정보가 없습니다");
+    }
 
-    return reservation;
+    // 1. sellerId → Seller 조회
+    Seller seller = sellerRepository.findById(product.getSeller().getId())
+        .orElseThrow(() -> new RuntimeException("판매자 정보 없음"));
+
+    // 2. Seller → User → userId
+    Long sellerUserId = seller.getUser().getId();
+    
+    System.out.println("sellerUserId"+sellerUserId);
+
+    // 👉 ReservationResponse에 seller의 userId도 포함하고 싶다면 여기에 담기
+    return ReservationResponse.from(reservation, sellerUserId); // 예시
 }
   
 }

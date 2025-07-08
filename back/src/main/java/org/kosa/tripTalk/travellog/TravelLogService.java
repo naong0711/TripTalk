@@ -11,89 +11,104 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 
 @Service
 @RequiredArgsConstructor
 public class TravelLogService {
-		private final TravelLogRepository travelLogRepository;
-		private final UserRepository userRepository;
-		private final CategoryRepository categoryRepository;
+	private final TravelLogRepository travelLogRepository;
+	private final UserRepository userRepository;
+	private final CategoryRepository categoryRepository;
 
-		@Transactional
-		public TravelLog write(TravelLogDTO article) {			
-			User users = userRepository.findById(article.getUserId())
-	                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-			
-			Category category = categoryRepository.findById(article.getCategoryId())
-	                .orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
-			
-			
-			TravelLog tlEntity = TravelLog.builder()
-					 .title(article.getTitle())
-					 .user(users)
-					 .content(article.getContent())
-					 .category(category)
-					 .createdAt(LocalDateTime.now())
-					 .build();
-			
-			return travelLogRepository.save(tlEntity);
-			
-		}
-		
-		@Transactional
-		// 단일 조회
-		public TravelLogListDTO findById(Long id) {
-		    TravelLog log = travelLogRepository.findById(id)
-		        .orElseThrow(() -> new IllegalArgumentException("해당 로그가 없습니다. id=" + id));
+	@Transactional
+	public TravelLog write(TravelLogDTO article) {
+		User users = userRepository.findById(article.getUserId())
+			.orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
 
-		    return TravelLogListDTO.builder()
-		            .id(log.getId())
-		            .userId((log.getUser()).getId())
-		            .title(log.getTitle())
-		            .content(log.getContent())
-		            .createdAt(log.getCreatedAt()) 
-		            .build();
-		}
+		Category category = categoryRepository.findById(article.getCategoryId())
+			.orElseThrow(() -> new IllegalArgumentException("카테고리가 존재하지 않습니다."));
 
-		// 전체 목록 조회
-		public List<TravelLogListDTO> findAll() {
-		    List<TravelLog> logs = travelLogRepository.findAll();
+		TravelLog tlEntity = TravelLog.builder()
+			.title(article.getTitle())
+			.user(users)
+			.content(article.getContent())
+			.category(category)
+			.createdAt(LocalDateTime.now())
+			.build();
 
-		    return logs.stream()
-		            .map(log -> TravelLogListDTO.builder()
-		                    .id(log.getId())
-		                    .userId((log.getUser()).getId())
-		                    .title(log.getTitle())
-		                    .content(log.getContent())
-		                    .createdAt(log.getCreatedAt())
-		                    .build())
-		            .toList();
-		}
+		return travelLogRepository.save(tlEntity);
+	}
 
-		//글 삭제 
-		public void deleteLog(Long id) {
-			TravelLog log = travelLogRepository.findById(id)
-				.orElseThrow(()-> new IllegalArgumentException("해당 로그가 없습니다. 글 번호 =" + id));
-			
-			travelLogRepository.delete(log);	
-		}
+	@Transactional
+	public TravelLogListDTO findById(Long id) {
+		TravelLog log = travelLogRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("해당 로그가 없습니다. id=" + id));
 
-		@Transactional
-		public  void update(Long id, TravelLogDTO updateDTO) {
-			TravelLog existingLog = travelLogRepository.findById(id)
-					.orElseThrow(()-> new IllegalArgumentException("해당 로그가 없습니다."));
-			
-			if(updateDTO.getTitle() != null) {
-				existingLog.setTitle(updateDTO.getTitle());
-			}
-			
-			if(updateDTO.getContent() != null) {
-				existingLog.setContent(updateDTO.getContent());
-			}
-			
+		User user = log.getUser();
+
+		return TravelLogListDTO.builder()
+			.id(log.getId())
+			.userId(user != null ? user.getId() : null)
+			.nickname(user != null ? user.getNickname() : "알 수 없음")
+			.title(log.getTitle())
+			.content(log.getContent())
+			.createdAt(log.getCreatedAt())
+			.build();
+	}
+
+	public List<TravelLogListDTO> findAll() {
+		List<TravelLog> logs = travelLogRepository.findAll();
+
+		return logs.stream()
+			.map(log -> {
+				User user = log.getUser();
+				return TravelLogListDTO.builder()
+					.id(log.getId())
+					.userId(user != null ? user.getId() : null)
+					.nickname(user != null ? user.getNickname() : "알 수 없음")
+					.title(log.getTitle())
+					.content(log.getContent())
+					.createdAt(log.getCreatedAt())
+					.build();
+			})
+			.toList();
+	}
+
+	public void deleteLog(Long id) {
+		TravelLog log = travelLogRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("해당 로그가 없습니다. 글 번호 = " + id));
+
+		travelLogRepository.delete(log);
+	}
+
+	@Transactional
+	public void update(Long id, TravelLogDTO updateDTO) {
+		TravelLog existingLog = travelLogRepository.findById(id)
+			.orElseThrow(() -> new IllegalArgumentException("해당 로그가 없습니다."));
+
+		if (updateDTO.getTitle() != null) {
+			existingLog.setTitle(updateDTO.getTitle());
 		}
 
+		if (updateDTO.getContent() != null) {
+			existingLog.setContent(updateDTO.getContent());
+		}
+	}
+	
+	@Transactional
+	public Page<TravelLogListDTO> findAll(Pageable pageable) {
+	    Page<TravelLog> pageResult = travelLogRepository.findAll(pageable);
 
+	    return pageResult.map(log -> {
+	        User user = log.getUser();
+	        return TravelLogListDTO.builder()
+	                .id(log.getId())
+	                .userId(user != null ? user.getId() : null)
+	                .nickname(user != null ? user.getNickname() : "알 수 없음")
+	                .title(log.getTitle())
+	                .content(log.getContent())
+	                .createdAt(log.getCreatedAt())
+	                .build();
+	    });
+	}
 }
-
-

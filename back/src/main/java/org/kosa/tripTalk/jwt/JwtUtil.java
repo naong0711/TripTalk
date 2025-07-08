@@ -42,7 +42,7 @@ public class JwtUtil {
   
   //토큰값으로 userId 추출
   public String extractUserId(String token) {
-    System.out.println("🟡 전달된 토큰: " + token);
+//    System.out.println("🟡 전달된 토큰: " + token);
     try {
         var claims = Jwts.parserBuilder()
                 .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))  // ✅ 이 값도 null이면 안 됨
@@ -51,7 +51,7 @@ public class JwtUtil {
                 .getBody();
 
         String subject = claims.getSubject();
-        System.out.println("🟢 추출된 subject(userId): " + subject);
+//        System.out.println("🟢 추출된 subject(userId): " + subject);
         return subject;
     } catch (Exception e) {
         System.err.println("🔴 토큰 파싱 오류: " + e.getClass().getSimpleName() + " - " + e.getMessage());

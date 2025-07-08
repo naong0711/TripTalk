@@ -91,9 +91,9 @@ public class UserService {
     
     String userId = jwtUtil.extractUserId(refreshToken);
     
-    System.out.println("++++++++++++++++++");
-    System.out.println("리프레시 토큰 요청"+userId);
-    System.out.println("++++++++++++++++++");
+//    System.out.println("++++++++++++++++++");
+//    System.out.println("리프레시 토큰 요청"+userId);
+//    System.out.println("++++++++++++++++++");
 
     RefreshToken savedToken = tokenRepository.findByuserId(userId)
         .orElseThrow(() -> new IllegalStateException("리프레시 토큰 없음"));

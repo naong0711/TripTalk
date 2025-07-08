@@ -70,8 +70,10 @@
     </div>
   </div>
 
-  <div class="recommended-section">
-  <h2>추천 상품</h2>
+<div class="recommended-section">
+  <h2 @click="goToProductList" style="cursor: pointer; user-select: none;">
+    추천 상품
+  </h2>
   <div class="recommended-list">
     <div
       class="recommended-card"
@@ -196,6 +198,18 @@ const goNext = () => {
 }
 
 const recommendedProducts = ref([])
+
+function goToProductList() {
+  router.push({
+    path: '/productList',
+    query: {
+      location: selectedRegion.value,
+      checkIn: startDate.value,
+      checkOut: endDate.value,
+      people: peopleCount.value
+    }
+  })
+}
 
 function goToDetail(productId) {
   router.push({

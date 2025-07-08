@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.product;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.product.discount.Discount;
@@ -62,10 +63,10 @@ public class Product {
 	private String address;
 
 	@Column(nullable = false)
-	private LocalDateTime startDate;
+	private LocalDate startDate;
 
 	@Column(nullable = false)
-	private LocalDateTime endDate;
+	private LocalDate endDate;
 
 	@Column(name = "min_people", nullable = false)
 	private Integer minPeople;

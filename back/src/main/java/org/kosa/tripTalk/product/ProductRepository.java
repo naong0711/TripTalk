@@ -19,13 +19,14 @@ public interface ProductRepository extends JpaRepository<Product, Long>, Product
 
     // ✅ location + 날짜 + 인원수 조건 검색
     @Query("SELECT p FROM Product p " +
-           "WHERE p.location = :location " +
-           "AND :checkIn >= p.startDate AND :checkOut <= p.endDate " +
-           "AND :people BETWEEN p.minPeople AND p.maxPeople")
+    	       "WHERE p.location = :location " +
+    	       "AND p.startDate <= :checkOut " +
+    	       "AND p.endDate >= :checkIn " +
+    	       "AND :people BETWEEN p.minPeople AND p.maxPeople")
     List<Product> findAllByLocationAndDateAndPeople(
         @Param("location") String location,
-        @Param("checkIn") LocalDateTime checkIn,
-        @Param("checkOut") LocalDateTime checkOut,
+        @Param("checkIn") LocalDate checkIn,
+        @Param("checkOut") LocalDate checkOut,
         @Param("people") int people
     );
 

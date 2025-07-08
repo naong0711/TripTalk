@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.product;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.kosa.tripTalk.category.Category;
@@ -39,10 +40,10 @@ public class ProductRequestDTO {
     private Integer price;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
     
     @NotNull(message = "판매자 ID는 필수입니다.")
     private Long sellerId;

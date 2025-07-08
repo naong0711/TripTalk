@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.product;
 
+import org.hibernate.internal.build.AllowSysOut;
 import org.kosa.tripTalk.common.dto.PageRequestDTO;
 import org.kosa.tripTalk.common.dto.Search;
 import org.kosa.tripTalk.file.FileService;
@@ -109,12 +110,13 @@ public class ProductController {
     
     @GetMapping("/search")
     public ResponseEntity<List<ProductResponseDTO>> searchProducts(
-        @RequestParam String location,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime checkIn,
-        @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime checkOut,
-        @RequestParam int people
+        @RequestParam("location") String location,
+        @RequestParam("checkIn") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkIn,
+        @RequestParam("checkOut") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate checkOut,
+        @RequestParam("people") int people
     ) {
         try {
+        	
             List<Product> results = productService.search(location, checkIn, checkOut, people);
 
             List<ProductResponseDTO> dtoList = results.stream()

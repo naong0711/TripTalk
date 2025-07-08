@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.product;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.kosa.tripTalk.product.discount.DiscountDTO;
@@ -31,8 +32,8 @@ public class ProductResponseDTO {
 
     private DiscountDTO discount;
 
-    private LocalDateTime startDate;
-    private LocalDateTime endDate;
+    private LocalDate startDate;
+    private LocalDate endDate;
     
     private Integer minPeople;
     private Integer maxPeople;

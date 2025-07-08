@@ -34,7 +34,7 @@
           <div class="product-info">
             <h3>{{ product.title }}</h3>
             <p>{{ product.address }}</p>
-            <p>{{ checkIn }} ~ {{ checkOut }} </p>
+            <p>{{ product.startDate }} ~ {{ product.endDate }} </p>
             <p>인원수: {{ product.minPeople }} ~ {{ product.maxPeople }}명</p>
           </div>
           <div class="product-price">
@@ -53,15 +53,21 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
-import { useRoute } from 'vue-router'   //검색 서치 임시
 
+const route = useRoute()
 const router = useRouter()
 
-const checkIn = ref(new Date().toISOString().slice(0, 10))
-const checkOut = ref('')
-const adults = ref(2)
+
+function toValidDate(dateStr) {
+  const date = new Date(dateStr)
+  return isNaN(date.getTime()) ? new Date() : date
+}
+
+const checkIn = ref(route.query.checkIn || new Date().toISOString().slice(0, 10))
+const checkOut = ref(route.query.checkOut || new Date().toISOString().slice(0, 10))
+const adults = ref(Number(route.query.people) || 2)
 
 const products = ref([])
 const totalPages = ref(0)
@@ -69,34 +75,81 @@ const page = ref(0)       // ✅ 프론트는 0부터 시작
 const size = 9            // ✅ 9개씩 보여주기
 
 
-const route = useRoute()
 const location = route.query.location
 const people = parseInt(route.query.people || 1) //검색 서치 임시
-
-const fetchProducts = async () => {
+const fetchSearchProducts = async () => {
   try {
-    const response = await axios.get('/api/product', {
-      params: {
-        page: page.value + 1,  // 혹은 그냥 page.value (서버 쪽 1부터 시작이면 +1 해야 함)
-        size: size,
-        sort: 'id,desc'
-      }
-    });
+    const hasSearchParams = location && checkIn.value && checkOut.value && adults.value
 
-    products.value = response.data.content.map(p => ({
-      id: p.id,
-      title: p.title,
-      address: p.address,
-      price: p.price,
-      minPeople: p.minPeople,
-      maxPeople: p.maxPeople,
-      image: `/api/files/image/product/${p.id}`
-    }))
-    totalPages.value = response.data.totalPages
+    if (hasSearchParams) {
+      const params = {
+        location,
+        checkIn: typeof checkIn.value === 'string' ? checkIn.value : new Date(checkIn.value).toISOString().slice(0, 10),
+        checkOut: typeof checkOut.value === 'string' ? checkOut.value : new Date(checkOut.value).toISOString().slice(0, 10),
+        people: adults.value,
+        page: page.value,
+        size: size || 9
+      }
+
+      const res = await axios.get('/api/product/search', { params })
+      const data = res.data
+
+      if (Array.isArray(data)) {
+        products.value = data.map(p => ({
+          id: p.id,
+          title: p.title,
+          address: p.address || '',
+          price: p.price,
+          minPeople: p.minPeople || 1,
+          maxPeople: p.maxPeople || 1,
+          image: `/api/files/image/product/${p.id}`,
+          startDate: p.startDate || '',
+          endDate: p.endDate || ''
+        }))
+        totalPages.value = 1
+      } else {
+        products.value = (data.content || []).map(p => ({
+          id: p.id,
+          title: p.title,
+          address: p.address || '',
+          price: p.price,
+          minPeople: p.minPeople || 1,
+          maxPeople: p.maxPeople || 1,
+          image: `/api/files/image/product/${p.id}`,
+          startDate: p.startDate || '',
+          endDate: p.endDate || ''
+        }))
+        totalPages.value = data.totalPages || 0
+      }
+    } else {
+      // 전체 상품 목록 호출
+      const res = await axios.get('/api/product', {
+        params: {
+          page: page.value + 1,
+          size: size || 9,
+          sort: 'id,desc'
+        }
+      })
+
+      const data = res.data
+      products.value = (data.content || []).map(p => ({
+        id: p.id,
+        title: p.title,
+        address: p.address || '',
+        price: p.price,
+        minPeople: p.minPeople || 1,
+        maxPeople: p.maxPeople || 1,
+        image: `/api/files/image/product/${p.id}`,
+        startDate: p.startDate || '',
+        endDate: p.endDate || ''
+      }))
+      totalPages.value = data.totalPages || 0
+    }
   } catch (err) {
-    console.error('상품 목록 로딩 실패:', err)
+    console.error('상품 검색 실패:', err)
   }
 }
+
 
 const goToPage = (newPage) => {
   if (newPage >= 0 && newPage < totalPages.value) {
@@ -107,9 +160,9 @@ const goToPage = (newPage) => {
 
 const searchProducts = () => {
   page.value = 0
-  fetchProducts()
-}
 
+  fetchSearchProducts()  // ✅ 이거로 교체
+}
 const goToDetail = (id) => {
   router.push({
     path: `/productDetail/${id}`,
@@ -126,20 +179,10 @@ const goToRegister = () => {
 }
 
 onMounted(() => {
-  fetchProducts()
+  fetchSearchProducts()
 })
 
 
-onMounted(async () => {
-  try {
-    const res = await axios.get('/api/product/search', {
-      params: { location, checkIn, checkOut, people }
-    })
-    productList.value = res.data
-  } catch (err) {
-    console.error('상품 검색 실패:', err)
-  }
-})
 </script>
 
   <style scoped>

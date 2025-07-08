@@ -78,7 +78,7 @@ public class ProductService {
     }
 
     // ✅ 상품 검색
-    public List<Product> search(String location, LocalDateTime checkIn, LocalDateTime checkOut, int people) {
+    public List<Product> search(String location, LocalDate checkIn, LocalDate checkOut, int people) {
         return productRepository.findAllByLocationAndDateAndPeople(location, checkIn, checkOut, people);
     }
 

@@ -13,6 +13,30 @@
           <input type="text" v-model="product.description" />
         </div>
 
+      <div class="form-group">
+        <label>지역 *</label>
+        <select v-model="product.location">
+          <option disabled value="">-- 지역을 선택하세요 --</option>
+          <option>서울</option>
+          <option>부산</option>
+          <option>인천</option>
+          <option>대구</option>
+          <option>광주</option>
+          <option>대전</option>
+          <option>울산</option>
+          <option>세종</option>
+          <option>경기</option>
+          <option>강원</option>
+          <option>충북</option>
+          <option>충남</option>
+          <option>전북</option>
+          <option>전남</option>
+          <option>경북</option>
+          <option>경남</option>
+          <option>제주</option>
+        </select>
+      </div>
+
         <div class="form-group">
           <label>주소 *</label>
           <input type="text" v-model="product.address" />
@@ -33,9 +57,19 @@
           <input type="datetime-local" v-model="product.endDate" />
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label>판매자 ID *</label>
           <input type="number" v-model.number="product.sellerId" />
+        </div> -->
+
+        <div class="form-group">
+          <label>최소 인원수 *</label>
+          <input type="number" v-model.number="product.minPeople" min="1" />
+        </div>
+
+        <div class="form-group">
+          <label>최대 인원수 *</label>
+          <input type="number" v-model.number="product.maxPeople" :min="product.minPeople || 1" />
         </div>
 
         <div class="form-group">
@@ -43,13 +77,13 @@
           <input type="number" v-model.number="product.categoryId" />
         </div>
 
-        <div class="form-group">
+        <!-- <div class="form-group">
           <label>할인 타입</label>
           <select v-model="product.discount.discountType">
             <option value="RATE">비율 할인 (RATE)</option>
             <option value="AMOUNT">금액 할인 (AMOUNT)</option>
           </select>
-        </div>
+        </div> -->
 
         <div class="form-group">
           <label>할인 이름</label>
@@ -111,7 +145,7 @@
   </template>
 
   <script setup>
-  import { ref, reactive, watch, defineProps, defineEmits } from 'vue'
+  import { ref, reactive, watch, defineProps, defineEmits ,onMounted } from 'vue'
   import { useRouter } from 'vue-router'
   import axios from 'axios'
   import CKEditor from '@ckeditor/ckeditor5-vue'
@@ -133,17 +167,36 @@
     title: '',
     description: '',
     address: '',
+    location: '',
     price: null,
     startDate: '',
     endDate: '',
     sellerId: null,
     categoryId: null,
+    minPeople: null,
+    maxPeople: null,  
     discount: {
       discountType: 'RATE',
       name: '',
       discountRate: null,
       startAt: '',
       endAt: ''
+    }
+  })
+
+  // 🔽 sellerId를 서버에서 불러오기
+  onMounted(async () => {
+    try {
+      const response = await axios.get('/api/sellers/my-id', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      })
+      product.sellerId = response.data
+      console.log('📦 sellerId:', product.sellerId)
+    } catch (err) {
+      console.error('❌ sellerId 조회 실패', err)
+      alert('판매자 정보 조회에 실패했습니다.')
     }
   })
 
@@ -189,17 +242,21 @@
     if (!dateStr) return null
     return new Date(dateStr).toISOString().replace('Z', '')
   }
-
-  const submitProduct = async () => {
-    if (!product.title || !product.description || !product.address || !product.price ||
-      !product.startDate || !product.endDate || !product.sellerId || !product.categoryId) {
-      alert('필수 항목을 모두 입력해주세요.')
-      return
-    }
-    if (!thumbnailFile.value) {
-      alert('대표 이미지를 선택해주세요.')
-      return
-    }
+const submitProduct = async () => {
+  if (!product.title || !product.description || !product.address|| !product.location  || !product.price ||
+    !product.startDate || !product.endDate || !product.sellerId || !product.categoryId ||
+    !product.minPeople || !product.maxPeople) {
+    alert('필수 항목을 모두 입력해주세요.')
+    return
+  }
+  if (product.minPeople > product.maxPeople) {
+    alert('최소 인원수가 최대 인원수보다 클 수 없습니다.')
+    return
+  }
+  if (!thumbnailFile.value) {
+    alert('대표 이미지를 선택해주세요.')
+    return
+  }
 
     try {
       const adjustedProduct = {
@@ -215,20 +272,25 @@
         } : null
       }
 
-      const formData = new FormData()
-      formData.append('product', JSON.stringify(adjustedProduct))
-      formData.append('file', thumbnailFile.value)
-      
-      console.log(formData)
-      console.log(JSON.stringify(adjustedProduct, null, 2))
-      await axios.post('/api/product', formData)
-      alert('상품 등록 성공')
-      router.push('/productList')
-    } catch (error) {
-      console.error(error)
-      alert('상품 등록 실패')
-    }
+    const formData = new FormData()
+    formData.append('product', JSON.stringify(adjustedProduct))
+    formData.append('file', thumbnailFile.value)
+
+    // ✅ 헤더에 Authorization 추가
+    await axios.post('/api/product', formData, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    })
+
+    alert('상품 등록 성공')
+    router.push('/productList')
+  } catch (error) {
+    console.error(error)
+    alert('상품 등록 실패')
   }
+}
 
   const cancel = () => {
     router.push('/productList')
@@ -417,4 +479,11 @@
   .cancel-btn {
     background-color: #e0e0e0;
   }
+
+select {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 14px;
+}
   </style>

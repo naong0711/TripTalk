@@ -23,81 +23,86 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
   
   private final UserService userService;
-  
+
   @PostMapping("login")
   public ResponseEntity<?> login(@RequestBody @Valid LoginRequest request) {
-    
     System.out.println(request);    
     LoginResponse response = userService.login(request);
-    
     return ResponseEntity.ok(response);
   }
-  
+
   @GetMapping("checkId")
   public ResponseEntity<?> checkUserId(@RequestParam("userId") String userId) {
     boolean exists = userService.checkUserId(userId);
     return ResponseEntity.ok(exists);
   }
-  
+
   @PostMapping("login/refresh")
   public ResponseEntity<?> refresh(HttpServletRequest request) {
-      String header = request.getHeader("Authorization");
+    String header = request.getHeader("Authorization");
 
-//      System.out.println("🔁 Refresh 요청 헤더: " + header);
-      
-      if (header == null || !header.startsWith("Bearer ")) {
-          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰 없음");
-      }
+    if (header == null || !header.startsWith("Bearer ")) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("리프레시 토큰 없음");
+    }
 
-      String refreshToken = header.substring(7);
+    String refreshToken = header.substring(7);
 
-      try {
-          String newAccessToken = userService.refreshAccessToken(refreshToken);
-          return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
-      } catch (Exception  e) {
-          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
-      }
+    try {
+      String newAccessToken = userService.refreshAccessToken(refreshToken);
+      return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
+    }
   }
-  
+
   @PostMapping("register")
   public ResponseEntity<?> register(@RequestBody @Valid UserRequest request) {
-
     System.out.println("============");
     System.out.println(request);
     UserResponse response = userService.register(request);
-    
     return ResponseEntity.ok(response);
   }
-  
+
   @PostMapping("verify-password")
   public ResponseEntity<?> verifyPassword(
       @RequestBody Map<String, String> payload,
       @AuthenticationPrincipal User user
   ) {
-    
     System.out.println("==========================");
     System.out.println(payload);
-      boolean matched = userService.verifyPassword(user.getUserId(), payload.get("password"));
-      if (!matched) {
-          return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호 불일치");
-      }
-      return ResponseEntity.ok().build();
+    boolean matched = userService.verifyPassword(user.getUserId(), payload.get("password"));
+    if (!matched) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("비밀번호 불일치");
+    }
+    return ResponseEntity.ok().build();
   }
-  
+
   @PostMapping("profile/image")
   public ResponseEntity<?> uploadProfileImage(@RequestPart("file") MultipartFile file,
                                               Authentication authentication) {
-      try {
-          User user = (User) authentication.getPrincipal();
-          Long userId = user.getId();  // user.getUserId()는 String일 수 있음
-
-          Map<String, Object> response = userService.uploadProfileImage(file, userId);
-          return ResponseEntity.ok(response);
-      } catch (Exception e) {
-          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .body(Map.of("error", e.getMessage()));
-      }
+    try {
+      User user = (User) authentication.getPrincipal();
+      Long userId = user.getId();  // user.getUserId()는 String일 수 있음
+      Map<String, Object> response = userService.uploadProfileImage(file, userId);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+              .body(Map.of("error", e.getMessage()));
+    }
   }
-  
-  
+
+  // ✅ 현재 로그인한 사용자 정보 조회 (ID, 닉네임 등)
+  @GetMapping("me")
+  public ResponseEntity<?> getCurrentUserInfo(@AuthenticationPrincipal User user) {
+    if (user == null) {
+      return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("로그인 필요");
+    }
+
+    return ResponseEntity.ok(Map.of(
+      "id", user.getId(),
+      "userId", user.getUserId(),
+      "nickname", user.getNickname()
+    ));
+  }
+
 }

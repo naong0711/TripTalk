@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.product;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import org.kosa.tripTalk.category.Category;
@@ -16,8 +17,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
@@ -37,10 +40,10 @@ public class ProductRequestDTO {
     private Integer price;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
     
     @NotNull(message = "판매자 ID는 필수입니다.")
     private Long sellerId;
@@ -49,6 +52,11 @@ public class ProductRequestDTO {
     private Long categoryId;
 
     private DiscountDTO discount;
+    
+    private Integer minPeople;
+    private Integer maxPeople;
+    
+    private String location;
     
 
 
@@ -62,7 +70,11 @@ public class ProductRequestDTO {
                 .endDate(this.endDate)
                 .seller(seller)
                 .category(category)
+                .minPeople(this.minPeople)
+                .maxPeople(this.maxPeople)
+                .location(this.location)
                 .build();
+        
 
         Discount discount = DiscountDTO.toEntity(this.discount);
         if (discount != null) {
@@ -71,4 +83,6 @@ public class ProductRequestDTO {
 
         return product;
     }
+
+
 }

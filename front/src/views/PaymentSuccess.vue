@@ -15,10 +15,10 @@ import { useRouter, useRoute } from 'vue-router'
 const router = useRouter()
 
 onMounted(() => {
-  // 3초 후 홈으로 이동
+  // 5초 후 홈으로 이동
   setTimeout(() => {
     router.push('/')
-  }, 3000)
+  }, 5000)
 })
 </script>
 

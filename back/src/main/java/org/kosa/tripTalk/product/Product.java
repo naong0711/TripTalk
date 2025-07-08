@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.product;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.product.discount.Discount;
@@ -52,6 +53,9 @@ public class Product {
 	@OneToOne(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private Discount discount;
 	
+	@Column(length = 255)
+	private String location;
+	
 	@Column(nullable = false)
 	private Integer price;
 
@@ -59,11 +63,17 @@ public class Product {
 	private String address;
 
 	@Column(nullable = false)
-	private LocalDateTime startDate;
+	private LocalDate startDate;
 
 	@Column(nullable = false)
-	private LocalDateTime endDate;
+	private LocalDate endDate;
 
+	@Column(name = "min_people", nullable = false)
+	private Integer minPeople;
+
+	@Column(name = "max_people", nullable = false)
+	private Integer maxPeople;
+	
 	// 수정DTO
 	public void updateFromDTO(ProductRequestDTO dto) {
 		this.title = dto.getTitle();

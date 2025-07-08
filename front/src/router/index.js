@@ -13,11 +13,13 @@ import ProfileUpdate from '@/views/mypage/ProfileUpdate.vue'
 import CartList from '@/views/mypage/CartList.vue'
 import Favorite from '@/views/mypage/Favorite.vue'
 import OAuthCallback from '@/views/login/OAuthCallback.vue'
-import ProductList from '@/views/ProductList.vue'
-import ProductRegister from '../views/ProductRegister.vue'
-import ProductDetail from '../views/ProductDetail.vue'
+import ProductList from '@/views/product/ProductList.vue'
+import ProductRegister from '../views/product/ProductRegister.vue'
+import ProductDetail from '../views/product/ProductDetail.vue'
 import PaymentSuccess from '@/views/PaymentSuccess.vue'
-
+import Boardlist from '@/views/board/BoardList.vue'
+import BoardDetail from '../views/board/BoardDetail.vue'
+import BoardWrite from '../views/board/BoardWrite.vue'
 
 const routes = [
   { path: '/', name: 'HelloWorld', component: HelloWorld } , //메인
@@ -38,6 +40,9 @@ const routes = [
   { path: '/productRegister', name: 'ProductRegister', component: ProductRegister},
   { path: '/productDetail/:id', name: 'ProductDetail', component: ProductDetail },
   { path: '/payment/success', name: 'PaymentSuccess', component: PaymentSuccess},
+  { path: '/BoardList', name: 'BoardList', component: Boardlist},
+  { path: '/BoardDetail/:id', name: 'BoardDetail', component: BoardDetail},
+  { path: '/BoardWrite', name: 'BoardWrite', component: BoardWrite},
 ]
 
 const router = createRouter({

@@ -17,6 +17,7 @@ public class TravelLogListDTO {
 	//log 목록을 보기 위한 DTO
 	private Long id;
 	private Long userId;
+	private String nickname;
 	private String title;
 	private String content;
 	private LocalDateTime createdAt;

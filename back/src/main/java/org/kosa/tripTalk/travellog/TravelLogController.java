@@ -10,9 +10,11 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 
 @RestController
 @RequestMapping("/api/log")
@@ -34,12 +36,13 @@ public class TravelLogController {
 	    return ResponseEntity.ok(log);
 	}
 
-	// 전체 목록 조회
-	@GetMapping("/list")
-	public ResponseEntity<List<TravelLogListDTO>> getAllLogs() {
-	    List<TravelLogListDTO> logs = travelLogService.findAll();
-	    return ResponseEntity.ok(logs);
-	}
+//	// 전체 목록 조회
+//	@GetMapping("/list")
+//	public ResponseEntity<List<TravelLogListDTO>> getAllLogs() {
+//	    List<TravelLogListDTO> logs = travelLogService.findAll();
+//	    return ResponseEntity.ok(logs);
+//	}
+//	
 	
 	//글 수정
 	@GetMapping("/update/{id}")
@@ -54,6 +57,23 @@ public class TravelLogController {
 	public ResponseEntity deleteLog(@PathVariable("id") Long id) {
 		travelLogService.deleteLog(id);
 		return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+	}
+	
+	@GetMapping("/list")
+	public ResponseEntity<Page<TravelLogListDTO>> getAllLogs(
+	        @RequestParam(name = "page", defaultValue = "0") int page,
+	        @RequestParam(name = "size", defaultValue = "10") int size,
+	        @RequestParam(name = "sortBy", defaultValue = "id") String sortBy,
+	        @RequestParam(name = "direction", defaultValue = "desc") String direction
+	) { System.out.println(page + size);
+	    Page<TravelLogListDTO> logs = travelLogService.findAll(PageRequest.of(
+	            page,
+	            size,
+	            direction.equals("desc") ? Sort.Direction.DESC : Sort.Direction.ASC,
+	            sortBy
+	    ));
+
+	    return ResponseEntity.ok(logs);
 	}
 	
 }

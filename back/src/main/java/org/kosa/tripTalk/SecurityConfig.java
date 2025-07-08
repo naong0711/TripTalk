@@ -51,12 +51,15 @@ public class SecurityConfig {
                           "/api/user/register",
                           "/**",
                           "/api/user/login/**",
+                          "/api/product/search",
                           "/chat-ws/**",
                           "/chat-ws/**/**",
                           "/oauth2/**",
                           "/payments/**",
                           "/api/files/**",
-                          "/email/verify"
+                          "/api/sellers/**",
+                          "/email/verify",
+                          "/api/log/list"
                       ).permitAll()
                       .requestMatchers("/api/mypage/**", "/api/chat/**").authenticated()  //로그인한 사용자만 접근 가능
                       .anyRequest().authenticated())

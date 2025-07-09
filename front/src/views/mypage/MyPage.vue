@@ -1,15 +1,20 @@
 <template>
   <div class="mypage-container">
     <!-- 프로필 -->
-    <div class="top-box">
-      <div class="profile-box">
-        <img :src="profileImage" class="profile-img" @error="profileImage = '/img/default-profile.jpg'" />
-        <div class="profile-info">
-          <h2 class="nickname" :title="nickname" @click="goToProfileDetail">{{ nickname }}</h2>
-          <button @click="changeProfile" class="change-btn">사진 변경</button>
-          <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" class="hidden" />
+      <div class="top-box">
+        <div class="profile-box">
+          <img :src="profileImage" class="profile-img" @error="profileImage = '/img/default-profile.jpg'" />
+
+          <div class="profile-info">
+            <h2 class="nickname" :title="nickname" @click="goToProfileDetail">{{ nickname }}</h2>
+            <button @click="changeProfile" class="change-btn">사진 변경</button>
+            <input type="file" ref="fileInput" @change="onImageSelected" accept="image/*" class="hidden" />
+          </div>
+
+          <div class="seller-btn-wrapper" v-if="!sellerId">
+            <button @click="goToSellerRequest" class="seller-btn">판매자 신청</button>
+          </div>
         </div>
-      </div>
     
     <hr>
 
@@ -94,6 +99,7 @@ const router = useRouter()
 const profileImage = ref('/img/default-profile.jpg')
 const nickname = ref('닉네임 불러오는 중...')
 const fileInput = ref(null)
+const sellerId = ref(null)
 const activeCategory = ref('여행')
 const reservations = ref([])
 
@@ -108,6 +114,10 @@ function openChat() {
   isChatOpen.value = true
 }
 
+function goToSellerRequest() {
+  router.push('/mypage/seller/request') // 실제 판매자 신청 페이지 경로로 바꿔도 됩니다.
+}
+
 // ✅ 마운트 시 프로필 정보 가져오기
 onMounted(async () => {
   try {
@@ -120,6 +130,7 @@ onMounted(async () => {
     console.log(res.data.profileImageUrl)
     profileImage.value = res.data.profileImageUrl || '/img/default-profile.jpg'
     nickname.value = res.data.nickname || '닉네임 없음'
+    sellerId.value = res.data.sellerId || null 
   } catch (err) {
     console.error('프로필 불러오기 실패:', err)
     nickname.value = '로그인 필요'
@@ -242,7 +253,7 @@ function goToCart() {
 }
 
 function goToFavorites() {
-  router.push('/favorites')
+  router.push('/favorite')
 }
 
 </script>
@@ -516,5 +527,35 @@ hr {
   font-size: 14px;
   font-weight: 500;
   color: #333;
+}
+
+.profile-box {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between; /* 판매자 버튼 오른쪽 정렬 */
+  padding: 16px;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.seller-btn-wrapper {
+  margin-left: auto;
+}
+
+.seller-btn {
+  font-size: 14px;
+  color: white;
+  background-color: #6c8e3f;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.seller-btn:hover {
+  background-color: #5a7533;
 }
 </style>

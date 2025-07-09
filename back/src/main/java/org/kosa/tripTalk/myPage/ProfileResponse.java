@@ -22,6 +22,7 @@ public class ProfileResponse {
     private String address;
     private String addressDetail;
     private String profileImageUrl;
+    private Long sellerId;
     
     private List<ReservationResponse> reservations;
 }

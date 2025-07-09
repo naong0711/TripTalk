@@ -91,6 +91,14 @@
     </div>
   </div>
 </div>
+
+<!-- 챗봇 모달 -->
+<ChatBotModal v-if="showChat" :close="() => showChat = false" />
+
+<!-- 고정형 둥근 버튼 -->
+<button class="fixed-chat-button" @click="showChat = true">
+  💬
+</button>
 </template>
 
 <script setup>
@@ -98,6 +106,7 @@ import axios from 'axios'
 import 'swiper/css'
 import 'swiper/css/pagination'
 import 'swiper/css/autoplay'
+import ChatBotModal from '@/components/chatBot/ChatBotModal.vue' 
 
 import { Swiper, SwiperSlide } from 'swiper/vue'
 import { Pagination, Autoplay } from 'swiper/modules'
@@ -108,6 +117,7 @@ const router = useRouter()
 const modules = [Pagination, Autoplay]
 const swiperRef = ref(null)
 const swiperInstance = ref(null)
+const showChat = ref(false)
 
 const onSwiperInit = (swiper) => {
   swiperInstance.value = swiper
@@ -492,5 +502,26 @@ onMounted(async () => {
   color: #4A90E2;
   font-weight: bold;
   margin-top: 8px;
+}
+
+.fixed-chat-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  background-color: #3e8ed0;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  transition: background 0.3s ease;
+}
+.fixed-chat-button:hover {
+  background-color: #357ABD;
 }
 </style>

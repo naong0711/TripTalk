@@ -12,4 +12,6 @@ public interface FileRepository extends JpaRepository<File, Long> {
 
     Optional<File> findFirstByOwnerTypeAndOwnerIdAndIsThumbnail(String ownerType, Long ownerId, int isThumbnail);
 
+    List<File> findByOwnerType(String ownerType);
+
 }

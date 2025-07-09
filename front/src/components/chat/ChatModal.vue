@@ -63,20 +63,28 @@ function enterRoom(roomInfo) {
   overflow: hidden;
   padding: 1rem;
   position: relative;
+  display: flex; 
+  flex-direction: column;
 }
 
 .close-btn {
   position: absolute;
   top: 21px;
-  right: 25px;
+  right: 32px;
   background: transparent;
   border: none;
   font-size: 1.5rem;
   cursor: pointer;
   color: #555;
+  z-index: 20;
 }
 
 .close-btn:hover {
   color: #000;
+}
+
+.modal-content > div {
+  flex: 1;
+  overflow-y: auto;
 }
 </style>

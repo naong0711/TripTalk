@@ -44,6 +44,10 @@ public class MyService {
         ? "/api/files/image/user/" + user.getId()
         : "/img/default-profile.jpg";
     
+    Long sellerId = sellerRepository.findByUserId(user.getId())
+        .map(Seller::getId)
+        .orElse(null);
+    
     System.out.println("+++++++++++");
     System.out.println(imageUrl);
     System.out.println("+++++++++++");
@@ -60,6 +64,7 @@ public class MyService {
         .address(user.getAddress())
         .addressDetail(user.getAddressDetail())
         .profileImageUrl(imageUrl)
+        .sellerId(sellerId)
         .build();
 }
 

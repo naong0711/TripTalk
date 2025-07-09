@@ -104,5 +104,44 @@ public class UserController {
       "nickname", user.getNickname()
     ));
   }
+  
+  //아이디찾기
+  @PostMapping("findId")
+  public ResponseEntity<?> findId(@RequestBody @Valid FindIdRequest request) {
+      // 이메일 또는 휴대폰 번호로 아이디 조회
+      String userId = userService.findUserIdByEmail(request.getQuery());
+      if (userId == null) {
+          return ResponseEntity.status(HttpStatus.NOT_FOUND).body("해당 정보로 가입된 아이디가 없습니다.");
+      }
+      return ResponseEntity.ok(new FindIdResponse(userId));
+  }
+  
+  //비번찾기
+  @PostMapping("findPw")
+  public ResponseEntity<?> findPw(@RequestBody @Valid FindPwRequest request) {
+      boolean success = userService.requestPasswordReset(request.getUserId(), request.getEmail());
+      if (!success) {
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("비밀번호 재설정 요청에 실패했습니다.");
+      }
+      return ResponseEntity.ok("비밀번호 재설정 이메일을 발송했습니다.");
+  }
+  
+  //새비밀번호설정
+  @PostMapping("changePassword")
+  public ResponseEntity<?> changePassword(@RequestBody ChangePwRequest request, Authentication authentication) {
+      
+      User user = (User) authentication.getPrincipal();
+      Long userId = user.getId();
+      
+      System.out.println(userId+"=userId");
+      
+    try {
+          userService.changePassword(userId, request.getNewPassword(), request.getConfirmPassword());
+          return ResponseEntity.ok("비밀번호 변경 완료");
+      } catch (Exception e) {
+          return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+      }
+  }
+  
 
 }

@@ -9,10 +9,10 @@
       </template>
     </dl>
 
-    <div class="btn-group">
-      <button class="btn-back" @click="goBack">뒤로 가기</button>
-      <button class="btn-edit" @click="showPasswordModal = true">정보 수정</button>
-    </div>
+  <div class="btn-group">
+    <button class="btn-back" @click="goBack">뒤로 가기</button>
+    <button class="btn-edit" @click="showPasswordModal = true">정보 수정</button>
+  </div>
 
     <PasswordConfirmModal
       v-if="showPasswordModal"
@@ -26,7 +26,7 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
-import PasswordConfirmModal from './PasswordConfirmModal.vue'
+import PasswordConfirmModal from '@/components/PasswordConfirmModal.vue'
 
 const router = useRouter()
 const userInfo = ref({})
@@ -168,4 +168,5 @@ h2 {
     flex-direction: column;
   }
 }
+
 </style>

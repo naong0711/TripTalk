@@ -37,9 +37,9 @@
     </form>
 
     <div class="helper-links">
-    <a href="#">아이디/비밀번호 찾기</a>
-    <span>|</span>
-    <router-link to="/register/agree">회원가입</router-link>
+      <button class="modal-open-btn" @click="showFindIdPwModal = true">아이디/비밀번호 찾기</button>
+      <span>|</span>
+      <router-link to="/register/agree">회원가입</router-link>
     </div>
 
     <div class="divider">
@@ -59,17 +59,34 @@
         <img src="@/assets/loginBtn/naver_login.png" alt="네이버 로그인" class="social-icon" />
     </div>
 
+       <FindIdPwModal v-if="showFindIdPwModal" @close="showFindIdPwModal = false" />
   </div>
+      <NewPasswordModal
+        v-if="showChangePasswordModal"
+        @success="handlePasswordChangeSuccess"
+        @cancel="showChangePasswordModal = false"
+      />
+
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import FindIdPwModal from '@/components/FindIdPw.vue'
+import NewPasswordModal from '@/components/NewPasswordModal.vue'
 
 const userid = ref('')
 const password = ref('')
+const showFindIdPwModal = ref(false) 
+const showChangePasswordModal = ref(false)
 const router = useRouter()
+
+function handlePasswordChangeSuccess() {
+  alert('완료되었습니다.')
+  showChangePasswordModal.value = false
+  router.push('/')
+}
 
 async function onSubmit() {
   console.log('userid:', userid.value)
@@ -87,6 +104,8 @@ async function onSubmit() {
     localStorage.setItem('accessToken', response.data.accessToken);
     localStorage.setItem('refreshToken', response.data.refreshToken);
 
+    console.log(response.data.tempPasswordUsed)
+
     const userId = getUserIdFromToken(response.data.accessToken);
     if (userId) {
       localStorage.setItem('userId', userId);
@@ -94,12 +113,22 @@ async function onSubmit() {
     } else {
       console.warn('userId 추출 실패: JWT 형식 확인 필요');
     }
+
+    if (response.data.tempPasswordUsed) {
+  showChangePasswordModal.value = true;
+  } else {
     router.push('/')
+  }
 
   } catch (error) {
     console.error('로그인 실패:', error.response || error.message)
     alert('로그인 실패: 아이디 또는 비밀번호를 확인하세요.')
   }
+}
+
+function goToChangePw() {
+  showChangePasswordModal.value = false
+  router.push('/mypage/change-password')
 }
 
 function getUserIdFromToken(token) {
@@ -116,6 +145,7 @@ function getUserIdFromToken(token) {
 function handleKakaoLogin() {
   window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
 }
+
 </script>
 
 
@@ -242,4 +272,5 @@ padding: 0 5px;
 .remember-me span {
   line-height: 1;
 }
+
 </style>

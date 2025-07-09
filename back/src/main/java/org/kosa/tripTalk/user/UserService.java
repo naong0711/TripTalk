@@ -1,8 +1,10 @@
 package org.kosa.tripTalk.user;
 
 import java.io.IOException;
+import java.security.SecureRandom;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import org.kosa.tripTalk.email.EmailRepository;
 import org.kosa.tripTalk.email.EmailService;
 import org.kosa.tripTalk.file.File;
@@ -58,6 +60,8 @@ public class UserService {
     String accessToken  = jwtUtil.generateAccessToken(user);
     String refreshToken = jwtUtil.generateRefreshToken(user.getUserId());
     
+    System.out.println("tempPasswordUsed: " + user.getTempPasswordUsed());
+    
     RefreshToken token = new RefreshToken();
     token .setUserId(user.getUserId());
     token .setToken(refreshToken);
@@ -66,7 +70,7 @@ public class UserService {
     tokenRepository.save(token);
     
     // LoginResponse 객체 생성 후 반환
-    return new LoginResponse(user.getId(), accessToken, refreshToken, user.getName(), user.getRole());
+    return new LoginResponse(user.getId(), accessToken, refreshToken, user.getName(), user.getRole(), user.getTempPasswordUsed());
   }
   
   //비밀번호 패턴 확인
@@ -163,6 +167,7 @@ public class UserService {
         .password(encodedPassword) 
         .role(User.Role.USER)
         .emailVerified(false)
+        .tempPasswordUsed(false) //임시비밀번호여부
         .build();
 
     User savedUser = repository.save(user);
@@ -236,7 +241,60 @@ public class UserService {
             "url", savedFile.getImageUrl()
     );
 }
+
+  public String findUserIdByEmail(String query) {
+    // 이메일로 User 검색 후 아이디 리턴
+    Optional<User> user = repository.findByEmail(query);
+
+    return user.map(User::getUserId).orElse(null);
+  }
   
+  public boolean requestPasswordReset(String userId, String email) {
+    Optional<User> userOpt = repository.findByUserIdAndEmail(userId, email);
+    if (userOpt.isEmpty()) {
+        return false;
+    }
+
+    User user = userOpt.get();
+
+    // 임시 비밀번호 생성
+    String tempPassword = generateTemporaryPassword();
+
+    // 임시 비밀번호 암호화 후 저장
+    user.setPassword(passwordEncoder.encode(tempPassword));
+    user.setTempPasswordUsed(true);
+    repository.save(user);
+
+    // 임시 비밀번호 이메일 발송
+    emailService.sendTemporaryPassword(user.getEmail(), user.getUserId(), tempPassword);
+    return true;
+}
+
+  //임시비밀번호 생성
+  private String generateTemporaryPassword() {
+      int length = 10;
+      String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$!%*#?&";
+      SecureRandom random = new SecureRandom();
+      StringBuilder sb = new StringBuilder(length);
+      for (int i = 0; i < length; i++) {
+          sb.append(chars.charAt(random.nextInt(chars.length())));
+      }
+      return sb.toString();
+  }
   
+  //비밀번호 변경
+  public void changePassword(Long userId, String newPassword, String confirmPassword) {
+    User user = repository.findById(userId)
+        .orElseThrow(() -> new UsernameNotFoundException("유저 없음"));
+    if (!newPassword.equals(confirmPassword)) {
+      throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+  }
+  
+    validatePasswordFormat(newPassword);
+    user.setPassword(passwordEncoder.encode(newPassword));
+    user.setTempPasswordUsed(false);
+    repository.save(user);
+    
+  }
 
 }

@@ -20,6 +20,10 @@ import PaymentSuccess from '@/views/PaymentSuccess.vue'
 import Boardlist from '@/views/board/BoardList.vue'
 import BoardDetail from '../views/board/BoardDetail.vue'
 import BoardWrite from '../views/board/BoardWrite.vue'
+import SellerRegister from '../views/mypage/SellerRegister.vue'
+import AdminPage from '../views/admin/AdminPage.vue'
+import SellerRequests from '../views/admin/SellerRequests.vue'
+
 
 const routes = [
   { path: '/', name: 'HelloWorld', component: HelloWorld } , //메인
@@ -43,6 +47,9 @@ const routes = [
   { path: '/BoardList', name: 'BoardList', component: Boardlist},
   { path: '/BoardDetail/:id', name: 'BoardDetail', component: BoardDetail},
   { path: '/BoardWrite', name: 'BoardWrite', component: BoardWrite},
+  { path: '/mypage/seller/request', name: 'SellerRegister', component: SellerRegister},
+  { path: '/admin', name: 'AdminPage', component: AdminPage},
+  { path: '/admin/sellerRequests', name: 'SellerRequests', component: SellerRequests},
 ]
 
 const router = createRouter({

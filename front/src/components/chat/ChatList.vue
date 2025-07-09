@@ -59,6 +59,7 @@ onMounted(async () => {
 .chat-list {
   overflow-y: auto;
   height: 100%;
+  overflow-x: hidden; 
 }
 
 .chat-list-title {
@@ -67,11 +68,17 @@ onMounted(async () => {
   padding: 7px 0 12px 0;
   margin: 0;
   user-select: none;
+  position: sticky;
+  top: 0;
+  background-color: white; /* 배경색을 명시해야 내용이 겹치지 않음 */
+  z-index: 10;             /* 위로 올라오게 함 */
+  border-bottom: 1px solid #ddd; /* 경계선 추가 (선택사항) */
 }
 
 .chat-list ul {
   list-style: none;
   padding: 0;
+  
   margin: 0;
 }
 
@@ -89,6 +96,9 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  width: 100%;
+  box-sizing: border-box;
+  min-width: 0;  /* flex 자식 요소가 부모 너비를 넘는 문제 방지 */
 }
 
 .buyer {
@@ -120,6 +130,7 @@ onMounted(async () => {
   white-space: nowrap;
 }
 
+
 .last-message {
   color: #666;
   font-size: 0.9rem;
@@ -127,8 +138,12 @@ onMounted(async () => {
   margin-left: 40px;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* 길면 ... 처리 */
+  text-overflow: ellipsis;
   flex: 1;
+  max-width: calc(100% - 68px); /* 40px margin + unread-badge 약 28px 공간 제외 */
+  min-width: 0; /* flex item에서 중요한 속성 (줄임말 위해) */
+  word-break: normal; /* 긴 단어는 넘기지 않음 */
+  overflow-wrap: normal;
 }
 
 .unread-badge {

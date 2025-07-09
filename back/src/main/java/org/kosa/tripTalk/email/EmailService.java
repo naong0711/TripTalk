@@ -125,4 +125,23 @@ public class EmailService {
           .map(user -> user.getEmailVerified() != null && user.getEmailVerified())
           .orElse(false);
   }
+    
+   
+    //임시 비밀번호
+    public void sendTemporaryPassword(String toEmail, String userId, String tempPassword) {
+      String subject = "[TripTalk] 임시 비밀번호 안내";
+      String body = String.format("""
+          안녕하세요, TripTalk입니다.
+
+          %s 님의 임시 비밀번호는 아래와 같습니다:
+
+          임시 비밀번호: %s
+
+          보안을 위해 로그인 후 반드시 비밀번호를 변경해 주세요.
+          """, userId, tempPassword);
+
+      sendEmail(toEmail, subject, body);
+  }
+    
+    
 }

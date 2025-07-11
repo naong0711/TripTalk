@@ -6,11 +6,11 @@
     </div>
 
 
-    <!-- ✅ 검색창 추가 -->
+    <!-- ✅ 검색창 추가
     <div class="search-box">
       <input type="text" v-model="searchQuery" placeholder="여행지를 검색해보세요" class="search-input" />
       <button class="search-button">검색</button>
-    </div>
+    </div> -->
 
 
     <!-- 햄버거 버튼 (마우스 호버용) -->

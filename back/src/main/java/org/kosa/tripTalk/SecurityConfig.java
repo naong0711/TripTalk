@@ -59,7 +59,9 @@ public class SecurityConfig {
                           "/api/files/**",
                           "/api/sellers/**",
                           "/email/verify",
+                          "/api/map/**",
                           "/api/log/list"
+                          
                       ).permitAll()
                       .requestMatchers("/api/mypage/**", "/api/chat/**").authenticated()  //로그인한 사용자만 접근 가능
                       .anyRequest().authenticated())

@@ -28,7 +28,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Seller {
-	
+
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seller_seq_gen")
   private Long id;  // seller 고유 PK

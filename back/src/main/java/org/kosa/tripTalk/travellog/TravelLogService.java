@@ -111,4 +111,9 @@ public class TravelLogService {
 	                .build();
 	    });
 	}
+
+	public void linkBookmarksToBoard(Long boardId, String tempKey) {
+		// TODO Auto-generated method stub
+		
+	}
 }

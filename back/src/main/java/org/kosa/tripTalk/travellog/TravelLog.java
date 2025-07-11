@@ -42,5 +42,9 @@ public class TravelLog {
 
     @Column
     private LocalDateTime createdAt;
+    
+    @Column(name = "temp_key")
+    private String tempKey;
+    
 
 }

@@ -23,7 +23,8 @@ import BoardWrite from '../views/board/BoardWrite.vue'
 import SellerRegister from '../views/mypage/SellerRegister.vue'
 import AdminPage from '../views/admin/AdminPage.vue'
 import SellerRequests from '../views/admin/SellerRequests.vue'
-
+import KakaoMapSearch from '../components/KakaoMapSearch.vue'
+import MapOnly from '../views/MapOnly.vue'
 
 const routes = [
   { path: '/', name: 'HelloWorld', component: HelloWorld } , //메인
@@ -50,6 +51,10 @@ const routes = [
   { path: '/mypage/seller/request', name: 'SellerRegister', component: SellerRegister},
   { path: '/admin', name: 'AdminPage', component: AdminPage},
   { path: '/admin/sellerRequests', name: 'SellerRequests', component: SellerRequests},
+  // { path: '/TravelLogRegister', name: 'TravelLogRegister', component: TravelLogRegister},
+  { path: '/travelmap/:boardId', name: 'KakaoMapSearch', component: KakaoMapSearch,
+    props: true },
+  { path: '/MapOnly', name: 'MapOnly', component: MapOnly},
 ]
 
 const router = createRouter({

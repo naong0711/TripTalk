@@ -73,8 +73,8 @@
         </div>
 
         <div class="form-group">
-          <label>카테고리 ID *</label>
-          <input type="number" v-model.number="product.categoryId" />
+
+          <input type="hidden" v-model.number="product.categoryId" />
         </div>
 
         <!-- <div class="form-group">
@@ -129,11 +129,11 @@
         <img :src="thumbnailPreview" alt="썸네일" />
       </div>
 
-      <label>추가 이미지</label>
+      <!-- <label>추가 이미지</label>
       <input type="file" multiple accept="image/*" @change="onAdditionalChange" />
       <div class="additional-preview-list">
         <img v-for="(img, idx) in additionalPreviews" :key="idx" :src="img" />
-      </div>
+      </div> -->
     </div>
 
         <div class="button-group">
@@ -172,7 +172,7 @@
     startDate: '',
     endDate: '',
     sellerId: null,
-    categoryId: null,
+    categoryId: 1,
     minPeople: null,
     maxPeople: null,  
     discount: {

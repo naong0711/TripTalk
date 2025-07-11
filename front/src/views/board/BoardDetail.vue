@@ -11,6 +11,9 @@
         {{ log.content }}
       </div>
 
+      <!-- ✅ 지도 출력 -->
+      <div id="map" class="map-container"></div>
+
       <div class="actions">
         <button @click="goToEdit" v-if="isOwner">✏ 수정</button>
         <button @click="deletePost" v-if="isOwner">🗑 삭제</button>
@@ -32,11 +35,23 @@ const log = ref(null)
 const currentUserId = ref(null)
 const isOwner = ref(false)
 
+let map = null
+let polyline = null
+let markers = []
+const boardId = route.params.id
+
+
 const fetchLog = async () => {
   try {
     const res = await axios.get(`/api/log/list/${route.params.id}`)
     log.value = res.data
     checkOwnership()
+
+    if (window.kakao && log.value?.id) {
+      window.kakao.maps.load(() => {
+        loadMapAndBookmarks(log.value.id)
+      })
+    }
   } catch (err) {
     console.error('후기 조회 실패:', err)
   }
@@ -88,21 +103,69 @@ const goBack = () => {
 
 const formatDate = (str) => new Date(str).toLocaleString()
 
+// ✅ 지도 및 북마크 마커 + 선 표시
+const loadMapAndBookmarks = async (id) => {
+  try {
+    console.log(id)
+    const res = await axios.get(`/api/map/get/${id}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    })
+
+    const bookmarks = res.data
+
+    const container = document.getElementById('map')
+    map = new window.kakao.maps.Map(container, {
+      center: new window.kakao.maps.LatLng(37.5665, 126.9780),
+      level: 5,
+    })
+
+    const path = []
+    bookmarks.forEach((bookmark, idx) => {
+      const position = new window.kakao.maps.LatLng(bookmark.latitude, bookmark.longitude)
+
+      const marker = new window.kakao.maps.Marker({
+        map,
+        position,
+        title: bookmark.placeName,
+      })
+
+      markers.push(marker)
+      path.push(position)
+    })
+
+    if (polyline) polyline.setMap(null)
+    polyline = new window.kakao.maps.Polyline({
+      path,
+      strokeWeight: 5,
+      strokeColor: '#FF0000',
+      strokeOpacity: 0.7,
+      strokeStyle: 'solid',
+    })
+    polyline.setMap(map)
+
+    const bounds = new window.kakao.maps.LatLngBounds()
+    path.forEach(pos => bounds.extend(pos))
+    map.setBounds(bounds)
+  } catch (err) {
+    console.error('지도 로딩 실패:', err)
+  }
+}
+
 onMounted(() => {
+  console.log(boardId)
   fetchCurrentUser()
   fetchLog()
 })
 </script>
 
 <style scoped>
-/* 전체 배경 느낌 */
 .detail-wrapper {
   background-color: #f6f6f6;
   padding: 32px;
   min-height: 100vh;
 }
-
-/* 박스 형태 카드 */
 .detail-box {
   background-color: white;
   border: 1px solid #ddd;
@@ -112,32 +175,24 @@ onMounted(() => {
   padding: 32px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.06);
 }
-
-/* 제목 */
 .title {
   font-size: 28px;
   font-weight: bold;
   margin-bottom: 12px;
   color: #222;
 }
-
-/* 작성자 정보 */
 .meta {
   font-size: 14px;
   color: #777;
   margin-bottom: 24px;
 }
-
 .meta .bold {
   font-weight: bold;
   color: #444;
 }
-
 .meta .date {
   font-style: italic;
 }
-
-/* 본문 내용 */
 .content {
   font-size: 18px;
   color: #333;
@@ -149,12 +204,14 @@ onMounted(() => {
   border-radius: 6px;
   border: 1px solid #eee;
 }
-
-/* 버튼 스타일 */
+.map-container {
+  width: 100%;
+  height: 400px;
+  margin-bottom: 32px;
+}
 .actions {
   text-align: right;
 }
-
 .actions button {
   margin-left: 8px;
   padding: 8px 14px;
@@ -166,7 +223,6 @@ onMounted(() => {
   cursor: pointer;
   transition: background-color 0.2s;
 }
-
 .actions button:hover {
   background-color: #357ab7;
 }

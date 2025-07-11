@@ -154,13 +154,12 @@ const fetchSearchProducts = async () => {
 const goToPage = (newPage) => {
   if (newPage >= 0 && newPage < totalPages.value) {
     page.value = newPage
-    fetchProducts()
+    fetchSearchProducts()
   }
 }
 
 const searchProducts = () => {
   page.value = 0
-
   fetchSearchProducts()  // ✅ 이거로 교체
 }
 const goToDetail = (id) => {

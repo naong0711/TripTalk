@@ -20,6 +20,8 @@ import PaymentSuccess from '@/views/PaymentSuccess.vue'
 import Boardlist from '@/views/board/BoardList.vue'
 import BoardDetail from '../views/board/BoardDetail.vue'
 import BoardWrite from '../views/board/BoardWrite.vue'
+import KakaoMapSearch from '../components/KakaoMapSearch.vue'
+import MapOnly from '../views/MapOnly.vue'
 
 const routes = [
   { path: '/', name: 'HelloWorld', component: HelloWorld } , //메인
@@ -43,6 +45,10 @@ const routes = [
   { path: '/BoardList', name: 'BoardList', component: Boardlist},
   { path: '/BoardDetail/:id', name: 'BoardDetail', component: BoardDetail},
   { path: '/BoardWrite', name: 'BoardWrite', component: BoardWrite},
+  // { path: '/TravelLogRegister', name: 'TravelLogRegister', component: TravelLogRegister},
+  { path: '/travelmap/:boardId', name: 'KakaoMapSearch', component: KakaoMapSearch,
+    props: true },
+  { path: '/MapOnly', name: 'MapOnly', component: MapOnly},
 ]
 
 const router = createRouter({

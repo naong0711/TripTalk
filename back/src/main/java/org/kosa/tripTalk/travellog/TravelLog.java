@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
@@ -31,6 +32,7 @@ public class TravelLog {
     @Column
     private String title;
 
+    @Lob
     @Column
     private String content;
 
@@ -40,5 +42,9 @@ public class TravelLog {
 
     @Column
     private LocalDateTime createdAt;
+    
+    @Column(name = "temp_key")
+    private String tempKey;
+    
 
 }

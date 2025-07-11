@@ -1,7 +1,9 @@
 package org.kosa.tripTalk.seller;
+import org.kosa.tripTalk.BooleanToYNConverter;
 import org.kosa.tripTalk.user.User;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -26,7 +28,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Builder
 public class Seller {
-	
+
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "seller_seq_gen")
   private Long id;  // seller 고유 PK
@@ -36,12 +38,16 @@ public class Seller {
   private User user;
 
   @Column(nullable = false)
-  private String businessName;
+  private String bankName;
 
   @Column(unique = true, nullable = false)
-  private String businessNumber;
+  private String accountNumber;
 
   @Column(nullable = false)
-  private String contact;
+  private String accountHolder;
+
+  @Column(name = "IS_APPLY", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'F'")
+  @Convert(converter = BooleanToYNConverter.class) //false -> 'F', true -> 'T' 자동 변환
+  private Boolean isApply; //승인여부
 
 }

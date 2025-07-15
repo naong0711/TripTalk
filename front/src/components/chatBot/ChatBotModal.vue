@@ -30,8 +30,6 @@ defineProps({
 }
 .modal-content {
   position: relative;
-  width: 650px;
-  max-height: 90vh;
   background: white;
   border-radius: 15px;
   overflow: hidden;
@@ -40,13 +38,13 @@ defineProps({
 
 .chat-close-btn {
   position: absolute;
-  top: 34px;
-  right: 38px;
+  top: 6px;
+  right: 12px;
   font-size: 1.5rem;
   background: transparent;
   border: none;
   cursor: pointer;
-  color: #ffffff;
+  color: #f7f7f7;
   z-index: 10;
 }
 

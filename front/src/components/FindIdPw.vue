@@ -148,8 +148,8 @@ async function findPassword() {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0,0,0,0.32);
-  backdrop-filter: blur(6px);
+  background-color: rgba(0,0,0,0.3);
+  backdrop-filter: blur(5px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -158,11 +158,11 @@ async function findPassword() {
 
 .modal-content {
   background: #fff;
-  width: 320px;
+  width: 360px;
   max-width: 90vw;
   padding: 32px 32px 36px;
-  border-radius: 24px;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   font-family: 'Noto Sans KR', sans-serif;
   position: relative;
   text-align: left;
@@ -172,8 +172,8 @@ async function findPassword() {
 /* 닫기 버튼 */
 .close-btn {
   position: absolute;
-  top: 18px;
-  right: 18px;
+  top: 16px;
+  right: 16px;
   font-size: 28px;
   color: #bbb;
   background: none;
@@ -183,124 +183,109 @@ async function findPassword() {
   transition: color 0.2s ease;
 }
 .close-btn:hover {
-  color: #a67c00;
+  color: #292e4c;
 }
 
 /* 제목 */
 h2 {
-  font-weight: 600;
-  font-size: 20px;
-  color: #2e2e2e;
-  margin-bottom: 28px;
+  font-weight: 800;
+  font-size: 24px;
+  color: #292e4c;
+  margin-bottom: 24px;
   text-align: center;
   letter-spacing: 0.02em;
 }
 
-/* 탭 스타일 - 심플한 언더라인 */
+/* 탭 스타일 */
 .tabs {
   display: flex;
   justify-content: center;
-  gap: 24px;
-  margin-bottom: 30px;
-  border-bottom: 2px solid #eee;
+  gap: 28px;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #e0e4ec;
 }
 
 .tabs button {
   background: none;
   border: none;
-  font-weight: 500;
+  font-weight: 600;
   font-size: 16px;
   padding-bottom: 8px;
   cursor: pointer;
   color: #999;
+  border-bottom: 3px solid transparent;
   transition: color 0.3s ease, border-bottom-color 0.3s ease;
-  border-bottom: 2px solid transparent;
 }
 
 .tabs button.active {
-  color: #a67c00;
-  border-bottom-color: #a67c00;
+  color: #292e4c;
+  border-bottom-color: #292e4c;
 }
 
 /* form-group */
 .form-group {
-  margin-bottom: 26px;
+  margin-bottom: 20px;
 }
 
 label {
-  font-weight: 500;
+  font-weight: 600;
   font-size: 14px;
-  color: #555;
+  color: #2c2c2c;
   margin-bottom: 6px;
   display: block;
 }
 
-/* input 필드: 밑줄만, 플랫 디자인 */
+/* input 필드 */
 input[type='text'],
 input[type='email'] {
   width: 100%;
-  padding: 10px 4px;
-  font-size: 15px;
-  border: none;
-  border-bottom: 2px solid #ddd;
-  font-family: 'Noto Sans KR', sans-serif;
-  transition: border-color 0.25s ease;
+  padding: 10px 12px;
+  font-size: 14px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
   outline: none;
   color: #222;
 }
 
-input[type='text']::placeholder,
-input[type='email']::placeholder {
+input::placeholder {
   color: #bbb;
 }
 
 input[type='text']:focus,
 input[type='email']:focus {
-  border-bottom-color: #a67c00;
+  border-color: #292e4c;
 }
 
+/* 제출 버튼 */
 .submit-btn {
   width: 100%;
-  background-color: #c8b66a; /* 단색 배경으로 변경 */
+  background-color: #292e4c;
   border: none;
-  border-radius: 30px;
+  border-radius: 8px;
   padding: 14px 0;
   font-weight: 700;
   font-size: 16px;
   color: white;
   cursor: pointer;
-  box-shadow: 0 6px 12px rgba(166,124,0,0.6);
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  transition: background-color 0.25s ease;
   user-select: none;
 }
 
 .submit-btn:disabled {
-  background-color: #f8f3d3;
+  background-color: #bbb;
   cursor: not-allowed;
-  box-shadow: none;
-  color: #999;
+  color: #eee;
 }
 
 .submit-btn:hover:not(:disabled) {
-  background-color: #d6ca7f; /* 호버 시 단색 진해짐 */
-  box-shadow: 0 8px 18px rgba(140,103,0,0.8);
+  background-color: #1d2138;
 }
+
 /* 결과 메시지 */
 .result-message {
-  margin-top: 28px;
-  font-weight: 600;
-  font-size: 14.5px;
-  text-align: center;
-  white-space: pre-wrap;
-  color: #388e3c; /* 성공 메시지 초록 */
-}
-
-.result-message.error {
-  color: #d32f2f; /* 오류 메시지 빨강 */
-}
-
-.result-message {
-  margin: 16px auto 0;
+  margin: 20px auto 0;
   max-width: 90%;
   font-weight: 600;
   font-size: 15px;

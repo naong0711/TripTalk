@@ -1,8 +1,12 @@
 <template>
   <div class="board-page">
+    
+    <div class="top-menu">
+    <h2>여행 후기</h2>
     <!-- 상단 버튼 -->
     <div class="header-actions">
-      <button @click="goToWrite" class="write-btn">✍ 후기 작성</button>
+      <button @click="goToWrite" class="write-btn">후기 작성</button>
+    </div>
     </div>
 
     <!-- 게시판 리스트 -->
@@ -85,6 +89,7 @@ onMounted(fetchLogs)
 </script>
 
 <style scoped>
+
 .board-page {
   max-width: 900px;
   margin: 30px auto;
@@ -95,20 +100,17 @@ onMounted(fetchLogs)
   text-align: right;
   margin-bottom: 16px;
 }
-
 .write-btn {
-  background-color: #4a90e2;
-  color: #fff;
-  padding: 8px 14px;
-  font-weight: bold;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
+    padding: 8px 16px;
+    background-color: #5cb85c;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
 .write-btn:hover {
-  background-color: #357abd;
-}
+    background-color: #449d44;
+  }
 
 .board-table {
   width: 100%;
@@ -157,25 +159,38 @@ onMounted(fetchLogs)
   color: #888;
 }
 
-.pagination {
+  .pagination {
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 16px;
-  gap: 16px;
+  margin-top: 24px;
+  gap: 12px;
 }
 
 .pagination button {
   padding: 6px 12px;
-  border: none;
-  background-color: #1976d2;
-  color: white;
+  background-color: #f1f1f1;
+  border: 1px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
 }
 
 .pagination button:disabled {
-  background-color: #ccc;
+  background-color: #e0e0e0;
   cursor: not-allowed;
 }
+
+.pagination span {
+  font-weight: bold;
+}
+
+.top-menu {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+
 </style>

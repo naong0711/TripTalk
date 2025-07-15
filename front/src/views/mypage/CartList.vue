@@ -276,7 +276,7 @@ hr {
 .price {
   font-size: 15px;
   font-weight: 700;
-  color: #c8ad7f;
+  color: #222;
 }
 .delete-btn {
   background: none;
@@ -315,7 +315,7 @@ hr {
 }
 
 .payment-btn {
-  background-color: #c8ad7f;
+  background-color: #292e4c;
   border: none;
   color: white;
   font-size: 18px;
@@ -331,6 +331,6 @@ hr {
 }
 
 .payment-btn:not(:disabled):hover {
-  background-color: #b4975a;
+  background-color: #1d2138;
 }
 </style>

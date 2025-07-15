@@ -95,10 +95,13 @@
 <!-- 챗봇 모달 -->
 <ChatBotModal v-if="showChat" :close="() => showChat = false" />
 
-<!-- 고정형 둥근 버튼 -->
-<button class="fixed-chat-button" @click="showChat = true">
-  💬
-</button>
+<!-- 챗봇 안내 문구 + 버튼 -->
+<div class="fixed-chat-wrapper">
+  <div class="chat-hint-text">어디로 떠날지 고민될 땐?</div>
+  <button class="fixed-chat-button" @click="showChat = true">
+    <img src="@/assets/chatBotBtn.png" />
+  </button>
+</div>
 </template>
 
 <script setup>
@@ -151,13 +154,13 @@ const images = [
 ]
 
 const backgrounds = [
-  'linear-gradient(135deg, #6DD5FA, #4A9FF4)',
+  'linear-gradient(135deg, #6dd5fa, #4a9ff4)',
   'linear-gradient(135deg, #FFDD95, #FBB464)',
-  'linear-gradient(135deg, #28C76F, #83FCBF)',
-  'linear-gradient(135deg, #FFB6B9, #FF9AA2)',
-  'linear-gradient(135deg, #C3F2E3, #B5EAD7)',
-  'linear-gradient(135deg, #A0A8F5, #C7CEEA)',
-  'linear-gradient(135deg, #F9BFAE, #FFDAC1)'
+  'linear-gradient(135deg, #ffc9cc, #FF9AA2)',
+  'linear-gradient(135deg, #b8ffc3, #4ddd66)',
+  'linear-gradient(135deg, #C3F2E3, #6ce1bc)',
+  'linear-gradient(135deg, #e2e7ff, #A0A8F5)',
+  'linear-gradient(135deg, #FFDAC1, #ff9d81)'
 ]
 
 const backgroundTexts = ['Busan', 'Daejeon', 'Seoul', 'Jeju', 'Gyeongju', 'Gangneung', 'Jeonju']
@@ -283,9 +286,9 @@ onMounted(async () => {
 
 .text-overlay {
   position: absolute;
-  top: 40px;
-  left: 8%;
-  font-size: 6rem;
+  top: 100px;
+  left: 8.5%;
+  font-size: 6.5rem;
   font-weight: 900;
   color: rgba(0, 0, 0, 0.4);
   user-select: none;
@@ -301,6 +304,7 @@ onMounted(async () => {
   margin-top: 8px;
   pointer-events: none;
   user-select: none;
+  word-break: keep-all; /* ✅ 단어 단위로 줄바꿈 */
   max-width: 400px;
 }
 
@@ -310,9 +314,18 @@ onMounted(async () => {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   overflow: visible;
   position: relative;
-  margin-left: 1000px;
+  margin-left: 960px;
   margin-top: auto;
   z-index: 1;
+}
+
+::v-deep .swiper-pagination-bullet {
+  background-color: #a0a8b8  !important;
+  opacity: 1;
+}
+
+::v-deep .swiper-pagination-bullet-active {
+  background-color: #2c3e50 !important;
 }
 
 .slide-image {
@@ -354,20 +367,20 @@ onMounted(async () => {
 }
 
 .package-form-wrapper {
-  position: absolute;
-  top: 400px;
+position: absolute;
+  top: 420px;         /* 약간 아래로 */
   left: 8%;
-  max-width: 600px;
-  width: 45%;
-  background: rgba(255, 255, 255, 0.9);
-  padding: 18px 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  max-width: 650px;   /* 최대 너비 증가 */
+  width: 50%;
+  background: rgba(255, 255, 255, 0.95); /* 조금 더 불투명 */
+  padding: 24px 30px; /* 패딩 살짝 증가 */
+  border-radius: 14px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
   z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr); /* 5칸 균등 분할 */
+  gap: 16px 20px; /* 세로 16px, 가로 20px 간격 */
+  align-items: end;
 }
 
 .package-form-wrapper form {
@@ -376,6 +389,7 @@ onMounted(async () => {
   flex-wrap: wrap;
   width: 100%;
   align-items: center;
+  display: contents;
 }
 
 .form-group {
@@ -406,6 +420,7 @@ onMounted(async () => {
 .form-group input[type='date']:focus,
 .form-group input[type='number']:focus {
   border-color: #4A90E2;
+  box-shadow: 0 0 6px rgba(74, 144, 226, 0.5);
 }
 
 /* form-row: 종료날짜, 인원수, 버튼 가로 배치 */
@@ -424,9 +439,9 @@ onMounted(async () => {
 
 /* 조회 버튼 작게 */
 .search-btn.small-btn {
-  padding: 8px 12px;
+  padding: 8px 20px;
   font-size: 0.9rem;
-  background-color: #4A90E2;
+  background-color: #292e4c;
   color: white;
   border: none;
   border-radius: 6px;
@@ -441,7 +456,7 @@ onMounted(async () => {
 }
 
 .search-btn.small-btn:hover {
-  background-color: #357ABD;
+  background-color: #39405e;
 }
 
 .recommended-section {
@@ -510,7 +525,7 @@ onMounted(async () => {
   right: 30px;
   width: 60px;
   height: 60px;
-  background-color: #3e8ed0;
+  background-color: #292e4c;
   color: white;
   border: none;
   border-radius: 50%;
@@ -519,9 +534,54 @@ onMounted(async () => {
   cursor: pointer;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   z-index: 999;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
+  transform-origin: center center; /* ✅ 기준점 고정 */
 }
+
 .fixed-chat-button:hover {
-  background-color: #357ABD;
+  filter: brightness(1.5);
+  transform: scale(1.08); /* ✅ 살짝 커지게 */
 }
+
+.fixed-chat-button img {
+  width: 45px;
+  padding: 5px 0 0 0;
+}
+
+.fixed-chat-wrapper {
+  position: fixed;
+  bottom: 90px;
+  right: 15px;
+  text-align: center;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chat-hint-text {
+  font-size: 0.75rem;
+  color: #333;
+  background: #fff;
+  padding: 5px 12px;
+  border-radius: 15px; /* ▶ 오른쪽 말풍선 */
+  margin-bottom: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  position: relative;
+  white-space: nowrap;
+}
+
+/* 말풍선 꼬리 - 오른쪽 위 방향 */
+.chat-hint-text::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  right: 12px;
+  width: 0;
+  height: 0;
+  border-top: 6px solid #fff;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+}
+
 </style>

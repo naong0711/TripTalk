@@ -141,14 +141,14 @@ public class FileController {
     // 🔹 특정 owner의 전체 파일 리스트 조회
     @GetMapping
     public ResponseEntity<List<File>> getFiles(
-            @RequestParam String ownerType,
-            @RequestParam Long ownerId) {
+            @RequestParam("ownerType") String ownerType,
+            @RequestParam("ownerId") Long ownerId) {
         return ResponseEntity.ok(fileService.getFilesByOwner(ownerType, ownerId));
     }
 
     // 🔹 파일 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteFile(@PathVariable Long id) {
+    public ResponseEntity<?> deleteFile(@PathVariable("id") Long id) {
         try {
             fileService.deleteFile(id);
             return ResponseEntity.ok(Map.of("message", "삭제 완료"));

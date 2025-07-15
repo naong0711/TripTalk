@@ -1,25 +1,30 @@
   <template>
     <div class="product-page">
-      <!-- ✅ 상단 등록 버튼 -->
-      <div class="header-actions">
-        <button @click="goToRegister" class="go-register">상품 등록</button>
-      </div>
+      
+      <h2>여행 예약</h2>
+            
+      <div class="top-bar">
+        <!-- ✅ 검색 바 -->
+        <div class="search-bar">
+          <div class="search-item">
+            <label>체크인</label>
+            <input type="date" v-model="checkIn" />
+          </div>
+          <div class="search-item">
+            <label>체크아웃</label>
+            <input type="date" v-model="checkOut" />
+          </div>
+          <div class="search-item numeric">
+            <label>인원수</label>
+            <input type="number" v-model.number="adults" min="1" />
+          </div>
+          <button @click="searchProducts">검색</button>
+        </div>
+          <!-- ✅ 상단 등록 버튼 -->
+         <div class="header-actions" v-if="isSeller">
+           <button @click="goToRegister" class="go-register">상품 등록</button>
+         </div>
 
-      <!-- ✅ 검색 바 -->
-      <div class="search-bar">
-        <div class="search-item">
-          <label>체크인</label>
-          <input type="date" v-model="checkIn" />
-        </div>
-        <div class="search-item">
-          <label>체크아웃</label>
-          <input type="date" v-model="checkOut" />
-        </div>
-        <div class="search-item numeric">
-          <label>인원수</label>
-          <input type="number" v-model.number="adults" min="1" />
-        </div>
-        <button @click="searchProducts">검색</button>
       </div>
 
       <!-- ✅ 상품 목록 -->
@@ -58,6 +63,8 @@ import axios from 'axios'
 
 const route = useRoute()
 const router = useRouter()
+
+const isSeller = ref(false)
 
 
 function toValidDate(dateStr) {
@@ -164,7 +171,7 @@ const searchProducts = () => {
 }
 const goToDetail = (id) => {
   router.push({
-    path: `/productDetail/${id}`,
+    path: `/product/${id}`,
     query: {
       checkIn: checkIn.value,
       checkOut: checkOut.value,
@@ -177,14 +184,40 @@ const goToRegister = () => {
   router.push('/productRegister')
 }
 
+const fetchIsSeller = async () => {
+  try {
+      const response = await axios.get('/api/sellers/my-id', {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      })
+
+      if(response.data > 0) {
+        isSeller.value = true
+      }
+      console.log('📦 sellerId:', response.data)
+    } catch (err) {
+      isSeller.value = false
+    }
+}
+
 onMounted(() => {
   fetchSearchProducts()
+  fetchIsSeller()
 })
 
 
 </script>
 
   <style scoped>
+
+  h2 {
+    margin-bottom: 10px;
+    padding-bottom: 20px;
+    padding-top: 5px;
+    border-bottom: 2px solid #333;
+  }
+
   .product-page {
     padding: 24px;
     max-width: 960px;
@@ -217,17 +250,6 @@ onMounted(() => {
   }
   .search-item.numeric input {
     width: 60px;
-  }
-  .search-bar button {
-    padding: 10px 20px;
-    background-color: #4A90E2;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  .search-bar button:hover {
-    background-color: #357ABD;
   }
   .results {
     display: grid;
@@ -280,4 +302,40 @@ onMounted(() => {
 .pagination span {
   font-weight: bold;
 }
+
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.search-item input[type="date" i],
+.search-item input[type='number'] {
+  padding: 8px 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+.search-bar button {
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    background-color: #292e4c;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    height: 38px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+}
+  .search-bar button:hover {
+    background-color: #39405e;
+  }
   </style>

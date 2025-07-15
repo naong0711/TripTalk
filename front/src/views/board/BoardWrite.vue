@@ -205,7 +205,12 @@ input {
 }
 
 .btn.submit {
-  background-color: #2f9bda;
+  background-color: #292e4c;
+  color: white;
+}
+
+.btn.submit:hover {
+  background-color: #292e4c;
   color: white;
 }
 

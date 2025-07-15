@@ -270,15 +270,22 @@ hr {
 .mypage-container {
   max-width: 480px;
   margin: 40px auto;
-  padding: 24px;
+  padding: 32px;
   font-family: 'Noto Sans KR', sans-serif;
   box-sizing: border-box;
+  background-color: #fff;
+  border: 1px solid #e0e4ec;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.06);
 }
 
+
 .top-box {
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  border: 1px solid #e0e4ec;
+  border-radius: 12px;
   background: #faf7f2;
+  padding: 16px;
+  margin-bottom: 40px;
 }
 
 .profile-box {
@@ -293,21 +300,26 @@ hr {
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
-  border: 1px solid #ccc;
+  border: 2px solid #292e4c;
+  box-shadow: 0 0 6px rgba(41, 46, 76, 0.2);
 }
+
 .profile-info {
   flex: 1;
-  max-width: 360px;
+  max-width: 320px;
 }
 
 .nickname {
-  font-size: 20px;
-  font-weight: 700;
-  margin-bottom: 6px;
+  font-size: 22px;
+  font-weight: 800;
+  color: #292e4c;
+  margin-bottom: 8px;
+  cursor: pointer;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .change-btn {
   font-size: 14px;
   color: #c8ad7f;
@@ -315,10 +327,21 @@ hr {
   border: none;
   cursor: pointer;
   text-decoration: underline;
+  padding: 0;
+  transition: color 0.25s ease;
 }
 
 .hidden {
   display: none;
+}
+
+
+.change-btn:hover {
+  color: #a6874f;
+}
+
+.seller-btn-wrapper {
+  margin-left: auto;
 }
 
 .section {
@@ -339,7 +362,7 @@ hr {
   border: none;
   font-size: 22px;
   margin: 0 4px;
-  color: #c8ad7f;
+  color: #292e4c;
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 4px;
@@ -448,7 +471,7 @@ hr {
   justify-content: flex-start;
   gap: 0;
   margin: 0;
-  border: 1px solid #c8ad7f;
+  border: 1px solid #292e4c;
   border-bottom: none;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
@@ -461,9 +484,9 @@ hr {
   padding: 10px 30px;
   font-size: 14px;
   background-color: white;
-  color: #c8ad7f;
+  color: #292e4c;
   border: none;
-  border-right: 1px solid #c8ad7f;
+  border-right: 1px solid #292e4c;
   cursor: pointer;
   transition: 0.2s ease all;
 }
@@ -474,14 +497,14 @@ hr {
 
 .category-buttons button.active,
 .category-buttons button:hover {
-  background-color: #c8ad7f;
+  background-color: #292e4c;
   color: white;
 }
 
 .reservation-category {
   display: flex;
   align-items: flex-end;
-  border-bottom: 2px solid #c8ad7f;
+  border-bottom: 2px solid #292e4c;
   height: 30px;
   margin-bottom: 10px;
 }

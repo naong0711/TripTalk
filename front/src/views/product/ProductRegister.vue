@@ -1,7 +1,11 @@
   <template>
     <div class="product-register-container">
-      <div class="form-wrapper">
-        <h2>신규 상품 등록</h2>
+  <div class="form-wrapper">
+    <h2>여행 상품 등록</h2>
+
+      <!-- 상품 정보 영역 -->
+      <div class="section">
+        <h3 class="section-title">상품 정보</h3>
 
         <div class="form-group">
           <label>제목 *</label>
@@ -13,135 +17,128 @@
           <input type="text" v-model="product.description" />
         </div>
 
-      <div class="form-group">
-        <label>지역 *</label>
-        <select v-model="product.location">
-          <option disabled value="">-- 지역을 선택하세요 --</option>
-          <option>서울</option>
-          <option>부산</option>
-          <option>인천</option>
-          <option>대구</option>
-          <option>광주</option>
-          <option>대전</option>
-          <option>울산</option>
-          <option>세종</option>
-          <option>경기</option>
-          <option>강원</option>
-          <option>충북</option>
-          <option>충남</option>
-          <option>전북</option>
-          <option>전남</option>
-          <option>경북</option>
-          <option>경남</option>
-          <option>제주</option>
-        </select>
-      </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>지역 *</label>
+            <select v-model="product.location">
+              <option disabled value="">-- 지역을 선택하세요 --</option>
+              <option>서울</option>
+              <option>부산</option>
+              <option>인천</option>
+              <option>대구</option>
+              <option>광주</option>
+              <option>대전</option>
+              <option>울산</option>
+              <option>세종</option>
+              <option>경기</option>
+              <option>강원</option>
+              <option>충북</option>
+              <option>충남</option>
+              <option>전북</option>
+              <option>전남</option>
+              <option>경북</option>
+              <option>경남</option>
+              <option>제주</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>가격 *</label>
+            <input type="number" v-model.number="product.price" min="1000" />
+          </div>
+        </div>
 
         <div class="form-group">
           <label>주소 *</label>
           <input type="text" v-model="product.address" />
         </div>
 
-        <div class="form-group">
-          <label>가격 *</label>
-          <input type="number" v-model.number="product.price" min="1000" />
+        <div class="form-row">
+          <div class="form-group">
+            <label>시작일 *</label>
+            <input type="date" v-model="product.startDate" />
+          </div>
+          <div class="form-group">
+            <label>종료일 *</label>
+            <input type="date" v-model="product.endDate" />
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>최소 인원수 *</label>
+            <input type="number" v-model.number="product.minPeople" min="1" />
+          </div>
+          <div class="form-group">
+            <label>최대 인원수 *</label>
+            <input type="number" v-model.number="product.maxPeople" :min="product.minPeople || 1" />
+          </div>
         </div>
 
         <div class="form-group">
-          <label>시작일 *</label>
-          <input type="datetime-local" v-model="product.startDate" />
-        </div>
-
-        <div class="form-group">
-          <label>종료일 *</label>
-          <input type="datetime-local" v-model="product.endDate" />
-        </div>
-
-        <!-- <div class="form-group">
-          <label>판매자 ID *</label>
-          <input type="number" v-model.number="product.sellerId" />
-        </div> -->
-
-        <div class="form-group">
-          <label>최소 인원수 *</label>
-          <input type="number" v-model.number="product.minPeople" min="1" />
-        </div>
-
-        <div class="form-group">
-          <label>최대 인원수 *</label>
-          <input type="number" v-model.number="product.maxPeople" :min="product.minPeople || 1" />
-        </div>
-
-        <div class="form-group">
-
           <input type="hidden" v-model.number="product.categoryId" />
         </div>
+      </div>
 
-        <!-- <div class="form-group">
-          <label>할인 타입</label>
-          <select v-model="product.discount.discountType">
-            <option value="RATE">비율 할인 (RATE)</option>
-            <option value="AMOUNT">금액 할인 (AMOUNT)</option>
-          </select>
-        </div> -->
+      <!-- 할인 정보 영역 -->
+      <div class="section">
+        <h3 class="section-title">할인 정보</h3>
 
-        <div class="form-group">
-          <label>할인 이름</label>
-          <input type="text" v-model="product.discount.name" />
-        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>할인 이름</label>
+            <input type="text" v-model="product.discount.name" />
+          </div>
 
-        <div class="form-group">
-          <label>할인율</label>
-          <input type="number" v-model.number="product.discount.discountRate" min="0" max="100" />
-        </div>
-
-        <div class="form-group">
-          <label>할인 시작일</label>
-          <input type="datetime-local" v-model="product.discount.startAt" />
-        </div>
-
-        <div class="form-group">
-          <label>할인 종료일</label>
-          <input type="datetime-local" v-model="product.discount.endAt" />
-        </div>
-
-        <!-- <div class="form-group">
-          <label>대표 이미지 (썸네일) *</label>
-          <input type="file" @change="onThumbnailSelected" accept="image/*" />
-          <div v-if="thumbnailPreview" class="image-preview">
-            <img :src="thumbnailPreview" alt="썸네일 미리보기" />
+          <div class="form-group">
+            <label>할인율</label>
+            <input type="number" v-model.number="product.discount.discountRate" min="0" max="100" />
           </div>
         </div>
 
+        <div class="form-row">
+          <div class="form-group">
+            <label>할인 시작일</label>
+            <input type="date" v-model="product.discount.startAt" />
+          </div>
+
+          <div class="form-group">
+            <label>할인 종료일</label>
+            <input type="date" v-model="product.discount.endAt" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 이미지 업로드 영역 -->
+      <div class="section">
+        <h3 class="section-title">이미지 업로드</h3>
+        <div class="form-row">
+          <div class="form-group">
+            <label>대표 이미지 *</label>
+            <input type="file" accept="image/*" @change="onThumbnailChange" />
+            <div v-if="thumbnailPreview" class="image-preview">
+              <img :src="thumbnailPreview" alt="썸네일" />
+            </div>
+          </div>
 
         <div class="form-group">
-          <label>추가 이미지 (선택)</label>
-          <input type="file" multiple @change="onAdditionalImagesSelected" accept="image/*" />
-          <div class="image-preview-list">
+          <label>추가 이미지</label>
+          <input type="file" multiple accept="image/*" @change="onAdditionalChange" />
+          <div class="additional-preview-list">
             <img v-for="(img, idx) in additionalPreviews" :key="idx" :src="img" />
           </div>
-        </div> -->
-
-          <div>
-      <label>대표 이미지 *</label>
-      <input type="file" accept="image/*" @change="onThumbnailChange" />
-      <div v-if="thumbnailPreview">
-        <img :src="thumbnailPreview" alt="썸네일" />
-      </div>
-
-      <!-- <label>추가 이미지</label>
-      <input type="file" multiple accept="image/*" @change="onAdditionalChange" />
-      <div class="additional-preview-list">
-        <img v-for="(img, idx) in additionalPreviews" :key="idx" :src="img" />
-      </div> -->
-    </div>
-
-        <div class="button-group">
-          <button class="submit-btn" @click="submitProduct">등록하기</button>
-          <button class="cancel-btn" @click="cancel">취소</button>
         </div>
       </div>
     </div>
+
+    <!-- 버튼 -->
+    <div class="button-group">
+      <button class="submit-btn" @click="submitProduct">등록하기</button>
+      <button class="cancel-btn" @click="cancel">취소</button>
+    </div>
+  </div>
+  </div>
+
   </template>
 
   <script setup>
@@ -172,7 +169,7 @@
     startDate: '',
     endDate: '',
     sellerId: null,
-    categoryId: 1,
+    categoryId: null,
     minPeople: null,
     maxPeople: null,  
     discount: {
@@ -298,192 +295,180 @@ const submitProduct = async () => {
   </script>
 
   <style scoped>
-  /* 기존 스타일 유지 */
-  .product-register-container {
-    display: flex;
-    justify-content: center;
-    padding: 40px 20px;
-    background-color: #f8f9fa;
-  }
-  .form-wrapper {
-    width: 100%;
-    max-width: 700px;
-    background: white;
-    padding: 32px;
-    border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.08);
-  }
-  h2 {
-    font-size: 24px;
-    margin-bottom: 24px;
-    text-align: center;
-  }
-  .form-group {
-    margin-bottom: 16px;
-    display: flex;
-    flex-direction: column;
-  }
-  label {
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  input[type="text"],
-  input[type="number"],
-  input[type="datetime-local"],
-  textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-  textarea {
-    resize: vertical;
-  }
-  .image-preview img {
-    max-width: 100%;
-    max-height: 160px;
-    margin-top: 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    object-fit: cover;
-  }
-  .image-preview-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .image-preview-list img {
-    width: 80px;
-    height: 80px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    object-fit: cover;
-  }
-  .button-group {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 24px;
-  }
-  .submit-btn,
-  .cancel-btn {
-    flex: 1;
-    padding: 12px 20px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  .submit-btn {
-    background-color: #00c73c;
-    color: white;
-    margin-right: 12px;
-  }
-  .cancel-btn {
-    background-color: #e0e0e0;
-  }
-  </style>
+/* 상품 등록 전체 컨테이너 */
+.product-register-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px;
+  background-color: #f8f9fa;
+}
 
-  <style scoped>
-  /* 스타일은 기존 그대로 유지 */
-  .product-register-container {
-    display: flex;
-    justify-content: center;
-    padding: 40px 20px;
-    background-color: #f8f9fa;
-  }
-  .form-wrapper {
-    width: 100%;
-    max-width: 700px;
-    background: white;
-    padding: 32px;
-    border-radius: 12px;
-    box-shadow: 0 0 12px rgba(0,0,0,0.08);
-  }
-  h2 {
-    font-size: 24px;
-    margin-bottom: 24px;
-    text-align: center;
-  }
-  .form-group {
-    margin-bottom: 16px;
-    display: flex;
-    flex-direction: column;
-  }
-  .form-group-row {
-    display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
-  }
-  .form-group.half {
-    flex: 1;
-  }
-  label {
-    font-weight: 600;
-    margin-bottom: 6px;
-  }
-  input[type="text"],
-  input[type="number"],
-  input[type="datetime-local"],
-  textarea {
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-  }
-  textarea {
-    resize: vertical;
-  }
-  .image-preview img {
-    max-width: 100%;
-    max-height: 160px;
-    margin-top: 10px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    object-fit: cover;
-  }
-  .image-preview-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 10px;
-  }
-  .image-preview-list img {
-    width: 80px;
-    height: 80px;
-    border-radius: 6px;
-    border: 1px solid #ddd;
-    object-fit: cover;
-  }
-  .button-group {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 24px;
-  }
-  .submit-btn,
-  .cancel-btn {
-    flex: 1;
-    padding: 12px 20px;
-    font-size: 16px;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s ease;
-  }
-  .submit-btn {
-    background-color: #00c73c;
-    color: white;
-    margin-right: 12px;
-  }
-  .cancel-btn {
-    background-color: #e0e0e0;
-  }
+/* 폼 박스 */
+.form-wrapper {
+  width: 100%;
+  max-width: 720px;
+  background: #ffffff;
+  padding: 36px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  font-family: 'Noto Sans KR', sans-serif;
+}
 
-select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
+/* 제목 */
+h2 {
+  font-size: 24px;
+  margin-bottom: 28px;
+  text-align: center;
+  font-weight: 700;
+  color: #2c2c2c;
+}
+
+/* 각 폼 필드 그룹 */
+.form-group {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 라벨 스타일 */
+label {
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #444;
+}
+
+/* 입력창 공통 스타일 */
+input[type="text"],
+input[type="number"],
+input[type="date"],
+input[type="file"],
+select,
+textarea {
+  padding: 10px 12px;
   font-size: 14px;
+  border: 1.5px solid #bbb;
+  border-radius: 6px;
+  transition: border-color 0.3s ease;
+  background-color: #fff;
+}
+
+/* 포커스 효과 */
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: #00c73c;
+  outline: none;
+}
+
+/* 텍스트에어리어 */
+textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* 이미지 미리보기 */
+.image-preview img,
+.additional-preview-list img {
+  max-width: 100%;
+  max-height: 160px;
+  border-radius: 8px;
+  object-fit: cover;
+  margin-top: 10px;
+  border: 1px solid #ddd;
+  padding: 4px;
+  background-color: #fff;
+}
+
+/* 추가 이미지 미리보기 리스트 */
+.additional-preview-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+/* 버튼 그룹 */
+.button-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 32px;
+}
+
+/* 제출 버튼 */
+.submit-btn,
+.cancel-btn {
+  flex: 1;
+  padding: 12px 0;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+/* 등록 버튼 */
+.submit-btn {
+  background-color: #292e4c;
+  color: white;
+}
+
+.submit-btn:hover {
+  background-color: #1d2138;
+}
+
+/* 취소 버튼 */
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #cfcfcf;
+}
+
+/* 셀렉트 드롭다운 커스텀 */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg fill='%23666' height='20' viewBox='0 0 24 24' width='20' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+  background-color: #fff;
+}
+
+/* 파일 인풋 여백 제거 */
+input[type="file"] {
+  padding: 6px 0;
+}
+
+.section {
+  border: 1px solid #e0e0e0;
+  padding: 24px;
+  margin-bottom: 32px;
+  border-radius: 8px;
+  background-color: #fafafa;
+}
+
+/* 섹션 제목 */
+.section-title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  color: #333;
+  border-left: 4px solid #292e4c;
+  padding-left: 12px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+}
+
+/* form-group이 form-row 안에 있을 때 너비 조정 */
+.form-row .form-group {
+  flex: 1;
 }
   </style>

@@ -89,7 +89,7 @@ public class ProductController {
     // ✅ 상품 수정
     @PutMapping("/{id}")
     public ResponseEntity<ProductResponseDTO> updateProduct(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @RequestBody ProductRequestDTO requestDTO) {
         Product updated = productService.update(id, requestDTO);
         return ResponseEntity.ok(ProductResponseDTO.from(updated));

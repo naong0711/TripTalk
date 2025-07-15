@@ -269,45 +269,50 @@ async function goNext() {
 
 <style scoped>
 .register-info {
-  max-width: 480px;
-  margin: 40px auto;
-  padding: 24px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  max-width: 520px;
+  margin: 48px auto;
+  padding: 32px;
+  background-color: #ffffff;
+  border: 1px solid #e0e4ec;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   font-family: 'Noto Sans KR', sans-serif;
 }
 
 .stepper {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 36px;
 }
 
 .step {
   flex: 1;
   text-align: center;
   font-weight: 600;
-  color: #999;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #ddd;
-  user-select: none;
+  color: #c0c0c0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #e0e0e0;
+  font-size: 15px;
+  transition: color 0.3s, border-color 0.3s;
 }
 
 .step.active {
-  color: #c8ad7f;
-  border-color: #c8ad7f;
+  color: #292e4c;
+  border-color: #292e4c;
 }
 
 h2 {
   text-align: center;
+  font-size: 22px;
   margin-bottom: 24px;
+  color: #2c2c2c;
 }
 
 fieldset {
   border: 1px solid #eee;
-  padding: 16px;
-  margin-bottom: 20px;
-  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 24px;
+  border-radius: 8px;
 }
 
 legend {
@@ -371,7 +376,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .check-btn {
-  background-color: #c8ad7f;
+  background-color: #292e4c;
   border: none;
   border-radius: 4px;
   padding: 0 12px;
@@ -382,7 +387,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .check-btn:hover {
-  background-color: #b79965;
+  background-color: #1f243a;
 }
 
 .error-msg {
@@ -403,9 +408,9 @@ input[type='date']::-webkit-calendar-picker-indicator {
   margin-top: 24px;
   width: 100%;
   padding: 14px 0;
-  background-color: #c8ad7f;
+  background-color: #292e4c;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   color: white;
   font-weight: 700;
   font-size: 16px;
@@ -414,7 +419,7 @@ input[type='date']::-webkit-calendar-picker-indicator {
 }
 
 .next-btn:hover {
-  background-color: #b79965;
+  background-color: #1f243a;
 }
 
 .hint {

@@ -34,37 +34,37 @@
     </div>
 
     <div class="form-group">
-    <label>이메일</label>
-    <div class="email-group">
+      <label>이메일</label>
+      <div class="email-group">
         <input v-model.trim="form.emailId" type="text" placeholder="이메일 아이디" />
         <span class="at-symbol">@</span>
         <select v-model="form.emailDomain" required>
-        <option value="">선택</option>
-        <option value="gmail.com">gmail.com</option>
-        <option value="naver.com">naver.com</option>
-        <option value="daum.net">daum.net</option>
-        <option value="kakao.com">kakao.com</option>
-        <option value="direct">직접 입력</option>
+          <option value="">선택</option>
+          <option value="gmail.com">gmail.com</option>
+          <option value="naver.com">naver.com</option>
+          <option value="daum.net">daum.net</option>
+          <option value="kakao.com">kakao.com</option>
+          <option value="direct">직접 입력</option>
         </select>
-    </div>
+      </div>
 
-    <div v-if="form.emailDomain === 'direct'" style="margin-top: 8px">
+      <div v-if="form.emailDomain === 'direct'" style="margin-top: 8px">
         <input v-model.trim="form.customEmailDomain" type="text" placeholder="도메인을 입력하세요 (예: example.com)" />
-    </div>
+      </div>
 
-    <div v-if="isEmailChanged" class="email-verify">
+      <div v-if="isEmailChanged" class="email-verify">
         <template v-if="emailVerified">
-            <span style="color: green; font-weight: 600;">✔ 이메일 인증이 완료되었습니다.</span>
+          <span style="color: green; font-weight: 600;">✔ 이메일 인증이 완료되었습니다.</span>
         </template>
         <template v-else>
-            <span class="pw-msg">이메일 변경됨 — 인증 필요</span>
-            <button class="link-btn" @click="verifyEmail">인증 요청</button>
+          <span class="pw-msg">이메일 변경됨 — 인증 필요</span>
+          <button class="link-btn" @click="verifyEmail">인증 요청</button>
         </template>
-    </div>
+      </div>
 
-    <div v-if="isEmailChanged && !emailVerified" class="pw-msg">
-    ⚠ 이메일 인증이 완료되지 않았습니다.
-    </div>
+      <div v-if="isEmailChanged && !emailVerified" class="pw-msg">
+        ⚠ 이메일 인증이 완료되지 않았습니다.
+      </div>
     </div>
 
     <div class="form-group">
@@ -294,32 +294,34 @@ function goBack() {
 <style scoped>
 .profile-detail {
   max-width: 480px;
-  margin: 50px auto;
-  padding: 30px 32px;
-  border-radius: 16px;
-  background: #fafafa;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  color: #333;
+  margin: 40px auto;
+  padding: 32px 36px;
+  border-radius: 12px;
+  background-color: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #444;
+  user-select: none;
 }
 
 h2 {
   font-weight: 700;
-  font-size: 1.8rem;
-  margin-bottom: 28px;
+  font-size: 30px;
+  color: #3a3a3a;
+  margin-bottom: 36px;
   text-align: center;
-  color: #5a4e3a;
+  letter-spacing: 0.02em;
 }
 
 .form-group {
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 label {
   font-weight: 600;
   display: block;
   margin-bottom: 8px;
-  color: #6b5e3a;
+  color: #292e4c;
   letter-spacing: 0.02em;
 }
 
@@ -330,16 +332,16 @@ select {
   font-size: 15px;
   border: 1.8px solid #ccc;
   border-radius: 8px;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
   background-color: #fff;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
   box-sizing: border-box;
 }
 
 input:focus,
 select:focus {
   outline: none;
-  border-color: #a88a5e;
-  box-shadow: 0 0 6px rgba(168, 138, 94, 0.5);
+  border-color: #5a4e3a;
+  box-shadow: 0 0 6px rgba(90, 78, 58, 0.3);
   background-color: #fffef6;
 }
 
@@ -351,7 +353,7 @@ select:focus {
 
 .at-symbol {
   font-size: 20px;
-  color: #a88a5e;
+  color: #5a4e3a;
   font-weight: 700;
 }
 
@@ -370,82 +372,71 @@ select:focus {
 }
 
 .input-with-btn input[type="text"] {
-  flex: 1 1 140px;  /* 최소 너비 140px 이상, 가능하면 넓게 */
+  flex: 1 1 140px;
   min-width: 140px;
   padding: 12px 14px;
   font-size: 15px;
   border: 1.8px solid #ccc;
-  border-radius: 8px 0 0 8px; /* 왼쪽만 둥글게 */
+  border-radius: 8px 0 0 8px;
   background-color: #fff;
-  box-sizing: border-box;
-}
-
-
-@media (max-width: 520px) {
-  .profile-detail {
-    margin: 20px 15px;
-    padding: 24px 20px;
-  }
-
-  button,
-  .check-btn {
-    padding: 12px 0;
-  }
 }
 
 .check-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12px 16px; /* 상하 여백을 키움 */
-  min-width: 110px;    /* 최소 너비를 지정 */
-  height: 46px;        /* input 높이와 맞춤 */
-  background: #c8ad7f;
+  padding: 12px 16px;
+  min-width: 110px;
+  height: 46px;
+  background: #292e4c;
   border: none;
-  border-radius: 0 8px 8px 0; /* 오른쪽만 둥글게 */
+  border-radius: 0 8px 8px 0;
   color: white;
   font-weight: 700;
   cursor: pointer;
   font-size: 15px;
-  gap: 6px;
 }
 
 .button-group {
   display: flex;
-  gap: 12px;
+  gap: 18px;
   margin-top: 24px;
+  justify-content: center;
 }
 
-/* 저장 버튼 */
+.cancel-btn,
 .save-btn {
   flex: 1;
   padding: 14px 0;
-  font-size: 17px;
-  background:#c8ad7f;
-  color: white;
-  border: none;
-  border-radius: 12px;
+  font-size: 18px;
   font-weight: 700;
+  border-radius: 8px;
+  border: none;
   cursor: pointer;
+  transition: background-color 0.25s ease;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
 .cancel-btn {
-  flex: 1;
-  padding: 14px 0;
-  font-size: 17px;
-  background: #888;
-  color: white;
-  border: none;
-  border-radius: 12px;
-  font-weight: 700;
-  cursor: pointer;
+  background-color: #f2f1ee;
+  color: #555;
 }
 
-.email-verify {
-  margin-top: 8px;
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.cancel-btn:hover {
+  background-color: #d3cfc2;
+  color: #222;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.save-btn {
+  background-color: #292e4c;
+  color: #fff;
+}
+
+.save-btn:hover {
+  background-color: #1d2138;
+  box-shadow: 0 4px 10px rgba(168,141,77,0.6);
 }
 
 .link-btn {
@@ -461,5 +452,28 @@ select:focus {
 
 .link-btn:hover {
   color: #004b8a;
+}
+
+.email-verify {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+@media (max-width: 520px) {
+  .profile-detail {
+    margin: 20px 15px;
+    padding: 24px 20px;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .cancel-btn,
+  .save-btn {
+    padding: 12px 0;
+  }
 }
 </style>

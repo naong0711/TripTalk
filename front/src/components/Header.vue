@@ -5,40 +5,40 @@
       <img src="@/assets/logo.png" alt="TripTalk 로고" class="logo-img" @click="goHome" />
     </div>
 
-
-    <!-- ✅ 검색창 추가
-    <div class="search-box">
-      <input type="text" v-model="searchQuery" placeholder="여행지를 검색해보세요" class="search-input" />
-      <button class="search-button">검색</button>
-    </div> -->
-
-
     <!-- 햄버거 버튼 (마우스 호버용) -->
     <div class="burger-wrapper">
       <button class="burger">☰</button>
 
       <!-- 버튼 / 네비게이션 영역 -->
       <nav class="nav-buttons">
-          <router-link to="/boardlist" class="nav-btn">여행 게시판</router-link>
-        <template v-if="!isLoggedIn">
-          <router-link to="/register/agree" class="nav-btn">회원가입</router-link>
-          <router-link to="/loginForm" class="nav-btn">로그인</router-link>
-        </template>
-        <template v-else>
-        <!-- 채팅 아이콘 -->
-          <div class="chat-icon-wrapper">
-            <button class="chat-btn" @click="isChatOpen = true">💬</button>
-            <span v-if="hasUnreadMessages" class="red-dot"></span>
-          </div>
-          <!-- 채팅 모달 -->
-          <ChatModal v-if="isChatOpen" @close="isChatOpen = false">
-            <ChatList @selectRoom="goToChatRoom" />
-          </ChatModal>
-          <button class="nav-btn" @click="logout">로그아웃</button>
-          <router-link to="/MyPage" class="nav-btn">마이페이지</router-link>
-        </template>
+        <!-- 여행 섹션 -->
+        <div class="nav-section nav-primary">
+          <router-link to="/productList" class="nav-btn">여행 예약</router-link>
+          <router-link to="/boardlist" class="nav-btn">여행 후기</router-link>
+        </div>
+
+        <!-- 🔴 사용자 섹션 -->
+        <div class="nav-section nav-user">
+          <template v-if="!isLoggedIn">
+            <router-link to="/register/agree" class="nav-btn register">회원가입</router-link>
+            <router-link to="/loginForm" class="nav-btn login">로그인</router-link>
+          </template>
+          <template v-else>
+            <!-- 채팅 아이콘 -->
+            <div class="chat-icon-wrapper">
+              <button class="chat-btn" @click="isChatOpen = true"><img src="@/assets/myPageBtn/chatBtn.png"></button>
+              <span v-if="hasUnreadMessages" class="red-dot"></span>
+            </div>
+            <ChatModal v-if="isChatOpen" @close="isChatOpen = false">
+              <ChatList @selectRoom="goToChatRoom" />
+            </ChatModal>
+            <button class="nav-btn" @click="logout">로그아웃</button>
+            <router-link to="/MyPage" class="nav-btn">마이페이지</router-link>
+          </template>
+        </div>
       </nav>
     </div>
+    <hr />
   </header>
 </template>
 
@@ -59,7 +59,6 @@ const isChatOpen = ref(false)
 const hasUnreadMessages = ref(false) // ✅ 읽지 않은 메시지 여부 상태
 let isCheckingUnread = false
 let unreadCheckInterval = null // ✅ interval 핸들 저장
-
 
 function goToChatRoom(roomId) {
   router.push(`/chat/room/${roomId}`)
@@ -103,9 +102,6 @@ async function checkUnreadMessages() {
     isCheckingUnread = false
   }
 }
-
-
-
 
 function checkLoginStatus() {
   isLoggedIn.value = !!localStorage.getItem('accessToken')
@@ -154,11 +150,10 @@ function logout() {
 }
 </script>
 
-
 <style scoped>
 .header {
   width: 100%;
-  height: 100px;
+  height: 80px;
   background-color: #f6f2ec;
   display: flex;
   align-items: center;
@@ -166,7 +161,7 @@ function logout() {
   padding: 0 5vw;
   box-sizing: border-box;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  border-bottom: 2px solid black; /* ✅ 검은 하단 선 추가 */
+  border-bottom: 2px solid black; /* 검은 하단 선 추가 */
   position: relative;
 }
 
@@ -181,47 +176,6 @@ function logout() {
   object-fit: contain;
   cursor: pointer;
 }
-
-.search-box {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  max-width: 600px;
-  margin-left: 10px;
-  margin-right: 250px; /* ✅ 오른쪽 마진 추가해서 왼쪽으로 이동 */
-}
-
-.search-input {
-  width: 400px;          /* 원하는 가로 크기 고정 */
-  height: 40px;          /* 원하는 높이 고정 */
-  padding: 12px 23px;    /* placeholder와 텍스트 좌우 패딩 조절 */
-  border: 2px solid #4a90e2;
-  border-radius: 8px;
-  outline: none;
-  font-size: 15px;
-  color: #333;
-  box-sizing: border-box; /* 패딩 포함해서 크기 계산 */
-}
-
-.search-input::placeholder {
-  color: #aaa;
-}
-
-.search-button {
-  padding: 10px 25px;
-  background-color: #4a90e2;
-  color: white;
-  font-weight: bold;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.search-button:hover {
-  background-color: #357abd;
-}
-
 
 .burger-wrapper {
   position: relative;
@@ -241,11 +195,26 @@ function logout() {
 
 .nav-buttons {
   display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: flex-end;
   align-items: center;
-  flex: 1 1 300px;
+  gap: 30px;
+}
+
+.nav-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-primary {
+  border-right: 1px solid #ccc;
+  padding-right: 20px;
+  margin-right: 20px;
+}
+
+.nav-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .nav-btn {
@@ -257,17 +226,72 @@ function logout() {
   border: none;
   border-radius: 6px;
   background-color: transparent;
-  transition: background 0.3s, color 0.3s;
+  transition: all 0.2s ease;
+  cursor: pointer;
 }
 
-.nav-btn:hover {
+.nav-btn:not(.chat-btn):hover {
+  background-color: transparent;
+  color: #2c3e50;
+  text-decoration: underline;
+  font-size: 17px;
+}
+
+.nav-user .nav-btn.register {
+  font-weight: bold;
+  font-size: 15px;
+  padding: 6px 10px;
+  background-color: transparent;
+  border: none;
+  color: #2c3e50;
+  cursor: pointer;
+}
+
+/* 로그인 버튼 (버튼처럼 스타일링) */
+.nav-user .nav-btn.login {
+  font-size: 14px;
+  padding: 6px 12px;
+  border: 1px solid #2c3e50;
+  border-radius: 16px;
+  background-color: transparent;
+  color: #2c3e50;
+  transition: all 0.2s ease;
+}
+
+/* 로그인 호버 효과 */
+.nav-user .nav-btn.login:hover {
   background-color: #2c3e50;
-  color: #ffffff;
+  color: white;
+  text-decoration: none;
+  transform: scale(1.05);
 }
 
 .chat-btn {
-  background-color: #f6f2ec;
+  background: none;
   border: none;
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+  padding: 6px;
+}
+
+.chat-btn:hover {
+  background-color: transparent;
+  color: inherit;
+}
+.chat-icon-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.red-dot {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
 }
 
 @media (max-width: 768px) {
@@ -305,18 +329,9 @@ function logout() {
   }
 }
 
-.chat-icon-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.red-dot {
-  position: absolute;
-  top: 0;
-  right: -3px;
-  width: 7px;
-  height: 7px;
-  background-color: red;
-  border-radius: 50%;
+.chat-btn img {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
 }
 </style>

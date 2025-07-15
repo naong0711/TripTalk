@@ -1,14 +1,40 @@
 <template>
   <div class="product-detail">
-    <div class="image-section">
-      <img :src="imageUrl" alt="상품 이미지" />
+
+    <div class="left-menu">
+      <!-- 1. 이미지 -->
+      <div class="image-section">
+        <img :src="imageUrl" alt="상품 이미지" />
+      </div>
+
+      <!-- 2. 상품 설명 (이미지 아래로 내려옴) -->
+      <div class="description-box">
+        <h2>{{ product.title }}</h2>
+        <p class="description">{{ product.description }}</p>
+        <p><strong>주소:</strong> {{ product.address }}</p>
+        <p><strong>지역:</strong> {{ product.location }}</p>
+        <p><strong>시작일:</strong> {{ formatDate(product.startDate) }}</p>
+        <p><strong>종료일:</strong> {{ formatDate(product.endDate) }}</p>
+        <p><strong>인원수:</strong> {{ product.minPeople }}명 ~ {{ product.maxPeople }}명</p>
+
+        <div v-if="product.discount" class="discount-info">
+          <h3>할인 정보</h3>
+          <p><strong>{{ product.discount.name }} : </strong> {{ (product.discount.discountRate * 100).toFixed(1) }}%</p>
+          <p><strong>할인 기간 : </strong> {{ formatDate(product.discount.startAt) }} ~  {{ formatDate(product.discount.endAt) }}</p>
+        </div>
+        <div v-else="product.discount" class="discount-info">
+          <h3>할인 정보</h3>
+          <p><strong>-</strong></p>
+        </div>
+      </div>
+
+
     </div>
 
-    <div class="info-section">
-      <h2>{{ product.title }}</h2>
-      <p class="description">{{ product.description }}</p>
-      <p><strong>주소:</strong> {{ product.address }}</p>
-      <p><strong>지역:</strong> {{ product.location }}</p>
+    <!-- 3. 예약하기 (기존 info-section 자리에 위치) -->
+    <div class="booking-box">
+      <h3>예약하기</h3>
+
       <div class="price-wrap">
         <p class="price">
           <span class="label">가격</span>
@@ -19,21 +45,6 @@
         </p>
       </div>
 
-      <p><strong>시작일:</strong> {{ formatDate(product.startDate) }}</p>
-      <p><strong>종료일:</strong> {{ formatDate(product.endDate) }}</p>
-      <p><strong>인원수:</strong> {{ product.minPeople }}명 ~ {{ product.maxPeople }}명</p>
-      <div v-if="product.discount" class="discount-info">
-        <h3>할인 정보</h3>
-        <p><strong>할인 이름:</strong> {{ product.discount.name }}</p>
-        <p><strong>할인율:</strong> {{ (product.discount.discountRate * 100).toFixed(1) }}%</p>
-        <p><strong>할인 시작일:</strong> {{ formatDate(product.discount.startAt) }}</p>
-        <p><strong>할인 종료일:</strong> {{ formatDate(product.discount.endAt) }}</p>
-      </div>
-    </div>
-
-    <div class="booking-box">
-      <h3>예약하기</h3>
-
       <label for="checkin">체크인</label>
       <input id="checkin" type="date" v-model="checkIn" :min="today" />
 
@@ -41,8 +52,9 @@
       <input id="checkout" type="date" v-model="checkOut" :min="checkIn" />
 
       <label for="adults">인원</label>
-      <input id="adults" type="number" min="1" v-model.number="adults" placeholder="인원 수" />
+      <input id="adults" type="number" min="1" v-model.number="adults" placeholder="인원 수" :max="product.maxPeople" />
 
+      <label for="paymentMethod">결제 방법</label>
       <select id="paymentMethod" v-model="paymentMethod">
         <option disabled value="">-- 결제 방법 선택 --</option>
         <option value="CARD">신용카드</option>
@@ -51,21 +63,48 @@
         <option value="BANK_TRANSFER">무통장입금</option>
       </select>
 
-
       <div class="price-info">
         <p>총 숙박일: <strong>{{ totalNights }}</strong> 박</p>
         <p>총 금액: <strong>{{ totalAmount.toLocaleString() }}원</strong></p>
       </div>
 
       <button @click="reserve">예약하기</button>
+
+    </div>
+
+    <!-- 4. 판매자 정보 (기존 예약하기 박스 자리) -->
+    <div class="seller-box">
+      <h3>판매자 정보</h3>
+      <div class="seller-profile">
+        <img
+          :src="`/api/files/image/user/${product.sellerUserId}`"
+          alt="판매자 프로필"
+          class="seller-profile-img"
+        />
+        <div class="seller-details">
+          <p><strong>이름 :</strong> {{ product.sellerNickname || '-' }}</p>
+          <p><strong>연락처 :</strong> {{ product.sellerPhone || '-' }}</p>
+          <p><strong>이메일 :</strong> {{ product.sellerEmail || '-' }}</p>
+        </div>
+        <button class="btn inquiry" @click="startChat">문의하기</button>
+      </div>
+
     </div>
   </div>
+
+  <ChatModal
+      v-if="isChatOpen"
+      :selectedRoom="selectedRoomInfo"
+      @close="isChatOpen = false"
+    />
 </template>
+
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import axios from 'axios'
+import ChatModal from '@/components/chat/ChatModal.vue'
 
 const route = useRoute()
 const productId = route.params.id
@@ -76,6 +115,8 @@ const checkIn = ref(route.query.checkIn || today)
 const checkOut = ref(route.query.checkOut || '')
 const adults = ref(route.query.adults || 2)
 const paymentMethod = ref('')
+const isChatOpen = ref(false)
+const selectedRoomInfo = ref(null)
 
 const product = ref({
   title: '',
@@ -85,10 +126,14 @@ const product = ref({
   startDate: '',
   endDate: '',
   sellerId: null,
+  sellerUserId: null, // 프로필 이미지용
+  sellerNickname: '',
+  sellerPhone: '',
+  sellerEmail: '',
   categoryId: null,
   discount: null,
   discountedPrice: 0,
-  minPeople: 1,    // 기본값 추가
+  minPeople: 1,
   maxPeople: 1,
 })
 
@@ -116,20 +161,57 @@ const fetchProduct = async () => {
   }
 }
 
+async function startChat() {
+  try {
+    const accessToken = localStorage.getItem('accessToken')
+    const sellerId = product.value.sellerId 
+
+    if(!accessToken) {
+      alert('로그인 후 이용해주세요.')
+      return
+    }
+
+    const res = await axios.get(`/api/chat/room/${sellerId}`, {
+      headers: { Authorization: `Bearer ${accessToken}` }
+    });
+
+    const roomId = res.data
+
+    selectedRoomInfo.value = {
+      roomId,
+      receiverId: sellerId,
+      userRole: 'BUYER',
+      opponentName: product.value.sellerNickname || '판매자'
+    }
+
+    isChatOpen.value = true
+
+  } catch (err) {
+    console.error('채팅방 ID 조회 실패:', err)
+    alert('채팅방을 여는 데 실패했습니다.')
+  }
+}
+
 const formatDate = (dateStr) => {
   if (!dateStr) return '-'
   const d = new Date(dateStr)
   if (isNaN(d)) return dateStr
-  return d.toLocaleString('ko-KR', {
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  const year = d.getFullYear()
+  const month = (d.getMonth() + 1).toString().padStart(2, '0')
+  const day = d.getDate().toString().padStart(2, '0')
+  return `${year}. ${month}. ${day}`
 }
 
 const reserve = async () => {
+
+  
+  const token = localStorage.getItem('accessToken')
+
+  if(!token) {
+    alert('로그인 후 이용해주세요.')
+    return
+  }
+
   if (!checkIn.value || !checkOut.value || !paymentMethod.value) {
     alert('체크인, 체크아웃 날짜와 결제 방법을 모두 선택해주세요.')
     return
@@ -158,7 +240,6 @@ const reserve = async () => {
       status: ''     // 백엔드에서 처리될 값
     }
 
-  const token = localStorage.getItem('accessToken')
    const response = await axios.post('/api/payments/create', paymentRequest,
   {
     headers: {
@@ -185,6 +266,30 @@ onMounted(() => {
 
 
 <style scoped>
+
+.description-box {
+  flex: 1 1 100%;
+  background: #fff;
+  padding: 24px;
+  margin-top: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  line-height: 1.6;
+}
+
+.description-box h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: #222;
+  margin-bottom: 12px;
+}
+
+.description-box p {
+  margin: 8px 0;
+  color: #555;
+  font-size: 16px;
+}
+
 .product-detail {
   max-width: 960px;
   margin: 40px auto;
@@ -196,7 +301,7 @@ onMounted(() => {
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
   display: flex;
   flex-wrap: wrap;
-  gap: 32px;
+  gap: 15px;
 }
 
 .image-section {
@@ -283,10 +388,12 @@ onMounted(() => {
 }
 
 .booking-box h3 {
-  margin-bottom: 16px;
+  margin-bottom: 5px;
   font-size: 22px;
   font-weight: 700;
-  color: #222;
+  color: #292e4c;
+  padding-bottom: 10px;
+  border-bottom: #eee solid 1px;
   text-align: center;
 }
 
@@ -325,7 +432,7 @@ button {
   padding: 14px 20px;
   font-size: 18px;
   font-weight: 700;
-  background-color: #2a9d8f;
+  background-color: #292e4c;
   color: white;
   border: none;
   border-radius: 10px;
@@ -334,6 +441,60 @@ button {
 }
 
 button:hover {
-  background-color: #21867a;
+  background-color: #1d2138;
 }
+
+.seller-box {
+  flex: 1 1 320px;
+  background: #fff;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  font-size: 1rem;
+}
+
+.seller-box h3 {
+  margin-bottom: 16px;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+  text-align: center;
+}
+
+.seller-profile {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.seller-profile-img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1.5px solid #ccc;
+}
+
+.seller-details p {
+  margin: 0.3rem 0;
+  color: #444;
+  font-size: 15px;
+}
+
+.btn.inquiry {
+  flex: none;              /* 버튼이 고정 크기 유지하도록 */
+  margin-left: 480px;
+  padding: 0.4rem 1rem;    /* 작고 여유 있는 패딩 */
+  font-weight: 600;
+  font-size: 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  border: 1.5px solid #888; /* 연한 회색 테두리 */
+  background-color: transparent;
+  color: #444;
+  user-select: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
 </style>

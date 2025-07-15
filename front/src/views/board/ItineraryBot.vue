@@ -1,7 +1,6 @@
 <template>
   <div class="chat-container">
     <div class="chat-header">
-      <h2>여행 챗봇</h2>
     </div>
     
     <div class="chat-messages" ref="chatMessagesRef">
@@ -10,6 +9,10 @@
         :key="index"
         :class="['message', msg.role]"
       >
+        <div v-if="msg.role === 'model'" class="avatar">
+          <img src="@/assets/chatBotBtn.png" alt="챗봇" />
+        </div>
+
         <div class="bubble">{{ msg.content }}</div>
       </div>
     </div>
@@ -110,58 +113,89 @@ const sendMessage = async () => {
 <style scoped>
 .chat-container {
   max-width: 600px;
-  margin: 30px auto;
-  border: 1px solid #ccc;
-  border-radius: 15px;
+  margin: 0 0 40px auto;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
-  height: 80vh;
-  font-family: 'Segoe UI', sans-serif;
+  height: 90vh;
+  font-family: 'Noto Sans KR', sans-serif;
+  background-color: #fff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
 }
 
 .chat-header {
-  background-color: #3e8ed0;
+  height: 80px;
+  background-color: #292e4c;
   color: white;
-  padding: 1rem;
   border-top-left-radius: 15px;
   border-top-right-radius: 15px;
   text-align: center;
+  font-size: 20px;
+  font-weight: bold;
 }
 
 .chat-messages {
   flex: 1;
-  padding: 1rem;
+  padding: 1.25rem;
   overflow-y: auto;
   background: #f7f7f7;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
 .message {
   display: flex;
-}
-
-.message.user {
-  justify-content: flex-end;
+  align-items: flex-end;
 }
 
 .message.model {
-  justify-content: flex-start;
+  flex-direction: row;
+}
+
+.message.user {
+  flex-direction: row-reverse;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+.avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
+  background-color: #292e4c;
 }
 
 .bubble {
+  position: relative;
   white-space: pre-line;
-  max-width: 60%;
+  max-width: 65%;
   padding: 0.75rem 1rem;
-  border-radius: 15px;
-  background-color: #e0e0e0;
   word-break: break-word;
+  font-size: 15px;
+  line-height: 1.5;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border-radius: 14px;
+}
+
+/* 챗봇 말풍선 + 꼬리 */
+.message.model .bubble {
+  background-color: #e0e0e0;
+  color: #000;
+  border-radius: 14px 14px 14px 0;
 }
 
 .message.user .bubble {
-  background-color: #3e8ed0;
+  position: relative;
+  background-color: #292e4c;
   color: white;
+  border-radius: 14px 14px 0 14px;
 }
 
 .chat-input {
@@ -169,23 +203,44 @@ const sendMessage = async () => {
   padding: 1rem;
   border-top: 1px solid #ccc;
   background: white;
+  gap: 12px;
 }
 
 .chat-input input {
   flex: 1;
-  padding: 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  margin-right: 0.5rem;
+  padding: 12px;
+  border: 1px solid #bbb;
+  border-radius: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+  outline: none;
+  color: #222;
+}
+
+.chat-input input::placeholder {
+  color: #bbb;
+}
+
+.chat-input input:focus {
+  border-color: #292e4c;
 }
 
 .chat-input button {
-  padding: 0.75rem 1rem;
-  background-color: #3e8ed0;
+  padding: 12px 24px;
+  background-color: #292e4c;
   color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
+  font-weight: 700;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.25s ease;
 }
+
+.chat-input button:hover {
+  background-color: #1d2138;
+}
+
 </style>
-`
+

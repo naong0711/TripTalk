@@ -3,7 +3,7 @@
     <h2>회원 상세 정보</h2>
 
     <dl class="info-list">
-      <template v-for="(value, key) in userInfo" :key="key">
+      <template v-for="(value, key) in filteredUserInfo" :key="key">
         <dt>{{ labels[key] || key }}</dt>
         <dd :title="value || '정보 없음'">{{ value || '정보 없음' }}</dd>
       </template>
@@ -23,7 +23,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
 import PasswordConfirmModal from '@/components/PasswordConfirmModal.vue'
@@ -44,6 +44,13 @@ const labels = {
   addressDetail: '상세주소',
   loginType: '로그인 유형',
 }
+
+const filteredUserInfo = computed(() => {
+  const excludeKeys = ['sellerId', 'profileImageUrl']
+  return Object.fromEntries(
+    Object.entries(userInfo.value).filter(([key]) => !excludeKeys.includes(key))
+  )
+})
 
 function handlePasswordConfirm() {
   showPasswordModal.value = false
@@ -101,7 +108,7 @@ h2 {
 
 .info-list dt {
   font-weight: 600;
-  color: #9b8e6f;
+  color: #292e4c;
   font-size: 16px;
   align-self: center;
   user-select: text;
@@ -153,12 +160,12 @@ h2 {
 
 /* 수정하기 버튼 */
 .btn-edit {
-  background-color: #c8ad7f;
+  background-color: #292e4c;
   color: #fff;
 }
 
 .btn-edit:hover {
-  background-color: #a88d4d;
+  background-color: #1d2138;
   box-shadow: 0 4px 10px rgba(168,141,77,0.6);
 }
 

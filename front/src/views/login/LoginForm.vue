@@ -26,12 +26,13 @@
         />
       </div>
 
-        <div class="remember-me">
-        <label for="remember">
-            <input type="checkbox" id="remember" />
-            <span>아이디 저장</span>
+      <div class="remember-me">
+        <label class="custom-checkbox">
+          <input type="checkbox" id="remember" />
+          <span class="checkmark"></span>
+          <span>아이디 저장</span>
         </label>
-        </div>
+      </div>
 
       <button type="submit" class="login-btn">로그인</button>
     </form>
@@ -57,6 +58,7 @@
           @click="handleKakaoLogin" 
         />
         <img src="@/assets/loginBtn/naver_login.png" alt="네이버 로그인" class="social-icon" />
+        <img src="@/assets/loginBtn/google_login.png" alt="구글 로그인" class="social-icon" />
     </div>
 
        <FindIdPwModal v-if="showFindIdPwModal" @close="showFindIdPwModal = false" />
@@ -151,27 +153,33 @@ function handleKakaoLogin() {
 
 <style scoped>
 .login-form {
-  max-width: 320px;
-  margin: 40px auto;
-  padding: 24px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
+  max-width: 360px;
+  margin: 48px auto;
+  padding: 32px;
+  background-color: #ffffff;
+  border: 1px solid #e0e4ec;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   font-family: 'Noto Sans KR', sans-serif;
 }
 
 h2 {
   text-align: center;
+  font-size: 24px;
+  color: #292e4c;
+  font-weight: 800;
   margin-bottom: 24px;
 }
 
 .form-group {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
 label {
   display: block;
   margin-bottom: 6px;
   font-weight: 600;
+  color: #2c2c2c;
 }
 
 input[type="text"],
@@ -180,78 +188,36 @@ input[type="password"] {
   padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #bbb;
-  border-radius: 4px;
+  border-radius: 6px;
   box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+  outline: none;
+  border-color: #292e4c;
 }
 
 .login-btn {
   width: 100%;
-  padding: 12px 0;
-  background-color: #c8ad7f;
-  color: white;
+  padding: 14px 0;
+  background-color: #292e4c;
+  color: #fff;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
   font-weight: 700;
   font-size: 16px;
   cursor: pointer;
+  transition: background-color 0.25s ease;
 }
 
 .login-btn:hover {
-  background-color: #c0a06a;
-}
-
-.social-login {
-  display: flex;
-  justify-content: center;
-  margin: 20px;
-  align-items: center;
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  text-align: center;
-}
-
-.divider hr {
-  flex: 1;
-  border: none;
-  border-top: 1px solid #ccc;
-}
-
-.divider span {
-  text-align: center;
-  color: #666;
-  padding: 10px;
-}
-
-.social-icon {
-box-sizing: border-box;
-width: 150px;
-cursor: pointer;
-display: block; 
-padding: 0 5px;
-}
-
-.helper-links {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 12px 0;
-  font-size: 13px;
-}
-
-.helper-links a {
-  color: #007bff;
-  text-decoration: none;
-}
-
-.helper-links a:hover {
-  text-decoration: underline;
+  background-color: #1d2138;
 }
 
 .remember-me {
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .remember-me label {
@@ -269,8 +235,117 @@ padding: 0 5px;
   vertical-align: middle;
 }
 
-.remember-me span {
-  line-height: 1;
+.helper-links {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin: 14px 0;
+  font-size: 13px;
 }
 
+.helper-links a,
+.helper-links .modal-open-btn {
+  color: #292e4c;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.helper-links a:hover,
+.helper-links .modal-open-btn:hover {
+  color: #1d2138;
+  text-decoration: underline;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 30px 0 16px;
+}
+
+.divider hr {
+  flex: 1;
+  border: none;
+  border-top: 1px solid #ccc;
+}
+
+.divider span {
+  padding: 0 12px;
+  color: #666;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.social-login {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.social-icon {
+  width: 40px;
+  cursor: pointer;
+  padding: 0 5px;
+  object-fit: contain;
+}
+
+.custom-checkbox {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  padding-left: 28px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  user-select: none;
+}
+
+.custom-checkbox input[type="checkbox"] {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.custom-checkbox .checkmark {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 18px;
+  width: 18px;
+  background-color: #fff;
+  border: 2px solid #6b7280;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.custom-checkbox input[type="checkbox"]:checked ~ .checkmark {
+  background-color: #292e4c;
+  border-color: #292e4c;
+}
+
+.custom-checkbox .checkmark::after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 4px;
+  bottom: 3px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.custom-checkbox input[type="checkbox"]:checked ~ .checkmark::after {
+  display: block;
+}
 </style>

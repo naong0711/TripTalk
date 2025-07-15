@@ -61,7 +61,7 @@ public class PaymentController {
 
     // ✅ 단건 결제 조회
     @GetMapping("/{id}")
-    public ResponseEntity<PaymentResponse> getById(@PathVariable Long id) {
+    public ResponseEntity<PaymentResponse> getById(@PathVariable("id") Long id) {
         return paymentService.getPayment(id)
                 .map(payment -> ResponseEntity.ok(PaymentResponse.builder()
                         .id(payment.getId())

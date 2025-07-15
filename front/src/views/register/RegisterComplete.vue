@@ -60,33 +60,36 @@ async function goReissue() {
 
 <style scoped>
 .register-info {
-  max-width: 480px;
-  margin: 40px auto;
-  padding: 24px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  max-width: 520px;
+  margin: 48px auto;
+  padding: 32px;
+  background-color: #ffffff;
+  border: 1px solid #e0e4ec;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
   font-family: 'Noto Sans KR', sans-serif;
 }
 
 .stepper {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 30px;
+  margin-bottom: 36px;
 }
 
 .step {
   flex: 1;
   text-align: center;
   font-weight: 600;
-  color: #999;
-  padding-bottom: 8px;
-  border-bottom: 2px solid #ddd;
-  user-select: none;
+  color: #c0c0c0;
+  padding-bottom: 10px;
+  border-bottom: 3px solid #e0e0e0;
+  font-size: 15px;
+  transition: color 0.3s, border-color 0.3s;
 }
 
 .step.active {
-  color: #c8ad7f;
-  border-color: #c8ad7f;
+  color: #292e4c;
+  border-color: #292e4c;
 }
 
 .register-complete {
@@ -98,7 +101,7 @@ async function goReissue() {
 }
 
 h2 {
-  color: #c8ad7f;
+  color: #292e4c;
   font-weight: 800;
   font-size: 28px;
   margin-bottom: 28px;
@@ -111,59 +114,60 @@ h2 {
   line-height: 1.6;
   margin-bottom: 32px;
   user-select: text;
-  border-top: 1px solid #c8ad7f33;
+  border-top: 1px solid #e0e4ec;
   padding-top: 40px;
   padding-bottom: 20px;
 }
 
 .message strong {
-  color: #a37a44;
+  color: #1e2340;
   word-break: break-word;
 }
 
 .btn-group {
   display: flex;
   justify-content: center;
-  gap: 16px; /* 간격 살짝 줄임 */
-  margin-bottom: 24px; /* 아래 여백 줄임 */
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .main-btn,
 .login-btn {
   flex: 1;
-  min-width: 120px; /* 최소 너비 지정 */
+  min-width: 120px;
   padding: 14px 0;
   font-weight: 700;
   font-size: 16px;
   border-radius: 8px;
   cursor: pointer;
   transition: background-color 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 3px 6px rgba(200, 173, 127, 0.4);
+  box-shadow: 0 3px 6px rgba(41, 46, 76, 0.15);
   user-select: none;
   text-decoration: none;
+  text-align: center;
 }
 
 .main-btn {
-  background-color: #f5f0e6;
-  border: 2px solid #c8ad7f;
-  color: #7b6845;
+  background-color: #f2f4f8;
+  border: 2px solid #292e4c;
+  color: #292e4c;
 }
 
 .main-btn:hover {
-  background-color: #c8ad7f;
-  color: white;
-  box-shadow: 0 5px 12px rgba(200, 173, 127, 0.7);
+  background-color: #292e4c;
+  color: #ffffff;
+  box-shadow: 0 5px 12px rgba(41, 46, 76, 0.4);
 }
 
 .login-btn {
-  background-color: #c8ad7f;
+  background-color: #292e4c;
   border: none;
   color: white;
 }
 
 .login-btn:hover {
-  background-color: #b79965;
-  box-shadow: 0 5px 12px rgba(183, 153, 101, 0.7);
+  background-color: #1d2138;
+  box-shadow: 0 5px 12px rgba(41, 46, 76, 0.4);
 }
 
 .email-help {
@@ -180,7 +184,7 @@ h2 {
 .reissue-btn {
   background: none;
   border: none;
-  color: #c8ad7f;
+  color: #292e4c;
   font-weight: 700;
   cursor: pointer;
   text-decoration: underline;
@@ -190,6 +194,6 @@ h2 {
 }
 
 .reissue-btn:hover {
-  color: #b79965;
+  color: #1d2138;
 }
 </style>

@@ -96,7 +96,7 @@ const submit = async () => {
         }
       })
       alert('수정 완료 되었습니다.')
-      router.push('/boardlist')
+      router.push(`/boardDetail/${route.query.id}`)
     } else {
       // 1. 글 등록
       const res = await axios.post('/api/log/write', form.value, {
@@ -123,7 +123,7 @@ const submit = async () => {
       }
 
       alert('등록 완료!')
-      router.push('/boardlist')
+      router.push(`/boardDetail/${res.data.id}`)
     }
   } catch (err) {
     console.error('등록/수정 실패:', err)
@@ -148,75 +148,108 @@ onMounted(() => {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 24px;
+  gap: 15px;
   padding: 24px;
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #2c2c2c;
 }
 
-/* 작성 폼 스타일 */
+/* 작성 폼 */
 .write-page {
   flex: 1;
   max-width: 600px;
   background: #fff;
   border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 36px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
 }
 
 .write-page h2 {
-  margin-bottom: 20px;
-  font-size: 24px;
-  color: #333;
+  margin-bottom: 30px;
+  font-size: 28px;
+  font-weight: 700;
+  color: #292e4c;
+  text-align: center;
 }
 
+/* 폼 필드 */
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 24px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 600;
-  color: #555;
+  color: #292e4c;
+  font-size: 15px;
 }
 
-textarea,
-input {
-  width: 100%;
-  padding: 10px 12px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+/* input, textarea */
+input,
+textarea {
+  width: 93%;
+  padding: 12px 16px;
+  font-size: 15px;
+  font-weight: 500;
+  color: #2c2c2c;
+  background-color: #fff;
+  border: 1.5px solid #c9cedb;
+  border-radius: 8px;
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #292e4c;
+  box-shadow: 0 0 8px rgba(41, 46, 76, 0.4);
+  background-color: #fff;
 }
 
 /* 버튼 그룹 */
 .actions {
-  margin-top: 16px;
+  margin-top: 24px;
   display: flex;
-  gap: 12px;
+  gap: 16px;
+  justify-content: center;
 }
 
 .btn {
-  padding: 10px 20px;
+  padding: 14px 0;
+  flex: 1;
+  font-size: 16px;
+  font-weight: 700;
+  border-radius: 8px;
   border: none;
-  border-radius: 6px;
-  font-weight: 600;
   cursor: pointer;
-  font-size: 14px;
+  transition: background-color 0.25s ease;
+  user-select: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* 작성/수정 버튼 */
 .btn.submit {
   background-color: #292e4c;
-  color: white;
+  color: #fff;
 }
 
 .btn.submit:hover {
-  background-color: #292e4c;
-  color: white;
+  background-color: #1d2138;
+  box-shadow: 0 4px 12px rgba(41, 46, 76, 0.4);
 }
 
+/* 취소 버튼 */
 .btn.cancel {
-  background-color: #757575;
-  color: white;
+  background-color: #f2f2f2;
+  color: #444;
+}
+
+.btn.cancel:hover {
+  background-color: #dcdcdc;
+  color: #222;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* 지도 영역 */
@@ -235,26 +268,5 @@ input {
   .form-map {
     min-width: 100%;
   }
-}
-
-textarea,
-input {
-  width: 94%;
-  padding: 12px 16px;
-  border: 1.5px solid #d1d5db; /* 부드러운 연회색 (#d1d5db) */
-  border-radius: 8px;
-  font-size: 15px;
-  font-weight: 500;
-  color: #333;
-  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-textarea:focus,
-input:focus {
-  outline: none;
-  border-color: #4caf50; /* 초록색 강조 */
-  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
-  background-color: #fff;
 }
 </style>

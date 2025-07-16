@@ -106,6 +106,8 @@ async function onSubmit() {
     localStorage.setItem('accessToken', response.data.accessToken);
     localStorage.setItem('refreshToken', response.data.refreshToken);
 
+    localStorage.setItem('userRole', response.data.role)
+
     console.log(response.data.tempPasswordUsed)
 
     const userId = getUserIdFromToken(response.data.accessToken);

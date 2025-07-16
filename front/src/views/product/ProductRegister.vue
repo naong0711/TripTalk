@@ -169,7 +169,7 @@
     startDate: '',
     endDate: '',
     sellerId: null,
-    categoryId: null,
+    categoryId: 1,
     minPeople: null,
     maxPeople: null,  
     discount: {
@@ -356,7 +356,7 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-  border-color: #00c73c;
+  border-color: #4c589b;
   outline: none;
 }
 

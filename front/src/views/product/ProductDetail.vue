@@ -415,7 +415,7 @@ onMounted(() => {
 
 .booking-box input:focus,
 .booking-box select:focus {
-  border-color: #4caf50;
+  border-color: #4c589b;
   outline: none;
 }
 

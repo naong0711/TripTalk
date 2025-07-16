@@ -33,7 +33,21 @@
               <ChatList @selectRoom="goToChatRoom" />
             </ChatModal>
             <button class="nav-btn" @click="logout">로그아웃</button>
-            <router-link to="/MyPage" class="nav-btn">마이페이지</router-link>
+              <router-link
+                v-if="memberRole === 'ADMIN'"
+                to="/admin"
+                class="nav-btn"
+              >
+                관리자페이지
+              </router-link>
+
+              <router-link
+                v-else
+                to="/MyPage"
+                class="nav-btn"
+              >
+                마이페이지
+              </router-link>
           </template>
         </div>
       </nav>
@@ -56,6 +70,7 @@ const router = useRouter()
 
 const isLoggedIn = ref(false)
 const isChatOpen = ref(false)
+const memberRole = ref('') 
 const hasUnreadMessages = ref(false) // ✅ 읽지 않은 메시지 여부 상태
 let isCheckingUnread = false
 let unreadCheckInterval = null // ✅ interval 핸들 저장
@@ -104,12 +119,16 @@ async function checkUnreadMessages() {
 }
 
 function checkLoginStatus() {
-  isLoggedIn.value = !!localStorage.getItem('accessToken')
-  if (isLoggedIn.value) {
+  const token = localStorage.getItem('accessToken')
+  isLoggedIn.value = !!token
+
+  if (token) {
+    memberRole.value = localStorage.getItem('userRole') || ''
     startUnreadPolling()
   } else {
     stopUnreadPolling()
     hasUnreadMessages.value = false
+    memberRole.value = ''
   }
 }
 

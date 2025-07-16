@@ -1,7 +1,10 @@
 <template>
   <div class="detail-wrapper" v-if="log">
     <div class="detail-box">
-      <h2 class="title">{{ log.title }}</h2>
+      <div class="title-wrapper">
+        <a class="back-btn" @click="goBack">&lt;</a>
+        <h2 class="title">{{ log.title }}</h2>
+      </div>
       <div class="meta">
         작성자 ID: <span class="bold">{{ log.userId }}</span> |
         작성일: <span class="date">{{ formatDate(log.createdAt) }}</span>
@@ -15,9 +18,8 @@
       <div id="map" class="map-container"></div>
 
       <div class="actions">
-        <button @click="goToEdit" v-if="isOwner">✏ 수정</button>
-        <button @click="deletePost" v-if="isOwner">🗑 삭제</button>
-        <button @click="goBack">← 목록으로</button>
+        <button @click="goToEdit" v-if="isOwner">수정</button>
+        <button @click="deletePost" v-if="isOwner">삭제</button>
       </div>
     </div>
   </div>
@@ -174,56 +176,101 @@ onMounted(() => {
   margin: 0 auto;
   padding: 32px;
   box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+  font-family: 'Noto Sans KR', sans-serif;
+  color: #2c2c2c;
+}
+.title-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.back-btn {
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: 700;
+  user-select: none;
+  color: #292e4c;
+  text-decoration: none;
+  padding: 0 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+.back-btn:hover {
+  background-color: #e1e6f9;
 }
 .title {
+  margin: 0;
   font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  color: #222;
+  font-weight: 700;
+  color: #292e4c;
 }
 .meta {
   font-size: 14px;
-  color: #777;
+  color: #6b7280;
   margin-bottom: 24px;
 }
 .meta .bold {
-  font-weight: bold;
+  font-weight: 700;
   color: #444;
 }
 .meta .date {
   font-style: italic;
+  color: #444;
 }
 .content {
-  font-size: 18px;
+  font-size: 16px;
   color: #333;
-  line-height: 1.8;
+  line-height: 1.7;
   margin-bottom: 32px;
   white-space: pre-wrap;
-  background: #fafafa;
+  background: #fafbff;
   padding: 16px;
-  border-radius: 6px;
-  border: 1px solid #eee;
+  border-radius: 8px;
+  border: 1.5px solid #d1d5db;
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.1);
 }
 .map-container {
   width: 100%;
   height: 400px;
   margin-bottom: 32px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(41, 46, 76, 0.15);
+  border: 1.5px solid #c9cedb;
 }
 .actions {
   text-align: right;
 }
 .actions button {
   margin-left: 8px;
-  padding: 8px 14px;
+  padding: 10px 18px;
   font-size: 14px;
+  font-weight: 600;
   border: none;
-  background-color: #4a90e2;
-  color: white;
-  border-radius: 6px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  color: #fff;
+  background-color: #6b7280; /* 기본 회색 (목록 버튼용) */
+  box-shadow: 0 2px 6px rgba(107, 114, 128, 0.3);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
 }
+
 .actions button:hover {
-  background-color: #357ab7;
+  background-color: #595f6d; /* 진한 회색 */
+  box-shadow: 0 4px 12px rgba(75, 85, 99, 0.5);
+}
+
+/* 수정, 삭제 버튼은 연한 네이비 */
+.actions button:first-child,
+.actions button:nth-child(2) {
+  background-color: #292e4c; /* 연한 네이비 */
+  box-shadow: 0 2px 6px rgba(90, 106, 145, 0.4);
+  color: #fff;
+}
+
+.actions button:first-child:hover,
+.actions button:nth-child(2):hover {
+  background-color: #1f2540; /* 좀 더 진한 네이비 */
+  box-shadow: 0 4px 12px rgba(67, 83, 122, 0.6);
 }
 </style>

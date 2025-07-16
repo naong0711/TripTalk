@@ -36,7 +36,11 @@
             @mouseover="displayInfowindow(markers[index], place.place_name)"
             @mouseout="closeInfowindow"
           >
-            <span :class="`markerbg marker_${index + 1}`"></span>
+            <!-- <span :class="`markerbg marker_${index + 1}`"></span> -->
+             <span
+                class="markerbg"
+                :style="getMarkerStyle(index)"
+              ></span>
             <div class="info">
               <h5>{{ place.place_name }}</h5>
               <span>{{ place.road_address_name || place.address_name }}</span>
@@ -123,6 +127,17 @@ function initMap() {
   infowindow = new window.kakao.maps.InfoWindow({ zIndex: 1 })
 }
 
+function getMarkerStyle(index) {
+  const offsetY = -10 - index * 46 // 시작 위치가 -10px, 간격은 46px
+  return {
+    background: `url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png') no-repeat`,
+    width: '36px',
+    height: '37px',
+    backgroundPosition: `0px ${offsetY}px`,
+    display: 'inline-block',
+  }
+}
+
 function searchPlaces() {
   if (!keyword.value.trim()) {
     alert('키워드를 입력해주세요!')
@@ -164,13 +179,22 @@ function displayMarkers(placesArray) {
 function addMarker(position, idx) {
   const imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png'
   const imageSize = new window.kakao.maps.Size(36, 37)
+  const spriteSize = new window.kakao.maps.Size(36, 691)
+  const spriteOriginY = (idx * 46) + 10
+
   const imgOptions = {
-    spriteSize: new window.kakao.maps.Size(36, 691),
-    spriteOrigin: new window.kakao.maps.Point(0, idx * 46 + 10),
+    spriteSize: spriteSize,
+    spriteOrigin: new window.kakao.maps.Point(0, spriteOriginY),
     offset: new window.kakao.maps.Point(13, 37),
   }
+
   const markerImage = new window.kakao.maps.MarkerImage(imageSrc, imageSize, imgOptions)
-  const marker = new window.kakao.maps.Marker({ position, image: markerImage })
+
+  const marker = new window.kakao.maps.Marker({
+    position,
+    image: markerImage,
+  })
+
   marker.setMap(map)
 
   window.kakao.maps.event.addListener(marker, 'mouseover', () =>
@@ -373,7 +397,7 @@ async function deleteBookmark(bookmarkId) {
 </script>
 
 <style scoped>
-/* 기존 스타일 그대로 유지하세요 */
+/* 지도 영역 공통 */
 .map_wrap,
 .map_wrap * {
   margin: 0;
@@ -385,216 +409,54 @@ async function deleteBookmark(bookmarkId) {
 .map_wrap a,
 .map_wrap a:hover,
 .map_wrap a:active {
-  color: #000;
+  color: #292e4c;
   text-decoration: none;
 }
-.map_wrap {
-  position: relative;
-  width: 100%;
-  height: 500px; /* 지도 높이 확보 필수! */
-}
-#map {
-  width: 100%;
-  height: 100%;
-}
-#menu_wrap {
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 270px;
-  margin: 10px 0 30px 10px;
-  padding: 5px;
-  overflow-y: auto;
-  background: rgba(255, 255, 255, 0.9);
-  z-index: 1;
-  font-size: 12px;
-  border-radius: 10px;
-}
-.bg_white {
-  background: #fff;
-}
-#menu_wrap hr {
-  display: block;
-  height: 1px;
-  border: 0;
-  border-top: 2px solid #5f5f5f;
-  margin: 3px 0;
-}
-#menu_wrap .option {
-  text-align: center;
-}
-#menu_wrap .option p {
-  margin: 10px 0;
-}
-#menu_wrap .option button {
-  margin-left: 5px;
-}
-#placesList {
-  list-style: none;
-  padding-left: 0;
-}
-#placesList .item {
-  position: relative;
-  border-bottom: 1px solid #888;
-  overflow: hidden;
-  cursor: pointer;
-  min-height: 65px;
-  padding-left: 55px;
-}
-#placesList .item span.markerbg {
-  position: absolute;
-  left: 10px;
-  top: 15px;
-  width: 36px;
-  height: 37px;
-  background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png')
-    no-repeat;
-}
-#placesList .item .marker_1 {
-  background-position: 0 -10px;
-}
-#placesList .item .marker_2 {
-  background-position: 0 -56px;
-}
-#placesList .item .marker_3 {
-  background-position: 0 -102px;
-}
-#placesList .item .marker_4 {
-  background-position: 0 -148px;
-}
-#placesList .item .marker_5 {
-  background-position: 0 -194px;
-}
-#placesList .item .marker_6 {
-  background-position: 0 -240px;
-}
-#placesList .item .marker_7 {
-  background-position: 0 -286px;
-}
-#placesList .item .marker_8 {
-  background-position: 0 -332px;
-}
-#placesList .item .marker_9 {
-  background-position: 0 -378px;
-}
-#placesList .item .marker_10 {
-  background-position: 0 -423px;
-}
-#placesList .item .marker_11 {
-  background-position: 0 -470px;
-}
-#placesList .item .marker_12 {
-  background-position: 0 -516px;
-}
-#placesList .item .marker_13 {
-  background-position: 0 -562px;
-}
-#placesList .item .marker_14 {
-  background-position: 0 -608px;
-}
-#placesList .item .marker_15 {
-  background-position: 0 -654px;
-}
-#placesList .item .info {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-#placesList .item .info h5 {
-  margin: 0;
-}
-#placesList .item .info .gray {
-  color: #8a8a8a;
-  padding-left: 26px;
-  background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png')
-    no-repeat;
-}
-#placesList .item .info .tel {
-  color: #009900;
-  display: block;
-}
-#placesList .item .info button {
-  margin-top: 5px;
-  padding: 4px 8px;
-  font-size: 12px;
-}
-#pagination {
-  margin: 10px auto;
-  text-align: center;
-}
-#pagination a {
-  display: inline-block;
-  margin-right: 10px;
-  cursor: pointer;
-}
-#pagination a.on {
-  font-weight: bold;
-  cursor: default;
-  color: #777;
-}
-
-.bookmark-list {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  padding: 10px 15px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  max-height: 200px;
-  overflow-y: auto; /* 북마크가 많으면 스크롤 */
-}
-.bookmark-list h3 {
-  margin-bottom: 10px;
-}
-.bookmark-list ul {
-  list-style: none;
-  padding-left: 0;
-}
-.bookmark-list li {
-  margin-bottom: 8px;
-  font-size: 14px;
-}
-.bookmark-list button {
-  margin-left: 10px;
-  cursor: pointer;
-  background: transparent;
-  border: none;
-  color: red;
-  font-weight: bold;
-}
-
-.container {
-  padding: 0 5px; /* 양쪽 여백 주기 */
-}
 
 .map_wrap {
+  position: relative;
   width: 100%;
   height: 500px;
   display: flex;
-  gap: 20px; /* 지도와 메뉴 사이 여백 */
 }
 
 #map {
   flex: 1;
-  min-width: 60%; /* 메뉴랑 함께 보여질 공간 확보 */
+  min-width: 60%;
+  height: 100%;
 }
 
 #menu_wrap {
   width: 280px;
   max-height: 100%;
   overflow-y: auto;
+  margin: 10px 0 30px 10px;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 10px;
+  z-index: 1;
+  font-size: 12px;
+  border: 1.5px solid #d1d5db;
 }
 
-.bookmark-list {
-  background: #f9f9f9;
-  border: 1px solid #ddd;
-  padding: 10px 15px;
-  margin: 20px auto; /* 가운데 정렬 */
-  border-radius: 8px;
-  max-height: 200px;
-  overflow-y: auto;
-  width: 720px; /* 내용 길이에 맞춰 너비 자동 조정 */
-  min-width: 300px; /* 너무 작지 않도록 최소 너비 설정 */
-  text-align: left; /* 내부 텍스트 가운데 정렬 */
+.bg_white {
+  background: #fff;
+}
+
+#menu_wrap hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 2px solid #292e4c;
+  margin: 8px 0;
+}
+
+#menu_wrap .option {
+  text-align: center;
+}
+
+#menu_wrap .option p {
+  margin: 10px 0;
 }
 
 #menu_wrap .option form {
@@ -607,30 +469,170 @@ async function deleteBookmark(bookmarkId) {
   flex: 1;
   padding: 6px 10px;
   font-size: 14px;
-  border: 1.5px solid #4caf50;
+  border: 1.5px solid #292e4c;
   border-radius: 4px;
   outline: none;
 }
 
 #menu_wrap .option input[type="text"]:focus {
-  border-color: #388e3c;
+  border-color: #1d2138;
+  box-shadow: 0 0 6px rgba(41, 46, 76, 0.3);
 }
 
 #menu_wrap .option button {
   padding: 6px 14px;
   font-size: 14px;
-  background-color: #4caf50;
+  background-color: #292e4c;
   border: none;
   border-radius: 4px;
   color: white;
   cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 #menu_wrap .option button:hover {
-  background-color: #388e3c;
+  background-color: #1d2138;
 }
 
 #menu_wrap .option button:active {
-  background-color: #2e7d32;
+  background-color: #141828;
 }
+
+/* 장소 리스트 */
+#placesList {
+  list-style: none;
+  padding-left: 0;
+}
+
+#placesList .item {
+  position: relative;
+  border-bottom: 1px solid #bbb;
+  overflow: hidden;
+  cursor: pointer;
+  min-height: 65px;
+  padding-left: 70px;
+  background-color: #fafbff;
+  border-radius: 4px;
+  margin-bottom: 6px;
+  padding: 10px;
+}
+
+#placesList .item:hover {
+  background-color: #e9ecf5;
+}
+
+#placesList .item span.markerbg {
+  position: absolute;
+  left: 10px;
+  top: 15px;
+  width: 36px;
+  height: 37px;
+  background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/marker_number_blue.png')
+    no-repeat;
+}
+
+#placesList .item .info {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  margin-left: 45px;
+}
+
+#placesList .item .info h5 {
+  margin: 0;
+  color: #292e4c;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+#placesList .item .info .gray {
+  color: #6b7280;
+  padding-left: 26px;
+  background: url('https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/places_jibun.png') no-repeat;
+}
+
+#placesList .item .info .tel {
+  color: #292e4c;
+  display: block;
+}
+
+#placesList .item .info button {
+  margin-top: 5px;
+  padding: 4px 8px;
+  font-size: 12px;
+  background-color: #292e4c;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+#placesList .item .info button:hover {
+  background-color: #1d2138;
+}
+
+#pagination {
+  margin: 10px auto;
+  text-align: center;
+}
+
+#pagination a {
+  display: inline-block;
+  margin-right: 10px;
+  cursor: pointer;
+  color: #292e4c;
+}
+
+#pagination a.on {
+  font-weight: bold;
+  cursor: default;
+  color: #1d2138;
+}
+
+/* 북마크 리스트 */
+.bookmark-list {
+  background: #f4f6fa;
+  border: 1px solid #ccc;
+  padding: 12px 18px;
+  margin: 20px auto;
+  border-radius: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 680px;
+  min-width: 300px;
+  color: #2c2c2c;
+  font-size: 14px;
+}
+
+.bookmark-list h3 {
+  margin-bottom: 10px;
+  color: #292e4c;
+  font-weight: bold;
+}
+
+.bookmark-list ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+.bookmark-list li {
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bookmark-list button {
+  background: none;
+  border: none;
+  color: #d32f2f;
+  font-weight: bold;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.bookmark-list button:hover {
+  color: #b71c1c;
+}
+
 </style>

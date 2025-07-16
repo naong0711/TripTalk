@@ -76,8 +76,8 @@
     <div class="seller-box">
       <h3>판매자 정보</h3>
       <div class="seller-profile">
-        <img
-          :src="`/api/files/image/user/${product.sellerUserId}`"
+       <img
+          :src="sellerProfileImage"
           alt="판매자 프로필"
           class="seller-profile-img"
         />
@@ -108,6 +108,16 @@ import ChatModal from '@/components/chat/ChatModal.vue'
 
 const route = useRoute()
 const productId = route.params.id
+
+const defaultProfileImage = new URL('@/assets/default-profile.png', import.meta.url).href
+const sellerProfileImage = computed(() => {
+  console.log(product.value.sellerUserId)
+  if (!product.value || !product.value.sellerUserId) {
+    return defaultProfileImage
+  }
+  return `/api/files/image/user/${product.value.sellerUserId}`
+})
+
 
 const today = new Date().toISOString().slice(0, 10)
 

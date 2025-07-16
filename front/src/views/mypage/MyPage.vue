@@ -3,7 +3,7 @@
     <!-- 프로필 -->
       <div class="top-box">
         <div class="profile-box">
-          <img :src="profileImage" class="profile-img" @error="profileImage = '/img/default-profile.jpg'" />
+          <img :src="profileImage" class="profile-img">
 
           <div class="profile-info">
             <h2 class="nickname" :title="nickname" @click="goToProfileDetail">{{ nickname }}</h2>
@@ -53,10 +53,10 @@
       </div>
 
       <div class="reservation-category">
-        <div class="category-buttons">
-          <button :class="{ active: activeCategory === '여행' }" @click="activeCategory = '여행'">여행</button>
-          <button :class="{ active: activeCategory === '교통' }" @click="activeCategory = '교통'">교통</button>
-          <button :class="{ active: activeCategory === '레저' }" @click="activeCategory = '레저'">레저</button>
+        <div class="reservation-status">
+          <button :class="{ active: activeStatus === '예약완료' }" @click="activeStatus = '예약완료'">예약</button>
+          <button :class="{ active: activeStatus === '환불완료' }" @click="activeStatus = '환불완료'">취소</button>
+          <button :class="{ active: activeStatus === '완료됨' }" @click="activeStatus = '완료됨'">완료</button>
         </div>
       </div>
 
@@ -74,6 +74,7 @@
               <p class="card-title" :title="item.title">{{ item.title }}</p>
             </div>
             <div class="card-footer">
+              <p>{{ item.status }}</p>
               <svg class="icon-calendar" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
               <p class="card-date">{{ item.date }}</p>
             </div>
@@ -96,11 +97,11 @@ import ChatList from '@/components/chat/ChatList.vue'
 
 const router = useRouter()
 
-const profileImage = ref('/img/default-profile.jpg')
+const profileImage = ref(new URL('@/assets/default-profile.png', import.meta.url).href)
 const nickname = ref('닉네임 불러오는 중...')
 const fileInput = ref(null)
 const sellerId = ref(null)
-const activeCategory = ref('여행')
+const activeStatus  = ref('예약완료')
 const reservations = ref([])
 
 const isChatOpen = ref(false)
@@ -127,8 +128,8 @@ onMounted(async () => {
       }
     })
     console.log(res.data)
+    profileImage.value = res.data.profileImageUrl || ''
     console.log(res.data.profileImageUrl)
-    profileImage.value = res.data.profileImageUrl || '/img/default-profile.jpg'
     nickname.value = res.data.nickname || '닉네임 없음'
     sellerId.value = res.data.sellerId || null 
   } catch (err) {
@@ -148,6 +149,7 @@ onMounted(async () => {
     reservations.value = res.data.map(item => ({
       id: item.id,
       title: item.title,  // ← 서버 응답 필드에 맞게 수정
+      status: item.status,
       date: formatDate(item.reservationDate) // ← 예: '2025-07-01'
     }))
     console.log(reservations.value)
@@ -209,27 +211,42 @@ const reservationPage = ref(0)
 const postPage = ref(0)
 
 function injectMoreCard(items, page) {
+  const maxDisplayItems = 6
   const start = page * visibleCount
   const end = start + visibleCount
-  const maxDisplayItems = 6
-  let displayItems = items.slice(0, maxDisplayItems)
-  const hasMore = items.length > maxDisplayItems
 
-  if (hasMore && displayItems.length === maxDisplayItems) {
-    displayItems[maxDisplayItems - 1] = { isMore: true }
-  } else if (hasMore && displayItems.length < maxDisplayItems) {
-    displayItems.push({ isMore: true })
+  // 현재 페이지 아이템
+  const pageItems = items.slice(start, end)
+
+  // 남은 아이템이 있을 때만 '더보기' 카드 표시
+  const hasMore = items.length > end
+
+  if (hasMore) {
+    // 마지막 아이템 자리에 '더보기' 카드 추가
+    // 만약 pageItems 길이가 visibleCount면 마지막 걸 '더보기'로 대체
+    if (pageItems.length === visibleCount) {
+      pageItems[visibleCount - 1] = { isMore: true }
+    } else {
+      pageItems.push({ isMore: true })
+    }
   }
 
-  return displayItems.slice(start, end)
+  return pageItems
 }
 
 const paginatedReservations = computed(() =>
-  injectMoreCard(reservations.value, reservationPage.value)
+  injectMoreCard(
+    reservations.value.filter(item => item.status === activeStatus.value),
+    reservationPage.value
+  )
 )
 
 function maxPage(type) {
-  return 1 // 향후 동적으로 변경 가능
+  if(type === 'reservations') {
+    const filtered = reservations.value.filter(item => item.status === activeStatus.value)
+    return Math.max(0, Math.ceil(filtered.length / visibleCount) - 1)
+  }
+  return 0
 }
 
 function next(type) {
@@ -466,7 +483,7 @@ hr {
   stroke: #c8ad7f;
 }
 
-.category-buttons {
+.reservation-status {
   display: flex;
   justify-content: flex-start;
   gap: 0;
@@ -480,7 +497,7 @@ hr {
   line-height: 1;
 }
 
-.category-buttons button {
+.reservation-status button {
   padding: 10px 30px;
   font-size: 14px;
   background-color: white;
@@ -491,15 +508,16 @@ hr {
   transition: 0.2s ease all;
 }
 
-.category-buttons button:last-child {
+.reservation-status button:last-child {
   border-right: none;
 }
 
-.category-buttons button.active,
-.category-buttons button:hover {
+.reservation-status button.active,
+.reservation-status button:hover {
   background-color: #292e4c;
   color: white;
 }
+
 
 .reservation-category {
   display: flex;

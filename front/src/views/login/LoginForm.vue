@@ -28,7 +28,7 @@
 
       <div class="remember-me">
         <label class="custom-checkbox">
-          <input type="checkbox" id="remember" />
+          <input type="checkbox" id="remember" v-model="remember" />
           <span class="checkmark"></span>
           <span>아이디 저장</span>
         </label>
@@ -72,7 +72,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import FindIdPwModal from '@/components/FindIdPw.vue'
@@ -83,6 +83,7 @@ const password = ref('')
 const showFindIdPwModal = ref(false) 
 const showChangePasswordModal = ref(false)
 const router = useRouter()
+const remember = ref(false)
 
 function handlePasswordChangeSuccess() {
   alert('완료되었습니다.')
@@ -99,6 +100,13 @@ async function onSubmit() {
       userId: userid.value,
       password: password.value,
     })
+
+    // 아이디 저장 처리
+    if (remember.value) {
+      localStorage.setItem('savedUserId', userid.value)
+    } else {
+      localStorage.removeItem('savedUserId')
+    }
 
     console.log('로그인 성공:', response.data)
     
@@ -149,6 +157,14 @@ function getUserIdFromToken(token) {
 function handleKakaoLogin() {
   window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
 }
+
+onMounted(() => {
+  const savedId = localStorage.getItem('savedUserId')
+  if (savedId) {
+    userid.value = savedId
+    remember.value = true
+  }
+})
 
 </script>
 

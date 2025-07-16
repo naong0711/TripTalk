@@ -1,9 +1,12 @@
 package org.kosa.tripTalk.travellog;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import org.kosa.tripTalk.bookmark.BookMark;
 import org.kosa.tripTalk.category.Category;
 import org.kosa.tripTalk.user.User;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +49,9 @@ public class TravelLog {
     
     @Column(name = "temp_key")
     private String tempKey;
+    
+    @OneToMany(mappedBy = "board", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<BookMark> bookmarks = new ArrayList<>();
     
 
 }

@@ -36,8 +36,8 @@
       <hr />
 
       <div class="seller-profile">
-        <img
-          :src="`/api/files/image/user/${reservation.sellerUserId}`"
+       <img
+          :src="sellerProfileImage"
           alt="판매자 프로필"
           class="seller-profile-img"
         />
@@ -71,6 +71,13 @@ import ChatModal from '@/components/chat/ChatModal.vue'
 const route = useRoute()
 const reservationId = route.params.id
 
+const defaultProfileImage = new URL('@/assets/default-profile.png', import.meta.url).href
+const sellerProfileImage = computed(() => {
+  if (!reservation.value || !reservation.value.sellerUserId) {
+    return defaultProfileImage
+  }
+  return `/api/files/image/user/${reservation.value.sellerUserId}`
+})
 
 const isChatOpen = ref(false)
 const selectedRoomInfo = ref(null)
@@ -176,6 +183,20 @@ const formatDate = (dateStr) => {
 }
 
 async function handleRefundRequest() {
+   
+  if (!reservation.value) return;
+    const status = displayStatus.value;
+
+  if (status === '완료됨') {
+    alert('지난 예약은 환불처리 할 수 없습니다.');
+    return;
+  }
+
+  if (status !== '예약완료') {
+    alert('현재 상태에서는 환불 요청이 불가능합니다.');
+    return;
+  }
+  
   try {
     confirm('결제를 취소하시겠습니까?')
 

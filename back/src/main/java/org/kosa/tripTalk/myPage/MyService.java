@@ -179,11 +179,11 @@ public class MyService {
 }
 
   //찜 삭제
-  public void deleteFavorite(Long favoriteId) {
+  public void deleteFavorite(Long favoriteId, String userId) {
     if (!favoriteRepository.existsById(favoriteId)) {
         throw new IllegalArgumentException("해당 찜 항목이 존재하지 않습니다.");
     }
-    favoriteRepository.deleteById(favoriteId);
+    favoriteRepository.deleteByIdAndUserId(favoriteId, userId);
 }
 
 
@@ -234,18 +234,20 @@ public class MyService {
 
 
   @Transactional
-  public Long addFavorite(String userId, Long productId) {
-      User user = userRepository.findByUserId(userId)
+  public Long addFavorite(Long userId, Long productId) {
+      User user = userRepository.findById(userId)
               .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-
+System.out.println("=================u"+user);
       Product product = productRepository.findById(productId)
               .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+      System.out.println("=================p"+product);
 
       // 이미 찜이 되어있는지 체크 (중복 방지)
       boolean exists = favoriteRepository.existsByUserAndProduct(user, product);
       if (exists) {
           throw new IllegalStateException("이미 찜한 상품입니다.");
       }
+      System.out.println("asdadad");
 
       Favorite favorite = Favorite.builder()
               .user(user)

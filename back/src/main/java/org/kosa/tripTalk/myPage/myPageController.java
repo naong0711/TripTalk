@@ -1,7 +1,9 @@
 package org.kosa.tripTalk.myPage;
 
 import java.nio.file.AccessDeniedException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.kosa.tripTalk.cart.CartResponse;
 import org.kosa.tripTalk.favorite.FavoriteResponse;
 import org.kosa.tripTalk.reservation.Reservation;
@@ -113,11 +115,18 @@ public class myPageController {
   public ResponseEntity<?> addFavorite(Authentication authentication, @PathVariable("productId") Long productId) {
       try {
           User user = (User) authentication.getPrincipal();
-          String userId = user.getUserId();
+          Long userId = user.getId();
+          
+          System.out.println("===========userid"+userId);
 
           Long favoriteId = myService.addFavorite(userId, productId);
 
-          return ResponseEntity.ok(favoriteId);
+          System.out.println(favoriteId);
+          // ✅ 응답 형식을 JSON으로 통일
+          Map<String, Object> response = new HashMap<>();
+          response.put("favoriteId", favoriteId);
+          return ResponseEntity.ok(response);
+
       } catch (Exception e) {
           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                                .body("찜 추가 중 오류가 발생했습니다.");
@@ -126,10 +135,14 @@ public class myPageController {
   
   //찜 삭제
   @DeleteMapping("/favorite/{favoriteId}")
-  public ResponseEntity<?> deleteFavorite(@PathVariable("favoriteId") Long favoriteId) {
+  public ResponseEntity<?> deleteFavorite(Authentication authentication, @PathVariable("favoriteId") Long favoriteId) {
       // 사용자 인증 정보 확인 및 삭제 로직 수행
     try {
-      myService.deleteFavorite(favoriteId);
+      
+      User user = (User) authentication.getPrincipal();
+      String userId = user.getUserId();
+
+      myService.deleteFavorite(favoriteId, userId);
       return ResponseEntity.ok("삭제되었습니다.");
   } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

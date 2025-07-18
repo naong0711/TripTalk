@@ -40,6 +40,7 @@
           <div class="title-with-like">
             <h3>{{ product.title }}</h3>
             <button 
+              v-if="isFavoritesReady"
               :class="['favorite-btn', isFavorited(product.id) ? 'liked' : '']" 
               @click.stop="toggleFavorite(product.id)"
               aria-label="찜하기 버튼"
@@ -76,61 +77,79 @@ const route = useRoute()
 const router = useRouter()
 
 const isSeller = ref(false)
-const favorites = ref(new Set())
 
-const favoriteMap = ref({})  // { productId: favoriteId, ... }
+const favorites = ref(new Set())
+const favoriteMap = ref({})
+const isFavoritesReady = ref(false)
+
 
 function isFavorited(productId) {
-  return productId in favoriteMap.value
+  return favorites.value.has(productId)
 }
 
 async function toggleFavorite(productId) {
+  if (!isFavoritesReady.value) return
+
   try {
-    if (favorites.value.has(productId)) {
-      const favoriteId = favoriteMap.value[productId]
-      if (!favoriteId) throw new Error('favoriteId not found for productId: ' + productId)
+    const token = localStorage.getItem('accessToken')
+    if (!token) return
 
-      await axios.delete(`/api/mypage/favorite/${favoriteId}`, { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } })
+  if (favorites.value.has(productId)) {
+    // 찜 해제
+    const favoriteId = favoriteMap.value[productId]
+    if (!favoriteId) throw new Error('favoriteId not found for productId: ' + productId)
 
-      favorites.value.delete(productId)
-      // 반응성 유지 위해 새 Set 할당
-      favorites.value = new Set(favorites.value)
+    await axios.delete(`/api/mypage/favorite/${favoriteId}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
 
-      delete favoriteMap.value[productId]
-      // 반응성 위해 새 객체 할당
-      favoriteMap.value = { ...favoriteMap.value }
-    } else {
-      const res = await axios.post(`/api/mypage/favorite/${productId}`, null, { headers: { Authorization: `Bearer ${localStorage.getItem('accessToken')}` } })
+    favorites.value.delete(productId)
+    favorites.value = new Set(favorites.value)
 
-      favorites.value.add(productId)
-      favorites.value = new Set(favorites.value)
+    delete favoriteMap.value[productId]
+    favoriteMap.value = { ...favoriteMap.value } // 찜 해제 후 삭제만 처리
+  } else {
+    // 찜 추가
+    const res = await axios.post(`/api/mypage/favorite/${productId}`, null, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
 
-      favoriteMap.value = { ...favoriteMap.value, [productId]: res.data }
-    }
-  } catch (e) {
-    console.error('찜 처리 실패:', e)
+    favorites.value.add(productId)
+    favorites.value = new Set(favorites.value)
+
+    favoriteMap.value = { ...favoriteMap.value, [productId]: res.data.favoriteId }
   }
+    } catch (e) {
+      console.error('찜 처리 실패:', e)
+    }
 }
 
 async function fetchFavorites() {
   try {
+    isFavoritesReady.value = false
+
     const token = localStorage.getItem('accessToken')
     if (!token) return
 
     const res = await axios.get('/api/mypage/favoriteList', {
       headers: { Authorization: `Bearer ${token}` }
     })
-
+    console.log('찜 목록 API 응답:', res.data)
+    
     const favSet = new Set()
     const favMap = {}
-
     res.data.forEach(fav => {
-      favSet.add(fav.productId)
-      favMap[fav.productId] = fav.favoriteId
+      if (fav.productId && fav.id) {
+        const pid = Number(fav.productId)
+        favSet.add(pid)
+        favMap[pid] = fav.id  // favoriteId 대신 id 사용
+      }
     })
 
     favorites.value = favSet
     favoriteMap.value = favMap
+
+    isFavoritesReady.value = true
   } catch (e) {
     console.error('찜 목록 조회 실패:', e)
   }
@@ -143,7 +162,7 @@ const adults = ref(Number(route.query.people) || 2)
 const products = ref([])
 const totalPages = ref(0)
 const page = ref(0)
-const size = 3
+const size = 9
 
 const location = route.query.location
 

@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,6 +56,7 @@ public class myPageController {
   //마이페이지 탈퇴
   @PutMapping("profile/delete")
   public ResponseEntity<?> profileDelete(Authentication authentication) {
+    
     
     //헤더에서 userid 추출
     User user = (User) authentication.getPrincipal();
@@ -106,6 +108,23 @@ public class myPageController {
     return ResponseEntity.ok(responseList);
   }
   
+  //찜 추가
+  @PostMapping("/favorite/{productId}")
+  public ResponseEntity<?> addFavorite(Authentication authentication, @PathVariable("productId") Long productId) {
+      try {
+          User user = (User) authentication.getPrincipal();
+          String userId = user.getUserId();
+
+          Long favoriteId = myService.addFavorite(userId, productId);
+
+          return ResponseEntity.ok(favoriteId);
+      } catch (Exception e) {
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                               .body("찜 추가 중 오류가 발생했습니다.");
+      }
+  }
+  
+  //찜 삭제
   @DeleteMapping("/favorite/{favoriteId}")
   public ResponseEntity<?> deleteFavorite(@PathVariable("favoriteId") Long favoriteId) {
       // 사용자 인증 정보 확인 및 삭제 로직 수행
@@ -130,6 +149,17 @@ public class myPageController {
     List<CartResponse> responseList = myService.cartList(userId);
 
     return ResponseEntity.ok(responseList);
+  }
+  
+  //장바구니 추가
+  @PostMapping("cart/{productId}")
+  public ResponseEntity<?> addCart(Authentication authentication, @PathVariable("productId") String productId) {
+      User user = (User) authentication.getPrincipal();
+      String userId = user.getUserId();
+
+      Long cartId = myService.addCart(userId, productId);
+
+      return ResponseEntity.ok(cartId);
   }
   
   //장바구니 삭제

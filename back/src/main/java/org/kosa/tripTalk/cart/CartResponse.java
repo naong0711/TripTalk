@@ -12,6 +12,7 @@ public class CartResponse {
   private String title;
   private int price;
   private Long categoryId;
+  private Long productId;
   private LocalDate startDate;
   private LocalDate endDate;
 

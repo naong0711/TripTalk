@@ -68,7 +68,12 @@
         <p>총 금액: <strong>{{ totalAmount.toLocaleString() }}원</strong></p>
       </div>
 
-      <button @click="reserve">예약하기</button>
+      <div class="button-group">
+        <button @click="cart" class="cartBtn" aria-label="장바구니 추가">
+          <img src="@/assets/mypageBtn/cartBtn.png" alt="장바구니 아이콘" />
+        </button>
+        <button @click="reserve">예약하기</button>
+      </div>
 
     </div>
 
@@ -111,13 +116,11 @@ const productId = route.params.id
 
 const defaultProfileImage = new URL('@/assets/default-profile.png', import.meta.url).href
 const sellerProfileImage = computed(() => {
-  console.log(product.value.sellerUserId)
   if (!product.value || !product.value.sellerUserId) {
     return defaultProfileImage
   }
   return `/api/files/image/user/${product.value.sellerUserId}`
 })
-
 
 const today = new Date().toISOString().slice(0, 10)
 
@@ -136,7 +139,7 @@ const product = ref({
   startDate: '',
   endDate: '',
   sellerId: null,
-  sellerUserId: null, // 프로필 이미지용
+  sellerUserId: null,
   sellerNickname: '',
   sellerPhone: '',
   sellerEmail: '',
@@ -158,7 +161,14 @@ const totalNights = computed(() => {
 })
 
 const totalAmount = computed(() => {
-  return product.value.price * totalNights.value * adults.value
+  const now = new Date()
+  const isDiscountActive = product.value.discount &&
+    new Date(product.value.discount.startAt) <= now &&
+    new Date(product.value.discount.endAt) >= now &&
+    product.value.discountedPrice > 0
+
+  const pricePerNight = isDiscountActive ? product.value.discountedPrice : product.value.price
+  return pricePerNight * totalNights.value * adults.value
 })
 
 const fetchProduct = async () => {
@@ -213,8 +223,6 @@ const formatDate = (dateStr) => {
 }
 
 const reserve = async () => {
-
-  
   const token = localStorage.getItem('accessToken')
 
   if(!token) {
@@ -231,7 +239,6 @@ const reserve = async () => {
     return
   }
 
-    // 인원수 범위 체크
   if (adults.value < product.value.minPeople) {
     alert(`최소 인원수는 ${product.value.minPeople}명 입니다.`)
     return
@@ -246,17 +253,17 @@ const reserve = async () => {
       productId: Number(productId),
       amount: totalAmount.value,
       paymentMethod: paymentMethod.value,
-      paymentId: '', // 백엔드에서 처리될 값
-      status: ''     // 백엔드에서 처리될 값
+      paymentId: '',
+      status: ''
     }
 
-   const response = await axios.post('/api/payments/create', paymentRequest,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
-  )
+    const response = await axios.post('/api/payments/create', paymentRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
     const redirectUrl = response.data.next_redirect_pc_url
     if (redirectUrl) {
       window.location.href = redirectUrl
@@ -269,11 +276,29 @@ const reserve = async () => {
   }
 }
 
+
+const cart = async () => {
+  const accessToken = localStorage.getItem('accessToken');
+  try {
+    const res = await axios.post(
+      `/api/mypage/cart/${productId}`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+
+    alert('장바구니에 추가되었습니다.');
+  } catch (error) {
+    alert('오류가 발생했습니다.');
+    console.error(error);
+  }
+};
+
 onMounted(() => {
   fetchProduct()
 })
 </script>
-
 
 <style scoped>
 
@@ -353,6 +378,17 @@ onMounted(() => {
 
 .price-wrap {
   margin: 16px 0;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;         /* 버튼 사이 간격 */
+  justify-content: center; /* 가운데 정렬 (필요 시) */
+  margin-top: 28px;  /* 기존 버튼 margin 유지 */
+}
+
+.button-group button {
+  flex: 1;           /* 두 버튼이 같은 너비를 가지도록 */
 }
 
 .price {
@@ -437,6 +473,14 @@ onMounted(() => {
   text-align: center;
 }
 
+.cartBtn {
+  background-color: #52535b;
+}
+
+.cartBtn:hover {
+  background-color: #494a52;
+}
+
 button {
   margin-top: 28px;
   padding: 14px 20px;
@@ -507,4 +551,41 @@ button:hover {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.cartBtn {
+  background-color: transparent; /* 배경색 제거 */
+  padding: 8px 12px;             /* 버튼 여백 적당히 조절 */
+  border: none;                  /* 필요하면 테두리 제거 */
+  cursor: pointer;
+}
+
+.cartBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* 살짝 호버 효과 원하면 */
+}
+
+.cartBtn img {
+  width: 48px;   /* 가로 48px */
+  height: 16px;  /* 세로 16px (3:1 비율) */
+  object-fit: contain;  /* 비율 유지하며 꽉차게 */
+  vertical-align: middle;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.button-group button {
+  /* 기본 flex-grow 제거 */
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.button-group button:first-child {
+  flex: 1 1 0;  /* 장바구니 버튼: 1 비율 */
+}
+
+.button-group button:last-child {
+  flex: 3 1 0;  /* 예약하기 버튼: 3 비율 */
+}
 </style>

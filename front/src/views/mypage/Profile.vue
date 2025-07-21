@@ -12,6 +12,7 @@
   <div class="btn-group">
     <button class="btn-back" @click="goBack">뒤로 가기</button>
     <button class="btn-edit" @click="showPasswordModal = true">정보 수정</button>
+    <button class="btn-del" @click="deleteMem">탈퇴</button>
   </div>
 
     <PasswordConfirmModal
@@ -73,6 +74,28 @@ onMounted(async () => {
 function goBack() {
   router.back()
 }
+
+async function deleteMem() {
+  try {
+    await axios.put(
+      '/api/mypage/profile/delete',
+      null,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`
+        }
+      }
+    )
+    alert('탈퇴 완료')
+    localStorage.removeItem("accessToken")
+    localStorage.removeItem("refreshToken")
+    router.push('/loginForm')
+  } catch (error) {
+    console.error('회원 탈퇴 실패:', error)
+    alert('회원 탈퇴 중 오류가 발생했습니다.')
+  }
+}
+
 </script>
 
 <style scoped>
@@ -133,7 +156,8 @@ h2 {
 }
 
 .btn-back,
-.btn-edit {
+.btn-edit,
+.btn-del {
   flex: 1;
   padding: 14px 0;
   font-size: 18px;
@@ -161,6 +185,11 @@ h2 {
 /* 수정하기 버튼 */
 .btn-edit {
   background-color: #292e4c;
+  color: #fff;
+}
+
+.btn-del {
+  background-color: #52535b;
   color: #fff;
 }
 

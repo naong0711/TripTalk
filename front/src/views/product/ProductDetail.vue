@@ -68,7 +68,12 @@
         <p>총 금액: <strong>{{ totalAmount.toLocaleString() }}원</strong></p>
       </div>
 
-      <button @click="reserve">예약하기</button>
+      <div class="button-group">
+        <button @click="cart" class="cartBtn" aria-label="장바구니 추가">
+          <img src="@/assets/mypageBtn/cartBtn.png" alt="장바구니 아이콘" />
+        </button>
+        <button @click="reserve">예약하기</button>
+      </div>
 
     </div>
 
@@ -271,6 +276,25 @@ const reserve = async () => {
   }
 }
 
+
+const cart = async () => {
+  const accessToken = localStorage.getItem('accessToken');
+  try {
+    const res = await axios.post(
+      `/api/mypage/cart/${productId}`,
+      {},
+      {
+        headers: { Authorization: `Bearer ${accessToken}` }
+      }
+    );
+
+    alert('장바구니에 추가되었습니다.');
+  } catch (error) {
+    alert('오류가 발생했습니다.');
+    console.error(error);
+  }
+};
+
 onMounted(() => {
   fetchProduct()
 })
@@ -356,6 +380,17 @@ onMounted(() => {
   margin: 16px 0;
 }
 
+.button-group {
+  display: flex;
+  gap: 12px;         /* 버튼 사이 간격 */
+  justify-content: center; /* 가운데 정렬 (필요 시) */
+  margin-top: 28px;  /* 기존 버튼 margin 유지 */
+}
+
+.button-group button {
+  flex: 1;           /* 두 버튼이 같은 너비를 가지도록 */
+}
+
 .price {
   font-size: 18px;
   font-weight: 700;
@@ -438,6 +473,14 @@ onMounted(() => {
   text-align: center;
 }
 
+.cartBtn {
+  background-color: #52535b;
+}
+
+.cartBtn:hover {
+  background-color: #494a52;
+}
+
 button {
   margin-top: 28px;
   padding: 14px 20px;
@@ -508,4 +551,41 @@ button:hover {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
+.cartBtn {
+  background-color: transparent; /* 배경색 제거 */
+  padding: 8px 12px;             /* 버튼 여백 적당히 조절 */
+  border: none;                  /* 필요하면 테두리 제거 */
+  cursor: pointer;
+}
+
+.cartBtn:hover {
+  background-color: rgba(0, 0, 0, 0.05); /* 살짝 호버 효과 원하면 */
+}
+
+.cartBtn img {
+  width: 48px;   /* 가로 48px */
+  height: 16px;  /* 세로 16px (3:1 비율) */
+  object-fit: contain;  /* 비율 유지하며 꽉차게 */
+  vertical-align: middle;
+}
+
+.button-group {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.button-group button {
+  /* 기본 flex-grow 제거 */
+  flex-grow: 0;
+  flex-shrink: 0;
+}
+
+.button-group button:first-child {
+  flex: 1 1 0;  /* 장바구니 버튼: 1 비율 */
+}
+
+.button-group button:last-child {
+  flex: 3 1 0;  /* 예약하기 버튼: 3 비율 */
+}
 </style>

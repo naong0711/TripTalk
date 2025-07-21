@@ -1,5 +1,6 @@
 package org.kosa.tripTalk.cart;
 
+import java.time.LocalDate;
 import org.kosa.tripTalk.product.Product;
 import org.kosa.tripTalk.user.User;
 import jakarta.persistence.Entity;
@@ -27,5 +28,9 @@ public class Cart {
 
     @ManyToOne @JoinColumn(name = "product_id")
     private Product product;
+    
+
+    private LocalDate checkIn;
+    private LocalDate checkOut;
 
 }

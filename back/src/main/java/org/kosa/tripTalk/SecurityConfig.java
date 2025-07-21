@@ -65,7 +65,11 @@ public class SecurityConfig {
                           "/api/sellers/**",
                           "/email/verify",
                           "/api/map/**",
-                          "/api/log/list"
+                          "/api/log/list",
+                          "/api/log/list/**",
+                          "/api/mypage/favorite/**",
+                          "/api/mypage/cart/**"
+                          
                           
                       ).permitAll()
                       .requestMatchers("/api/mypage/**", "/api/chat/**").authenticated()  //로그인한 사용자만 접근 가능

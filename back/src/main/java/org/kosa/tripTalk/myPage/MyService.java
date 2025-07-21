@@ -1,6 +1,7 @@
 package org.kosa.tripTalk.myPage;
 
 import java.nio.file.AccessDeniedException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.kosa.tripTalk.favorite.Favorite;
 import org.kosa.tripTalk.favorite.FavoriteRepository;
 import org.kosa.tripTalk.favorite.FavoriteResponse;
 import org.kosa.tripTalk.product.Product;
+import org.kosa.tripTalk.product.ProductRepository;
 import org.kosa.tripTalk.reservation.Reservation;
 import org.kosa.tripTalk.reservation.ReservationRepository;
 import org.kosa.tripTalk.reservation.ReservationResponse;
@@ -21,6 +23,7 @@ import org.kosa.tripTalk.user.User;
 import org.kosa.tripTalk.user.UserRepository;
 import org.kosa.tripTalk.user.UserRequest;
 import org.springframework.stereotype.Service;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor; 
 
 
@@ -33,6 +36,7 @@ public class MyService {
   private final FavoriteRepository favoriteRepository;
   private final CartRepository cartRepository;
   private final SellerRepository sellerRepository;
+  private final ProductRepository productRepository;
   
   
   
@@ -119,6 +123,7 @@ public class MyService {
             .categoryId(cart.getProduct().getCategory().getId())
             .startDate(cart.getProduct().getStartDate())
             .endDate(cart.getProduct().getEndDate())    
+            .productId(cart.getProduct().getId())
             .build())
         .collect(Collectors.toList());
   }
@@ -174,11 +179,11 @@ public class MyService {
 }
 
   //찜 삭제
-  public void deleteFavorite(Long favoriteId) {
+  public void deleteFavorite(Long favoriteId, String userId) {
     if (!favoriteRepository.existsById(favoriteId)) {
         throw new IllegalArgumentException("해당 찜 항목이 존재하지 않습니다.");
     }
-    favoriteRepository.deleteById(favoriteId);
+    favoriteRepository.deleteByIdAndUserId(favoriteId, userId);
 }
 
 
@@ -209,5 +214,50 @@ public class MyService {
     // 👉 ReservationResponse에 seller의 userId도 포함하고 싶다면 여기에 담기
     return ReservationResponse.from(reservation, sellerUserId); // 예시
 }
+
+//카트추가
+  public Long addCart(String userId, String productId) {
+    User user = userRepository.findByUserId(userId)
+        .orElseThrow(() -> new IllegalArgumentException("사용자 없음"));
+
+    Product product = productRepository.findById(Long.parseLong(productId))
+        .orElseThrow(() -> new IllegalArgumentException("상품 없음"));
+
+    Cart cart = Cart.builder()
+        .user(user)
+        .product(product)
+        .build();
+    Cart savedCart = cartRepository.save(cart);
+
+    return savedCart.getId();
+}
+
+
+  @Transactional
+  public Long addFavorite(Long userId, Long productId) {
+      User user = userRepository.findById(userId)
+              .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+System.out.println("=================u"+user);
+      Product product = productRepository.findById(productId)
+              .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
+      System.out.println("=================p"+product);
+
+      // 이미 찜이 되어있는지 체크 (중복 방지)
+      boolean exists = favoriteRepository.existsByUserAndProduct(user, product);
+      if (exists) {
+          throw new IllegalStateException("이미 찜한 상품입니다.");
+      }
+      System.out.println("asdadad");
+
+      Favorite favorite = Favorite.builder()
+              .user(user)
+              .product(product)
+              .clickDate(LocalDateTime.now())
+              .build();
+
+      favoriteRepository.save(favorite);
+
+      return favorite.getId();
+  }
   
 }

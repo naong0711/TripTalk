@@ -21,7 +21,7 @@
             :key="item.id"
           >
             <input type="checkbox" v-model="selectedItems" :value="item.id" />
-            <img :src="item.thumbnailUrl || '/img/no-image.jpg'" class="cart-img" />
+            <img :src="getProductImage(item.productId)" class="cart-img" />
 
             <div class="cart-info" @click="goToProduct(item.productId)">
               <h3 class="title">{{ item.title }}</h3>
@@ -105,10 +105,15 @@ onMounted(async () => {
       },
     })
     cartItems.value = res.data
+    console.log(cartItems.value)
   } catch (err) {
     console.error('장바구니 불러오기 실패:', err)
   }
 })
+
+function getProductImage(productId) {
+  return `/api/files/image/product/${productId}`
+}
 
 const categorizedItems = computed(() => {
   const result = { 숙박: [], 교통: [], 레저: [] }

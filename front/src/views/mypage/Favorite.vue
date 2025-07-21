@@ -16,7 +16,7 @@
 
         <div v-else>
           <div class="favorite-box" v-for="item in pagedItems(category)" :key="item.id">
-            <img :src="item.thumbnailUrl || '/img/no-image.jpg'" class="favorite-img" />
+            <img :src="getProductImage(item.productId)" class="favorite-img" />
             <div class="favorite-info" @click="goToProduct(item.productId)">
               <h3 class="title">{{ item.title }}</h3>
               <p class="address">{{ item.address }}</p>
@@ -45,6 +45,10 @@ import axios from 'axios'
 
 const router = useRouter()
 const favoriteItems = ref([])
+
+function getProductImage(productId) {
+  return `/api/files/image/product/${productId}`
+}
 
 const categoryMap = {
   1: '숙박',

@@ -1,6 +1,9 @@
 package org.kosa.tripTalk.reservation;
 
-import lombok.RequiredArgsConstructor;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import org.kosa.tripTalk.chat.ChatMessage;
 import org.kosa.tripTalk.chat.ChatMessageRepository;
 import org.kosa.tripTalk.chat.ChatMessageService;
@@ -12,6 +15,7 @@ import org.kosa.tripTalk.user.UserRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -63,6 +67,13 @@ public class ReservationService {
 
       // 1) 채팅방 조회 또는 생성
       ChatRoom chatRoom = chatRoomService.getOrCreateRoom(buyerId, sellerId);
+      
+      Long millis = reservation.getReservationDate(); // 예: 1750409583904L
+      LocalDateTime dateTime = LocalDateTime.ofInstant(
+              Instant.ofEpochMilli(millis),
+              ZoneId.of("Asia/Seoul") // 또는 시스템 시간대
+      );
+      String formattedDate = dateTime.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
       // 2) 예약 완료 자동 메시지 생성 및 저장
       ChatMessage autoMsg = ChatMessage.builder()
@@ -77,7 +88,7 @@ public class ReservationService {
               reservation.getUser().getName(),              // 예약자 닉네임
               reservation.getProduct().getTitle(),               // 상품명
               reservation.getId(),                               // 예약번호
-              reservation.getReservationDate().toString()       // 예약일
+              formattedDate      // 예약일
           ))
           .isRead(false)
           .build();

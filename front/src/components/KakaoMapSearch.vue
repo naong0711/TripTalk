@@ -70,6 +70,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useRoute } from 'vue-router'
+import { v4 as uuidv4 } from 'uuid'
 
 const route = useRoute()
 const boardId = ref(route.query.id || null)
@@ -278,7 +279,7 @@ async function bookmarkPlace(place) {
 
   // 없으면 새로 생성
   if (!localStorage.getItem('bookmarkTempKey')) {
-    localStorage.setItem('bookmarkTempKey', crypto.randomUUID())
+    localStorage.setItem('bookmarkTempKey', uuidv4())
   }
 
   const bookmarkData = {

@@ -86,7 +86,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
       response.addCookie(accessTokenCookie);
 
       // ✅ 프론트로 리다이렉트 + 토큰 전달
-      String redirectUrl = "http://localhost:5173/oauth2/callback"
+      String redirectUrl = "http://192.168.182.128/oauth2/callback"
           + "?accessToken=" + accessToken
           + "&refreshToken=" + refreshToken;
 

@@ -1,3 +1,4 @@
+
 package org.kosa.tripTalk;
 
 import jakarta.persistence.AttributeConverter;

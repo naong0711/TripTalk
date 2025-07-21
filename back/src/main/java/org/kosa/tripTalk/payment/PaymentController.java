@@ -56,7 +56,7 @@ public class PaymentController {
         }
 
         // 3. 프론트의 결제 성공 페이지로 리다이렉트
-        return new RedirectView("http://localhost:5173/payment/success");
+        return new RedirectView("http://192.168.182.128/payment/success");
     }
 
     // ✅ 단건 결제 조회

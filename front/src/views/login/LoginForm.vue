@@ -155,7 +155,7 @@ function getUserIdFromToken(token) {
 }
 
 function handleKakaoLogin() {
-  window.location.href = "http://localhost:8080/oauth2/authorization/kakao";
+  window.location.href = "http://192.168.182.128/oauth2/authorization/kakao";
 }
 
 onMounted(() => {

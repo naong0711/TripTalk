@@ -21,11 +21,11 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "http://localhost:8080",
+        target: "http://192.168.182.128:8080",
         changeOrigin: true,
       },
       "/chat-ws": {
-        target: "http://localhost:8080",
+        target: "http://192.168.182.128:8080",
         ws: true,
         changeOrigin: true,
       },

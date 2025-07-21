@@ -20,16 +20,16 @@
 
         <div class="quick-menu">
           <div class="menu-item" @click="goToCart">
-            <span class="icon"><img src="@/assets/myPageBtn/cartBtn.png"></span>
+            <span class="icon"><img src="@/assets/mypageBtn/cartBtn.png"></span>
             <span class="label">장바구니</span>
           </div>
           <div class="menu-item" @click="goToFavorites">
-            <span class="icon"><img src="@/assets/myPageBtn/favoriteBtn.png"></span>
+            <span class="icon"><img src="@/assets/mypageBtn/favoriteBtn.png"></span>
             <span class="label">찜 내역</span>
           </div>
           <!-- ✨ 채팅 메뉴 항목 (ChatModal 포함) -->
           <div class="menu-item" @click="openChat">
-            <span class="icon"><img src="@/assets/myPageBtn/chatBtn.png"></span>
+            <span class="icon"><img src="@/assets/mypageBtn/chatBtn.png"></span>
             <span class="label">채팅</span>
           </div>
         </div>

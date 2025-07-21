@@ -32,6 +32,10 @@ public class KakaoPayServiceImpl implements KakaoPayService {
     @Value("${kakao.secret-key}")
     private String secretKey;
 
+    // application.properties의 server.address 값을 읽음
+    @Value("${server.address}")
+    private String serverAddress;
+
     private static final String HOST = "https://open-api.kakaopay.com"; // 카카오페이 API 기본 URL
     private KakaoPayReadyResponse kakaoPayReadyResponse;
     private final PaymentService paymentService;
@@ -45,14 +49,16 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         this.Payment = paymentService.createPayment(request);
         Long paymentId = this.Payment.getId();
 
-        // 2. approval_url에 paymentId 포함
-        String approvalUrl = "http://localhost:8080/api/payments/approve?paymentId=" + paymentId;
+        // 2. approval_url에 paymentId 포함, localhost 대신 실제 IP 또는 도메인 사용
+        String approvalUrl = serverAddress + "/api/payments/approve?paymentId=" + paymentId;
+        String cancelUrl = serverAddress + "/api/payments/cancel";
+        String failUrl = serverAddress + "/api/payments/fail";
 
         // HTTP 요청 헤더 설정
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "SECRET_KEY " + secretKey);
-    
+
         // 카카오페이 결제 승인 요청용 파라미터
         Map<String, Object> payload = new HashMap<>();
         payload.put("cid", "TC0ONETIME");
@@ -64,19 +70,20 @@ public class KakaoPayServiceImpl implements KakaoPayService {
         payload.put("vat_amount", 0);
         payload.put("tax_free_amount", 0);
         payload.put("approval_url", approvalUrl);
-        payload.put("cancel_url", "http://localhost:8080/api/payments/cancel");
-        payload.put("fail_url", "http://localhost:8080/api/payments/fail");
+        payload.put("cancel_url", cancelUrl);
+        payload.put("fail_url", failUrl);
 
         HttpEntity<Map<String,Object>> body = new HttpEntity<>(payload, headers);
 
-     // 카카오페이 결제 준비 API 호출 (POST)
+        // 카카오페이 결제 준비 API 호출 (POST)
         ResponseEntity<KakaoPayReadyResponse> res = rt.postForEntity(
             HOST + "/online/v1/payment/ready", body, KakaoPayReadyResponse.class
         );
 
-     // 응답에서 결제 준비 정보 저장 (tid 등)
-        this.kakaoPayReadyResponse = res.getBody(); // tid 저장용
-        return this.kakaoPayReadyResponse;
+        // 응답에서 결제 준비 정보 저장 (tid 등)
+        this.kakaoPayReadyResponse = res.getBody();
+
+        return kakaoPayReadyResponse;
     }
 
     @Override

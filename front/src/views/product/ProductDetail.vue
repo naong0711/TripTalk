@@ -111,13 +111,11 @@ const productId = route.params.id
 
 const defaultProfileImage = new URL('@/assets/default-profile.png', import.meta.url).href
 const sellerProfileImage = computed(() => {
-  console.log(product.value.sellerUserId)
   if (!product.value || !product.value.sellerUserId) {
     return defaultProfileImage
   }
   return `/api/files/image/user/${product.value.sellerUserId}`
 })
-
 
 const today = new Date().toISOString().slice(0, 10)
 
@@ -136,7 +134,7 @@ const product = ref({
   startDate: '',
   endDate: '',
   sellerId: null,
-  sellerUserId: null, // 프로필 이미지용
+  sellerUserId: null,
   sellerNickname: '',
   sellerPhone: '',
   sellerEmail: '',
@@ -158,7 +156,14 @@ const totalNights = computed(() => {
 })
 
 const totalAmount = computed(() => {
-  return product.value.price * totalNights.value * adults.value
+  const now = new Date()
+  const isDiscountActive = product.value.discount &&
+    new Date(product.value.discount.startAt) <= now &&
+    new Date(product.value.discount.endAt) >= now &&
+    product.value.discountedPrice > 0
+
+  const pricePerNight = isDiscountActive ? product.value.discountedPrice : product.value.price
+  return pricePerNight * totalNights.value * adults.value
 })
 
 const fetchProduct = async () => {
@@ -213,8 +218,6 @@ const formatDate = (dateStr) => {
 }
 
 const reserve = async () => {
-
-  
   const token = localStorage.getItem('accessToken')
 
   if(!token) {
@@ -231,7 +234,6 @@ const reserve = async () => {
     return
   }
 
-    // 인원수 범위 체크
   if (adults.value < product.value.minPeople) {
     alert(`최소 인원수는 ${product.value.minPeople}명 입니다.`)
     return
@@ -246,17 +248,17 @@ const reserve = async () => {
       productId: Number(productId),
       amount: totalAmount.value,
       paymentMethod: paymentMethod.value,
-      paymentId: '', // 백엔드에서 처리될 값
-      status: ''     // 백엔드에서 처리될 값
+      paymentId: '',
+      status: ''
     }
 
-   const response = await axios.post('/api/payments/create', paymentRequest,
-  {
-    headers: {
-      Authorization: `Bearer ${token}`
-    }
-  }
-  )
+    const response = await axios.post('/api/payments/create', paymentRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    )
     const redirectUrl = response.data.next_redirect_pc_url
     if (redirectUrl) {
       window.location.href = redirectUrl
@@ -273,7 +275,6 @@ onMounted(() => {
   fetchProduct()
 })
 </script>
-
 
 <style scoped>
 

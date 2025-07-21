@@ -154,7 +154,7 @@
   const editorConfig = {
     toolbar: [ 'imageUpload' ],  // 이미지 업로드 버튼만 보여줌
     ckfinder: {
-      uploadUrl: 'http://localhost:8080/api/files/image/editor/'
+      uploadUrl: 'http://192.168.182.128/api/files/image/editor/'
     }
   }
 

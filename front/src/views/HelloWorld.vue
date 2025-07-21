@@ -226,7 +226,7 @@ function goToProductList() {
 
 function goToDetail(productId) {
   router.push({
-    path: `/productDetail/${productId}`,
+    path: `/product/${productId}`,
     query: {
       checkIn: startDate.value,
       checkOut: endDate.value,

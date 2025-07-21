@@ -26,7 +26,7 @@
           <template v-else>
             <!-- 채팅 아이콘 -->
             <div class="chat-icon-wrapper">
-              <button class="chat-btn" @click="isChatOpen = true"><img src="@/assets/myPageBtn/chatBtn.png"></button>
+              <button class="chat-btn" @click="isChatOpen = true"><img src="@/assets/mypageBtn/chatBtn.png"></button>
               <span v-if="hasUnreadMessages" class="red-dot"></span>
             </div>
             <ChatModal v-if="isChatOpen" @close="isChatOpen = false">

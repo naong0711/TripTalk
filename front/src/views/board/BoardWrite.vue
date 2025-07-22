@@ -39,7 +39,15 @@ import KakaoMapSearch from '@/components/KakaoMapSearch.vue'
 const route = useRoute()
 const router = useRouter()
 
-const tempKey = crypto.randomUUID()
+function generateUUID() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    const r = (Math.random() * 16) | 0
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
+const tempKey = generateUUID()
 localStorage.setItem('bookmarkTempKey', tempKey)
 
 const isEditMode = ref(route.query.mode === 'edit')

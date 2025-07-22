@@ -69,7 +69,7 @@ const showInfoModal = ref(false)
 let stompClient = null
 
 stompClient = new Client({
-  brokerURL: 'ws://localhost:8080/chat-ws',
+  brokerURL: 'ws://192.168.4.194/chat-ws',
   connectHeaders: {
     Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
   },

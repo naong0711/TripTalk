@@ -7,6 +7,13 @@
       <!-- ✅ 검색 바 -->
       <div class="search-bar">
         <div class="search-item">
+            <label for="region">지역 선택</label>
+            <select id="region" v-model="selectedRegion" required>
+              <option disabled value="">지역을 선택하세요</option>
+              <option v-for="(region, i) in regions" :key="i" :value="region">{{ region }}</option>
+            </select>
+        </div>
+        <div class="search-item">
           <label>체크인</label>
           <input type="date" v-model="checkIn" />
         </div>
@@ -77,11 +84,12 @@ const route = useRoute()
 const router = useRouter()
 
 const isSeller = ref(false)
-
 const favorites = ref(new Set())
 const favoriteMap = ref({})
 const isFavoritesReady = ref(false)
 
+const regions = ref([])
+const selectedRegion = ref('')
 
 function isFavorited(productId) {
   return favorites.value.has(productId)
@@ -94,34 +102,32 @@ async function toggleFavorite(productId) {
     const token = localStorage.getItem('accessToken')
     if (!token) return
 
-  if (favorites.value.has(productId)) {
-    // 찜 해제
-    const favoriteId = favoriteMap.value[productId]
-    if (!favoriteId) throw new Error('favoriteId not found for productId: ' + productId)
+    if (favorites.value.has(productId)) {
+      const favoriteId = favoriteMap.value[productId]
+      if (!favoriteId) throw new Error('favoriteId not found for productId: ' + productId)
 
-    await axios.delete(`/api/mypage/favorite/${favoriteId}`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+      await axios.delete(`/api/mypage/favorite/${favoriteId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
 
-    favorites.value.delete(productId)
-    favorites.value = new Set(favorites.value)
+      favorites.value.delete(productId)
+      favorites.value = new Set(favorites.value)
 
-    delete favoriteMap.value[productId]
-    favoriteMap.value = { ...favoriteMap.value } // 찜 해제 후 삭제만 처리
-  } else {
-    // 찜 추가
-    const res = await axios.post(`/api/mypage/favorite/${productId}`, null, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
+      delete favoriteMap.value[productId]
+      favoriteMap.value = { ...favoriteMap.value }
+    } else {
+      const res = await axios.post(`/api/mypage/favorite/${productId}`, null, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
 
-    favorites.value.add(productId)
-    favorites.value = new Set(favorites.value)
+      favorites.value.add(productId)
+      favorites.value = new Set(favorites.value)
 
-    favoriteMap.value = { ...favoriteMap.value, [productId]: res.data.favoriteId }
-  }
-    } catch (e) {
-      console.error('찜 처리 실패:', e)
+      favoriteMap.value = { ...favoriteMap.value, [productId]: res.data.favoriteId }
     }
+  } catch (e) {
+    console.error('찜 처리 실패:', e)
+  }
 }
 
 async function fetchFavorites() {
@@ -134,21 +140,19 @@ async function fetchFavorites() {
     const res = await axios.get('/api/mypage/favoriteList', {
       headers: { Authorization: `Bearer ${token}` }
     })
-    console.log('찜 목록 API 응답:', res.data)
-    
+
     const favSet = new Set()
     const favMap = {}
     res.data.forEach(fav => {
       if (fav.productId && fav.id) {
         const pid = Number(fav.productId)
         favSet.add(pid)
-        favMap[pid] = fav.id  // favoriteId 대신 id 사용
+        favMap[pid] = fav.id
       }
     })
 
     favorites.value = favSet
     favoriteMap.value = favMap
-
     isFavoritesReady.value = true
   } catch (e) {
     console.error('찜 목록 조회 실패:', e)
@@ -164,62 +168,71 @@ const totalPages = ref(0)
 const page = ref(0)
 const size = 9
 
-const location = route.query.location
+// 전체 상품 목록 조회 함수
+const fetchAllProducts = async () => {
+  try {
+    const res = await axios.get('/api/product', {
+      params: {
+        page: page.value + 1, // API가 1부터 페이지 시작 시
+        size,
+        sort: 'id,desc'
+      }
+    })
+    const data = res.data
+    products.value = (data.content || []).map(p => ({
+      id: p.id,
+      title: p.title,
+      address: p.address || '',
+      price: p.price,
+      minPeople: p.minPeople || 1,
+      maxPeople: p.maxPeople || 1,
+      image: `/api/files/image/product/${p.id}`,
+      startDate: p.startDate || '',
+      endDate: p.endDate || ''
+    }))
+    totalPages.value = data.totalPages || 0
+  } catch (err) {
+    console.error('전체 상품 목록 불러오기 실패:', err)
+  }
+}
 
+// 검색 조건에 따른 상품 검색 함수
 const fetchSearchProducts = async () => {
   try {
-    const hasSearchParams = location && checkIn.value && checkOut.value && adults.value
+    // 검색 조건이 하나라도 없으면 검색하지 않음 (필요에 따라 조건 조절 가능)
+    const hasSearchParams = checkIn.value && checkOut.value && adults.value
+    if (!hasSearchParams) {
+      // 조건 없으면 전체 목록 호출
+      await fetchAllProducts()
+      return
+    }
 
-    if (hasSearchParams) {
-      const params = {
-        location,
-        checkIn: typeof checkIn.value === 'string' ? checkIn.value : new Date(checkIn.value).toISOString().slice(0, 10),
-        checkOut: typeof checkOut.value === 'string' ? checkOut.value : new Date(checkOut.value).toISOString().slice(0, 10),
-        people: adults.value,
-        page: page.value,
-        size: size
-      }
+    const params = {
+      ...(selectedRegion.value ? { location: selectedRegion.value } : {}),
+      checkIn: typeof checkIn.value === 'string' ? checkIn.value : new Date(checkIn.value).toISOString().slice(0, 10),
+      checkOut: typeof checkOut.value === 'string' ? checkOut.value : new Date(checkOut.value).toISOString().slice(0, 10),
+      people: adults.value,
+      page: page.value,
+      size
+    }
 
-      const res = await axios.get('/api/product/search', { params })
-      const data = res.data
+    const res = await axios.get('/api/product/search', { params })
+    const data = res.data
 
-      if (Array.isArray(data)) {
-        products.value = data.map(p => ({
-          id: p.id,
-          title: p.title,
-          address: p.address || '',
-          price: p.price,
-          minPeople: p.minPeople || 1,
-          maxPeople: p.maxPeople || 1,
-          image: `/api/files/image/product/${p.id}`,
-          startDate: p.startDate || '',
-          endDate: p.endDate || ''
-        }))
-        totalPages.value = 1
-      } else {
-        products.value = (data.content || []).map(p => ({
-          id: p.id,
-          title: p.title,
-          address: p.address || '',
-          price: p.price,
-          minPeople: p.minPeople || 1,
-          maxPeople: p.maxPeople || 1,
-          image: `/api/files/image/product/${p.id}`,
-          startDate: p.startDate || '',
-          endDate: p.endDate || ''
-        }))
-        totalPages.value = data.totalPages || 0
-      }
+    if (Array.isArray(data)) {
+      products.value = data.map(p => ({
+        id: p.id,
+        title: p.title,
+        address: p.address || '',
+        price: p.price,
+        minPeople: p.minPeople || 1,
+        maxPeople: p.maxPeople || 1,
+        image: `/api/files/image/product/${p.id}`,
+        startDate: p.startDate || '',
+        endDate: p.endDate || ''
+      }))
+      totalPages.value = 1
     } else {
-      const res = await axios.get('/api/product', {
-        params: {
-          page: page.value + 1,
-          size,
-          sort: 'id,desc'
-        }
-      })
-
-      const data = res.data
       products.value = (data.content || []).map(p => ({
         id: p.id,
         title: p.title,
@@ -234,14 +247,28 @@ const fetchSearchProducts = async () => {
       totalPages.value = data.totalPages || 0
     }
   } catch (err) {
-    console.error('상품 검색 실패:', err)
+    console.error('검색 상품 불러오기 실패:', err)
   }
 }
 
 const goToPage = (newPage) => {
   if (newPage >= 0 && newPage < totalPages.value) {
     page.value = newPage
-    fetchSearchProducts()
+    // 페이지 변경시 검색 조건이 있으면 검색, 아니면 전체 조회
+    if (checkIn.value && checkOut.value && adults.value) {
+      fetchSearchProducts()
+    } else {
+      fetchAllProducts()
+    }
+  }
+}
+
+const fetchRegions = async () => {
+  try {
+    const res = await axios.get('/api/product/locations')
+    regions.value = res.data
+  } catch (e) {
+    console.error('지역 목록 불러오기 실패:', e)
   }
 }
 
@@ -273,7 +300,9 @@ const fetchIsSeller = async () => {
       }
     })
 
-    isSeller.value = response.data > 0
+    if (response.data > 0) {
+      isSeller.value = true
+    }
     console.log('📦 sellerId:', response.data)
   } catch (err) {
     isSeller.value = false
@@ -281,11 +310,13 @@ const fetchIsSeller = async () => {
 }
 
 onMounted(() => {
-  fetchSearchProducts()
+  fetchAllProducts()
   fetchIsSeller()
   fetchFavorites()
+  fetchRegions()
 })
 </script>
+
 
 <style scoped>
 h2 {
@@ -384,7 +415,8 @@ h2 {
   flex-wrap: wrap;
 }
 .search-item input[type="date" i],
-.search-item input[type='number'] {
+.search-item input[type='number'],
+.search-item select{
   padding: 8px 10px;
   font-size: 1rem;
   border: 1px solid #ccc;
